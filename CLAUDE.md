@@ -295,7 +295,7 @@ Wartość i następnik **muszą być odczytywane z własnej bazy SQLite** (seed 
 │       └── docs/                   # SERVICE_CHARTER, RACI, SLO, RUNBOOK... (6.5.5)
 ├── frontend/<element>/
 ├── infra/
-│   ├── traefik/  keycloak/  openbao/  consul/  grafana/  prometheus/  loki/  alertmanager/
+│   ├── redpanda/  docs-portal/  keycloak/  openbao/  consul/  grafana/  prometheus/  loki/  alertmanager/
 │   └── aws/                        # OpenTofu
 ├── templates/service/              # szablon nowego serwisu
 ├── templates/docs/                 # szablony dokumentów korporacyjnych

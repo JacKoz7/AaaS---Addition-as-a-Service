@@ -22,7 +22,6 @@
 /templates/                   @JacKoz7
 /scripts/                     @JacKoz7
 /.github/                     @JacKoz7
-/infra/traefik/               @JacKoz7
 /infra/redpanda/              @JacKoz7
 /infra/docs-portal/           @JacKoz7
 /infra/consul/                @JacKoz7
