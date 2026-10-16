@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       repo
+# Module:          compose/frontend.yml
+# Owning Team:     Customer Experience Tribe (CXT)
+# Classification:  INTERNAL
+# Purpose:         Profile `frontend`: the single-spa shell and the sixteen
+#                  microfrontends, each served by its own nginx container on
+#                  the `public` network behind the gateway.
+# Related Docs:    CLAUDE.md (section 2, microfrontends), ADR-0003
+
+# Profile: frontend
+# The temporary plain-JS shell arrives in P1.8; the single-spa shell and the
+# per-key microfrontends arrive in Phase 8.
+services: {}

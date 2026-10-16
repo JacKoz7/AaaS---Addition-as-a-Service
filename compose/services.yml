@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       repo
+# Module:          compose/services.yml
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         Profile `services`: the 35 AaaS microservices and their
+#                  databases. `scripts/new-service.sh` (P0.4) appends one
+#                  service and one database block per scaffolded service.
+# Related Docs:    CLAUDE.md (section 2, service catalog; section 6.2), ADR-0003
+
+# Profile: services
+# Every service block follows the same shape (enforced by the P0.4 template):
+#   build, image, profiles: [services], networks: [services, data],
+#   mem_limit, cpus, healthcheck, depends_on with condition: service_healthy,
+#   and a volume named <service>-data for its database.
+services: {}

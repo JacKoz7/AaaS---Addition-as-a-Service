@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       repo
+# Module:          compose/core.yml
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         Profile `core`: shared infrastructure every addition needs —
+#                  the Redpanda event bus with its console (P1.1) and the
+#                  Temporal server with its UI and PostgreSQL (P3.2).
+# Related Docs:    CLAUDE.md (section 2, "shared infrastructure"), ADR-0003
+
+# Profile: core
+# Services are added by the steps named above. Until then this file declares
+# no services; it is included so that `make up` and `docker compose config`
+# exercise the full include chain from the first step on.
+services: {}

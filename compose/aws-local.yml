@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       repo
+# Module:          compose/aws-local.yml
+# Owning Team:     Cloud Governance Committee (CGC)
+# Classification:  INTERNAL
+# Purpose:         Profile `aws-local`: the Floci AWS emulator (SQS, Lambda,
+#                  DynamoDB) used instead of a real AWS account (P10.1).
+#                  Not started by `make up`; use `make up PROFILES=aws-local`.
+# Related Docs:    CLAUDE.md (sections 6.2 and 10), ADR-0003
+
+# Profile: aws-local
+# Services arrive in step P10.1.
+services: {}

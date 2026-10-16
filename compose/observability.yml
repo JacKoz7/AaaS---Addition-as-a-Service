@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       repo
+# Module:          compose/observability.yml
+# Owning Team:     Observability Steering Group (OSG)
+# Classification:  INTERNAL
+# Purpose:         Profile `observability`: OpenTelemetry Collector,
+#                  Prometheus, Loki, Jaeger, Grafana and Alertmanager (P7.1).
+# Related Docs:    CLAUDE.md (section 2, shared infrastructure; Phase 7), ADR-0003
+
+# Profile: observability
+# Services arrive in step P7.1.
+services: {}

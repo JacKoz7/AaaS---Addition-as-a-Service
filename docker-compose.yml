@@ -1,0 +1,35 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       repo
+# Module:          docker-compose.yml
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         Root Compose file. Declares the project name and the three
+#                  networks, then includes one file per Compose profile. No
+#                  service is defined here; services live in compose/*.yml.
+# Related Docs:    CLAUDE.md (section 6.2), compose/README.md, ADR-0003
+
+name: aaas
+
+include:
+  - path: compose/core.yml
+  - path: compose/services.yml
+  - path: compose/frontend.yml
+  - path: compose/observability.yml
+  - path: compose/aws-local.yml
+
+# Networks (CLAUDE.md 6.2):
+#   public   — only the gateway and the microfrontends; the only network with
+#              ports published on the host.
+#   services — service-to-service traffic (HTTP, gRPC, Redpanda, Temporal).
+#   data     — databases only. Each service joins `data` solely to reach its
+#              own database; databases never join `services`.
+networks:
+  public:
+    name: aaas-public
+  services:
+    name: aaas-services
+  data:
+    name: aaas-data
+    internal: true

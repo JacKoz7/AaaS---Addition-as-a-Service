@@ -98,7 +98,11 @@ help: ## Show this help
 .PHONY: up
 up: ## Start all profiles except aws-local and wait for healthchecks
 	$(call require_file,$(COMPOSE_FILE),P0.3)
-	$(COMPOSE) up --detach --build --remove-orphans --wait
+	@if [ -z "$$($(COMPOSE) config --services)" ]; then \
+		echo "no services defined for profiles '$(PROFILES)' yet; nothing to start."; \
+	else \
+		$(COMPOSE) up --detach --build --remove-orphans --wait; \
+	fi
 
 .PHONY: down
 down: ## Stop and remove containers (volumes are kept)
