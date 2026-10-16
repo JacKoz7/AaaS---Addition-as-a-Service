@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       gateway
+# Module:          .godoc-lint.yaml
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         godoclint configuration of the documentation coverage
+#                  check: every symbol, exported or not, in source and test
+#                  files, has a doc comment that starts with its name
+#                  (CLAUDE.md 6.5.3, 6.5.4).
+# Related Docs:    services/gateway/Dockerfile (doc-coverage stage), ADR-0012
+
+version: "1.0"
+default: basic
+enable:
+  - require-doc
+  - require-pkg-doc
+  - start-with-name
+options:
+  require-doc/ignore-exported: false
+  require-doc/ignore-unexported: false
+  require-doc/include-tests: true
+  require-pkg-doc/include-tests: true
+  start-with-name/include-unexported: true
+  start-with-name/include-tests: true

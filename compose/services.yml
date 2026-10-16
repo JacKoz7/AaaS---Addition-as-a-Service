@@ -19,6 +19,46 @@
 #
 # scripts/new-service.sh inserts service blocks above the AAAS:VOLUMES marker
 # and volume entries at the end of the file. Keep the marker in place.
-services: {}
+services:
+  # --- gateway (traefik, PEG) ---------------------------------
+  # The only entry point (CLAUDE.md 4.1, ADR-0012). Traefik with file-based
+  # routes and the local `edge` plugin. No database until the Redis provider
+  # of P5.4 (route table); the Redis container is added by that step.
+  gateway:
+    build:
+      # Relative to compose/, the directory of the included file.
+      context: ../services/gateway
+      dockerfile: Dockerfile
+      target: runtime
+    image: aaas/gateway:dev
+    profiles: [services]
+    # `public` for the published port, `services` to reach the upstreams.
+    networks: [public, services]
+    ports:
+      # Bound to the loopback interface until public access (Phase 12).
+      - "127.0.0.1:80:8000"
+    environment:
+      AAAS_SERVICE: gateway
+      AAAS_ENV: ${AAAS_ENV:-local}
+      AAAS_BOOTSTRAP: ${AAAS_BOOTSTRAP:-env}
+      # Upstreams of the routes in services/gateway/config/dynamic/routes.yml;
+      # the values below are also the defaults built into the image.
+      AAAS_UPSTREAM_EXPRESSION_ASSEMBLER: http://expression-assembler:8080
+      # TEMPORARY(P3.3): task status is served by the ledger until the
+      # saga-orchestrator takes over.
+      AAAS_UPSTREAM_TASKS: http://ledger:8080
+      AAAS_UPSTREAM_FRONTEND: http://frontend-shell:8080
+    # Compiled language (Go): default limit for compiled services
+    # (CLAUDE.md 6.2). Measured usage: services/gateway/docs/CAPACITY.md.
+    mem_limit: 64m
+    cpus: 0.5
+    # Traefik finishes requests in flight for 8 s (config/traefik.yml).
+    stop_grace_period: 10s
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/health || exit 1"]
+      interval: 10s
+      timeout: 2s
+      retries: 5
+      start_period: 10s
 # AAAS:VOLUMES
 volumes: {}

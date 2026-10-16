@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       gateway
+# Module:          .dockerignore
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         Keeps documentation, git metadata and host build output out
+#                  of the Docker build context.
+# Related Docs:    services/gateway/Dockerfile
+
+.git
+docs/
+README.md
+**/node_modules
+**/target
+**/_build
+**/build
+**/dist
+**/*.log

@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       gateway
+# Module:          src/edge/.traefik.yml
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         Manifest of the local Traefik middleware plugin `edge`
+#                  (RFC 9457 error responses and the JSON health endpoint),
+#                  read by Traefik from /plugins-local/src/aaas/edge.
+# Related Docs:    services/gateway/README.md, ADR-0012
+
+displayName: AaaS edge
+type: middleware
+import: aaas/edge
+summary: RFC 9457 problem details for API errors and the JSON health endpoint of the AaaS gateway.
+testData:
+  mode: problem

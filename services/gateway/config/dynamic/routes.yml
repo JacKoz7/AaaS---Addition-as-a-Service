@@ -1,0 +1,113 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       gateway
+# Module:          config/dynamic/routes.yml
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         Routes of the public API and the frontend (CLAUDE.md 4.1),
+#                  the internal health endpoint, the middlewares and the
+#                  upstream services. A Go template rendered by Traefik's
+#                  file provider: upstream URLs come from AAAS_UPSTREAM_*
+#                  environment variables with the Compose service names as
+#                  defaults.
+# Related Docs:    services/gateway/README.md, services/gateway/docs/API.md,
+#                  ADR-0012, CLAUDE.md (4.1)
+#
+# Router priority: Traefik orders routers by `priority`, which defaults to
+# the length of the rule. The explicit values keep the order independent of
+# rule length: API routes (100) > API catch-all (20) > frontend (10).
+# Each later step adds the route of the service it delivers (stopwatch
+# P8.16, billing P9.2, ledger verification P3.7, auth P6.1).
+
+http:
+  routers:
+    # POST /api/v1/keys -> expression-assembler (P1.4).
+    api-keys:
+      entryPoints: [web]
+      rule: "Path(`/api/v1/keys`)"
+      priority: 100
+      middlewares: [api-problem, api-retry]
+      service: expression-assembler
+
+    # GET /api/v1/tasks/{taskId} -> the service that owns task status.
+    api-tasks:
+      entryPoints: [web]
+      rule: "PathRegexp(`^/api/v1/tasks/[^/]+$`)"
+      priority: 100
+      middlewares: [api-problem, api-retry]
+      service: tasks
+
+    # Any other /api path: 404 problem, no upstream. Not PathPrefix(`/api`)
+    # alone, which would also capture frontend paths such as /apiary.
+    api-not-found:
+      entryPoints: [web]
+      rule: "Path(`/api`) || PathPrefix(`/api/`)"
+      priority: 20
+      middlewares: [api-not-found]
+      service: noop@internal
+
+    # Everything else: the single-spa shell (P1.8 temporary page, P8.1).
+    frontend:
+      entryPoints: [web]
+      rule: "PathPrefix(`/`)"
+      priority: 10
+      service: frontend-shell
+
+    # GET /health on the internal entry point (CLAUDE.md 6.1).
+    health:
+      entryPoints: [internal]
+      rule: "Path(`/health`)"
+      middlewares: [health]
+      service: noop@internal
+
+  middlewares:
+    # Every API error becomes RFC 9457 problem details (src/edge).
+    api-problem:
+      plugin:
+        edge:
+          mode: problem
+    api-not-found:
+      plugin:
+        edge:
+          mode: not-found
+    health:
+      plugin:
+        edge:
+          mode: health
+    # Up to 3 attempts with exponential backoff, only when the upstream
+    # cannot be reached (Traefik never retries once a response has
+    # started), CLAUDE.md 6.1.
+    api-retry:
+      retry:
+        attempts: 3
+        initialInterval: 100ms
+
+  services:
+    expression-assembler:
+      loadBalancer:
+        serversTransport: upstream
+        servers:
+          - url: '{{ env "AAAS_UPSTREAM_EXPRESSION_ASSEMBLER" | default "http://expression-assembler:8080" }}'
+    tasks:
+      loadBalancer:
+        serversTransport: upstream
+        servers:
+          # TEMPORARY(P3.3): the ledger answers task status until the
+          # saga-orchestrator takes over; switch the default to
+          # http://saga-orchestrator:8080 then.
+          - url: '{{ env "AAAS_UPSTREAM_TASKS" | default "http://ledger:8080" }}'
+    frontend-shell:
+      loadBalancer:
+        serversTransport: upstream
+        servers:
+          - url: '{{ env "AAAS_UPSTREAM_FRONTEND" | default "http://frontend-shell:8080" }}'
+
+  serversTransports:
+    # Timeouts of CLAUDE.md 6.1: 2 s to connect and 2 s until the response
+    # headers; streamed bodies (SSE) are not limited.
+    upstream:
+      forwardingTimeouts:
+        dialTimeout: 2s
+        responseHeaderTimeout: 2s
+        idleConnTimeout: 90s

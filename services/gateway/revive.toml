@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       gateway
+# Module:          revive.toml
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         revive configuration of the documentation coverage check:
+#                  the `exported` and `package-comments` rules as errors
+#                  (CLAUDE.md 6.5.4); unexported symbols are checked by
+#                  godoclint (.godoc-lint.yaml).
+# Related Docs:    services/gateway/Dockerfile (doc-coverage stage), ADR-0012
+
+severity = "error"
+confidence = 0.8
+errorCode = 1
+warningCode = 1
+
+[rule.exported]
+[rule.package-comments]

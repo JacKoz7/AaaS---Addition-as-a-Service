@@ -1,0 +1,92 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       gateway
+# Module:          config/traefik.yml
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         Static configuration of Traefik: entry points, the file
+#                  provider for the routes, the local `edge` plugin,
+#                  Prometheus metrics, JSON logs and the shutdown grace
+#                  period. Baked into the image at /etc/traefik/traefik.yml.
+# Related Docs:    services/gateway/README.md, ADR-0012, CLAUDE.md (6.1, 6.2)
+
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+entryPoints:
+  # Public traffic: frontend, API and (from P6.1) /auth. Published on host
+  # port 80 by Compose. An unprivileged port, because Traefik runs as a
+  # non-root user.
+  web:
+    address: ":8000"
+    # Request hygiene: no AaaS path contains an encoded reserved character,
+    # so they are rejected (400) instead of being forwarded ambiguously, and
+    # headers whose names alias another header (X_Auth_User for
+    # X-Auth-User) are dropped before forwarding.
+    http: &request-hygiene
+      aliasHeadersStrategy: delete
+      encodedCharacters:
+        allowEncodedSlash: false
+        allowEncodedBackSlash: false
+        allowEncodedNullCharacter: false
+        allowEncodedSemicolon: false
+        allowEncodedPercent: false
+        allowEncodedQuestionMark: false
+        allowEncodedHash: false
+    transport:
+      # Graceful shutdown on SIGTERM within the 10 s of CLAUDE.md 6.1:
+      # stop accepting at once, let requests in flight finish for 8 s.
+      lifeCycle:
+        requestAcceptGraceTimeout: 0s
+        graceTimeOut: 8s
+  # Internal endpoints of CLAUDE.md 6.1 (GET /health, GET /metrics); never
+  # published on the host.
+  internal:
+    address: ":8080"
+    http: *request-hygiene
+    transport:
+      lifeCycle:
+        requestAcceptGraceTimeout: 0s
+        graceTimeOut: 8s
+
+providers:
+  # File-based routes (P1.2); the Redis provider replaces them in P5.4.
+  # No watch: the configuration is part of the image and changes only with
+  # a rebuild.
+  file:
+    directory: /etc/traefik/dynamic
+    watch: false
+
+# Local middleware plugin from /plugins-local/src/aaas/edge (src/edge).
+experimental:
+  localPlugins:
+    edge:
+      moduleName: aaas/edge
+
+metrics:
+  prometheus:
+    entryPoint: internal
+    addEntryPointsLabels: true
+    addRoutersLabels: true
+    addServicesLabels: true
+
+# JSON on stdout (CLAUDE.md 6.1). The field names are Traefik's own; they
+# are mapped to the AaaS log fields by the collector in P7.1.
+log:
+  level: INFO
+  format: json
+
+accessLog:
+  format: json
+  fields:
+    headers:
+      defaultMode: drop
+      names:
+        traceparent: keep
+        Idempotency-Key: keep
+
+# The dashboard and API stay off: no unauthenticated management surface.
+api:
+  dashboard: false
