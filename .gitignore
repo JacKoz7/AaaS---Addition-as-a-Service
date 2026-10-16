@@ -1,0 +1,52 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       repo
+# Module:          .gitignore
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         Keeps secrets, build artifacts and generated documentation
+#                  out of version control.
+# Related Docs:    CLAUDE.md (section 6.3), CONTRIBUTING.md
+
+# Secrets and local configuration (only .env.example is committed)
+.env
+.env.*
+!.env.example
+infra/openbao/*.json
+infra/aws/*.tfstate
+infra/aws/*.tfstate.*
+infra/aws/.terraform/
+
+# Generated documentation portal
+docs/site/
+
+# Operating system and editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
+!.vscode/extensions.json
+
+# Local Claude Code settings (shared settings are committed)
+.claude/settings.local.json
+
+# Language and tool build outputs (per-service .gitignore files refine these)
+node_modules/
+dist/
+build/
+target/
+_build/
+bin/
+obj/
+*.o
+*.a
+*.so
+*.dylib
+*.log
+__pycache__/
+*.pyc
+.venv/
+coverage/

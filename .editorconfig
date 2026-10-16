@@ -1,0 +1,42 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       repo
+# Module:          .editorconfig
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         Enforces consistent whitespace, line endings and charset
+#                  across the 28 languages used in this repository.
+# Related Docs:    CLAUDE.md (section 6.3), CONTRIBUTING.md
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[Makefile]
+indent_style = tab
+
+[*.{go,mod,sum}]
+indent_style = tab
+
+[*.{rs,py,rb,php,cs,kt,kts,java,swift,dart,d,nim,cr,zig,ex,exs,gleam,hs,ml,mli,pas,lua,rkt,lisp,asd,pl,pm,c,h,cpp,hpp,f90,F90,cob,cbl,ts,tsx,js,jsx,mjs,vue,svelte,elm,marko,proto}]
+indent_size = 4
+
+[*.{yml,yaml,json,toml,sql,sh,html,css,scss,typ,tf}]
+indent_size = 2
+
+[*.{cob,cbl}]
+# GnuCOBOL fixed-format sources are column-sensitive.
+trim_trailing_whitespace = false
+
+[*.{f90,F90}]
+indent_size = 2
