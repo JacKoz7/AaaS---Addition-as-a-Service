@@ -34,9 +34,11 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 HEADERS_DIR="${ROOT}/templates/headers"
-STYLES="${HEADERS_DIR}/styles.psv"
 CANONICAL="${HEADERS_DIR}/header.txt"
 CATALOG="${ROOT}/templates/service/catalog.psv"
+
+# shellcheck source=scripts/lib/header-styles.sh
+. "${ROOT}/scripts/lib/header-styles.sh"
 
 # Width of the label column ("Purpose:         ") in the canonical header.
 LABEL_WIDTH=17
@@ -51,38 +53,6 @@ usage() {
 die() {
   echo "error: $*" >&2
   exit 1
-}
-
-# style_rows: print the data rows of styles.psv (no comments, no blank lines).
-style_rows() {
-  grep -vE '^(#|$)' "$STYLES"
-}
-
-# load_style <type>: set S_OPEN, S_PREFIX, S_CLOSE, S_WIDTH and S_PREAMBLE
-# from the styles.psv row of <type> (the type and matches columns are skipped).
-load_style() {
-  local row
-  row="$(style_rows | grep -E "^${1}\|" || true)"
-  [ -n "$row" ] || die "unknown header type '${1}' (see: scripts/file-header.sh list)"
-  IFS='|' read -r _ _ S_OPEN S_PREFIX S_CLOSE S_WIDTH S_PREAMBLE <<<"$row"
-}
-
-# detect_type <path>: print the header type whose `matches` column covers the
-# base name of <path> (exact name or extension suffix); fail if none does.
-detect_type() {
-  local base type matches match
-  local -a list
-  base="$(basename "$1")"
-  while IFS='|' read -r type matches _; do
-    IFS=',' read -r -a list <<<"$matches"
-    for match in "${list[@]+"${list[@]}"}"; do
-      case "$match" in
-        .*) [[ "$base" == *"$match" ]] && { echo "$type"; return 0; } ;;
-        *) [ "$base" = "$match" ] && { echo "$type"; return 0; } ;;
-      esac
-    done
-  done < <(style_rows)
-  return 1
 }
 
 # resolve_type <type-or-path>: print the type itself if it is a known type,
