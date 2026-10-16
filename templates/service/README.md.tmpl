@@ -1,0 +1,64 @@
+# __SERVICE__
+
+| Field | Value |
+| --- | --- |
+| Owning team | __TEAM__ (__TEAM_ABBR__) |
+| Language | __LANGUAGE__ |
+| Database | __DB__ (__DB_KIND__) |
+| Compose profile | `services` |
+| Networks | `services`, `data` |
+| Ports (container) | 8080 HTTP, 9090 gRPC |
+| Version | 0.1.0 |
+
+## Role
+
+__PURPOSE__
+
+<!-- TODO(scaffold): describe where this service sits in the request flow
+     (CLAUDE.md section 3) and what happens to the addition if it is down. -->
+
+## Contracts
+
+<!-- TODO(scaffold): list every HTTP endpoint, gRPC method and event this
+     service produces or consumes, with links to contracts/. -->
+
+| Kind | Name | Direction | Contract |
+| --- | --- | --- | --- |
+| HTTP | `GET /health` | in | `{ "status": "ok", "checks": { ... } }` |
+| HTTP | `GET /metrics` | in | Prometheus text format |
+
+## Database
+
+__DB__ (__DB_KIND__). The service never reads another service's database.
+
+<!-- TODO(scaffold): tables/collections, migration strategy, retention. -->
+
+## Configuration
+
+| Variable | Default | Meaning |
+| --- | --- | --- |
+| `AAAS_SERVICE` | `__SERVICE__` | Service name used in logs, metrics and Consul |
+| `AAAS_ENV` | `local` | Environment name sent to config-server |
+| `AAAS_BOOTSTRAP` | `env` | `env` (read env vars) or `platform` (config-server + OpenBao) |
+| `AAAS_HTTP_PORT` | `8080` | HTTP port |
+| `AAAS_GRPC_PORT` | `9090` | gRPC port |
+| `__SERVICE_UPPER___DB_PASSWORD` | `change-me` | Database password (moves to OpenBao in P5.3) |
+
+<!-- TODO(scaffold): add every other variable the service reads. -->
+
+## Running and testing
+
+```sh
+make build-__SERVICE__   # image through Compose (root Makefile)
+make test-__SERVICE__    # unit tests in the Dockerfile `test` stage
+make lint-__SERVICE__    # formatter check and linter in the `lint` stage
+make fmt-__SERVICE__     # format sources in place
+make logs SVC=__SERVICE__
+```
+
+From this directory: `make help`.
+
+## Documents
+
+See `docs/` for the service charter, RACI, SLO, runbook, threat model, data
+classification, dependencies, capacity, API reference and changelog.

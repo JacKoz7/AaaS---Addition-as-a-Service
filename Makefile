@@ -156,9 +156,18 @@ e2e: ## Run end-to-end tests through the gateway
 # ---------------------------------------------------------------------------
 
 .PHONY: lint
-lint: lint-repo ## Run every linter (repository-level and per component)
+lint: lint-repo lint-scaffold ## Run every linter (repository-level and per component)
 	@for name in $(COMPONENT_NAMES); do $(MAKE) lint-$$name; done
 	@$(MAKE) temporary
+
+.PHONY: lint-scaffold
+lint-scaffold: ## Fail if any TODO(scaffold) marker from new-service.sh remains
+	@echo "==> TODO(scaffold) markers"
+	@if grep -rn 'TODO(scaffold)' --exclude-dir=.git --exclude-dir=templates \
+		--exclude-dir=node_modules --exclude=Makefile --exclude=new-service.sh \
+		--exclude=CLAUDE.md --exclude-dir=docs . ; then \
+		echo "error: unfinished scaffold; replace the markers above." >&2; exit 1; \
+	else echo "    none"; fi
 
 .PHONY: lint-repo
 lint-repo: ## Run repository-level linters (pre-commit, delivered by P0.5)

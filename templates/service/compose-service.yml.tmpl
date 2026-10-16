@@ -1,0 +1,24 @@
+  # --- __SERVICE__ (__LANGUAGE__, __TEAM_ABBR__) ---------------------------------
+  __SERVICE__:
+    build:
+      context: services/__SERVICE__
+      dockerfile: Dockerfile
+      target: runtime
+    image: aaas/__SERVICE__:dev
+    profiles: [services]
+    networks: [services, data]
+    environment:
+      AAAS_SERVICE: __SERVICE__
+      AAAS_ENV: ${AAAS_ENV:-local}
+      AAAS_BOOTSTRAP: ${AAAS_BOOTSTRAP:-env}
+      __SERVICE_UPPER___DB_PASSWORD: ${__SERVICE_UPPER___DB_PASSWORD:-change-me}
+    # __MEM_REASON__
+    mem_limit: __MEM__
+    cpus: 0.5
+    stop_grace_period: 10s
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/health || exit 1"]
+      interval: 10s
+      timeout: 2s
+      retries: 5
+      start_period: 30s

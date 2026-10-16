@@ -1,0 +1,20 @@
+  __SERVICE__-db:
+    # TODO(scaffold): pin the __DB__ image (multi-arch, no `latest`).
+    image: __DB_IMAGE__
+    profiles: [services]
+    networks: [data]
+    environment:
+      # TODO(scaffold): credentials variables expected by the __DB__ image.
+      AAAS_DB_PASSWORD: ${__SERVICE_UPPER___DB_PASSWORD:-change-me}
+    volumes:
+      # TODO(scaffold): data directory of the __DB__ image.
+      - __SERVICE__-data:/data
+    mem_limit: 256m
+    cpus: 0.5
+    healthcheck:
+      # TODO(scaffold): readiness command of the __DB__ image.
+      test: ["CMD-SHELL", "exit 1"]
+      interval: 10s
+      timeout: 2s
+      retries: 10
+      start_period: 30s

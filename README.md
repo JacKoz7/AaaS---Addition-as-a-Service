@@ -45,6 +45,7 @@ service catalog, contracts and request flow are described in [`CLAUDE.md`](CLAUD
 ```sh
 make help    # lists every target
 make status  # current step, latest snapshots, container state
+make new-service NAME=successor LANG=haskell   # scaffold a service
 make up      # starts everything except the aws-local profile
 make e2e     # proves that 2 + 3 = 5
 make down
@@ -74,6 +75,8 @@ step is tagged `step/P<phase>.<step>` and has a log in
 | `frontend/<element>/` | One directory per microfrontend (from Phase 1) |
 | `contracts/` | JSON Schemas, Protobuf and OpenAPI contracts (from Phase 1) |
 | `compose/` | Docker Compose files, one per profile (see `compose/README.md`) |
+| `templates/service/` | Language-agnostic service template rendered by `scripts/new-service.sh` |
+| `scripts/` | Repository scripts (`new-service.sh`, later `e2e.sh`, `doc-check.sh`) |
 | `docker-compose.yml` | Root Compose file: project name, networks, includes |
 
 ## Cost

@@ -1,0 +1,67 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       __SERVICE__
+# Module:          Dockerfile
+# Owning Team:     __TEAM__ (__TEAM_ABBR__)
+# Classification:  INTERNAL
+# Purpose:         Multi-stage build of the __SERVICE__ service (__LANGUAGE__).
+#                  Stages: toolchain (dependencies), lint, test, build and the
+#                  minimal non-root runtime image used by Compose.
+# Related Docs:    services/__SERVICE__/README.md, CLAUDE.md (section 6.2),
+#                  ADR-0002, ADR-0004
+#
+# Stage contract (used by services/__SERVICE__/Makefile and the root Makefile):
+#   toolchain — base image with the __LANGUAGE__ toolchain and dependencies.
+#   lint      — runs the formatter check and linter; fails the build on findings.
+#   test      — runs unit tests; fails the build on failures.
+#   build     — produces the release artifact.
+#   runtime   — minimal image, non-root user, port 8080 (HTTP) and 9090 (gRPC).
+
+# TODO(scaffold): pin the __LANGUAGE__ toolchain image (multi-arch, no `latest`).
+FROM __TOOLCHAIN_IMAGE__ AS toolchain
+WORKDIR /src
+# TODO(scaffold): copy dependency manifests first so that the layer is cached,
+# then install dependencies.
+COPY . .
+
+FROM toolchain AS lint
+# TODO(scaffold): run the standard __LANGUAGE__ formatter in check mode and the linter.
+RUN echo "TODO(scaffold): lint __SERVICE__" && exit 1
+
+FROM toolchain AS test
+# TODO(scaffold): run the unit tests from tests/.
+RUN echo "TODO(scaffold): test __SERVICE__" && exit 1
+
+FROM toolchain AS build
+# TODO(scaffold): build the release artifact into /out.
+RUN mkdir -p /out && echo "TODO(scaffold): build __SERVICE__" && exit 1
+
+# TODO(scaffold): pin a minimal runtime image (distroless, alpine or scratch).
+FROM __RUNTIME_IMAGE__ AS runtime
+
+LABEL org.opencontainers.image.title="__SERVICE__" \
+      org.opencontainers.image.description="AaaS __SERVICE__ service (__LANGUAGE__): __PURPOSE__" \
+      org.opencontainers.image.version="0.1.0" \
+      org.opencontainers.image.source="https://github.com/JacKoz7/AaaS---Addition-as-a-Service" \
+      org.opencontainers.image.licenses="MIT" \
+      org.opencontainers.image.vendor="AaaS Contributors" \
+      com.aaas.owning-team="__TEAM__ (__TEAM_ABBR__)"
+
+# Runtime images must contain `wget` (busybox) for the Compose healthcheck, or
+# the healthcheck in compose/services.yml must be changed to a tool the image has.
+WORKDIR /app
+COPY --from=build /out/ /app/
+COPY migrations/ /app/migrations/
+
+# Non-root user (CLAUDE.md 6.2). Create it in a way the runtime image supports.
+# TODO(scaffold): adjust user creation for the chosen runtime image.
+USER 10001:10001
+
+EXPOSE 8080 9090
+ENV AAAS_SERVICE=__SERVICE__ \
+    AAAS_HTTP_PORT=8080 \
+    AAAS_GRPC_PORT=9090
+
+# TODO(scaffold): entrypoint of the release artifact.
+ENTRYPOINT ["/app/__SERVICE__"]
