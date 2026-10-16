@@ -6,7 +6,7 @@ directory. No service is defined in the root file.
 
 | File | Profile | Owning team | Content |
 | --- | --- | --- | --- |
-| `core.yml` | `core` | PEG | Redpanda + Console (P1.1), Temporal + UI + PostgreSQL (P3.2) |
+| `core.yml` | `core` | PEG | Redpanda, topic job and Console (P1.1, [ADR-0011](../docs/adr/0011-event-bus-redpanda.md), [`infra/redpanda/`](../infra/redpanda/README.md)), Temporal + UI + PostgreSQL (P3.2) |
 | `services.yml` | `services` | PEG | The 35 microservices and their databases |
 | `frontend.yml` | `frontend` | CXT | single-spa shell and microfrontends (nginx) |
 | `observability.yml` | `observability` | OSG | OTel Collector, Prometheus, Loki, Jaeger, Grafana, Alertmanager |
@@ -16,7 +16,7 @@ directory. No service is defined in the root file.
 
 | Network | Docker name | Members | Published ports |
 | --- | --- | --- | --- |
-| `public` | `aaas-public` | gateway, microfrontends | yes (only the gateway publishes `80`; UIs listed in `CLAUDE.md` 6.2 publish their own) |
+| `public` | `aaas-public` | gateway, microfrontends, operator UIs that publish a port (Redpanda Console) | yes (only the gateway publishes `80`; UIs listed in `CLAUDE.md` 6.2 publish their own) |
 | `services` | `aaas-services` | every service, Redpanda, Temporal, observability | no |
 | `data` | `aaas-data` | databases and the single service that owns each one | no (`internal: true`, no egress) |
 
@@ -40,7 +40,8 @@ Taken from `CLAUDE.md` 6.2 and enforced by the P0.4 template:
 
 ```sh
 make up                      # core,services,frontend,observability
-make up PROFILES=core        # one profile
+make up PROFILES=core        # one profile (Redpanda, topics, Console)
+make topics-check            # topics match contracts/events/topics.psv
 make up PROFILES=aws-local   # Floci only
 docker compose config        # render the merged model
 ```

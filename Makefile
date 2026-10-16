@@ -7,8 +7,9 @@
 # Classification:  INTERNAL
 # Purpose:         Single entry point for building, running, testing and
 #                  inspecting the AaaS system on a developer workstation.
-# Related Docs:    CLAUDE.md (sections 6.2, 6.4, 6.5.4, 6.5.7, 6.5.8, 8.1,
-#                  9.3), ADR-0002, ADR-0009, ADR-0010, docs/PROGRESS.md
+# Related Docs:    CLAUDE.md (sections 4.2, 6.2, 6.4, 6.5.4, 6.5.7, 6.5.8,
+#                  8.1, 9.3), ADR-0002, ADR-0009, ADR-0010, ADR-0011,
+#                  docs/PROGRESS.md
 #
 # Conventions:
 #   - `make <verb>` acts on the whole system; `make <verb>-<name>` acts on one
@@ -72,6 +73,15 @@ define require_file
 	fi
 endef
 
+# require_running <service>: fail with a clear message if the Compose
+# service is not running (the topic targets need a live broker).
+define require_running
+	@if [ -z "$$($(COMPOSE) ps --status running --quiet $(1) 2>/dev/null)" ]; then \
+		echo "error: $(1) is not running; start it with: make up PROFILES=core" >&2; \
+		exit 1; \
+	fi
+endef
+
 # component_dir <name>: directory of a service or microfrontend, or empty.
 component_dir = $(firstword $(wildcard services/$(1)/Makefile frontend/$(1)/Makefile))
 
@@ -127,6 +137,20 @@ ps: ## Show container state
 logs: ## Follow logs (all containers, or SVC=<name>)
 	$(call require_file,$(COMPOSE_FILE),P0.3)
 	$(COMPOSE) logs --follow --tail=$(TAIL) $(SVC)
+
+# ---------------------------------------------------------------------------
+# Event bus topics (CLAUDE.md 4.2, ADR-0011)
+# ---------------------------------------------------------------------------
+
+.PHONY: topics
+topics: ## Create missing Redpanda topics of contracts/events/topics.psv (broker must be up)
+	$(call require_running,redpanda)
+	$(COMPOSE) run --rm --no-deps redpanda-topics
+
+.PHONY: topics-check
+topics-check: ## Verify that every topic exists with its declared partitions and config
+	$(call require_running,redpanda)
+	$(COMPOSE) run --rm --no-deps redpanda-topics --check
 
 # ---------------------------------------------------------------------------
 # Building

@@ -6,12 +6,117 @@
 # Owning Team:     Platform Enablement Guild (PEG)
 # Classification:  INTERNAL
 # Purpose:         Profile `core`: shared infrastructure every addition needs —
-#                  the Redpanda event bus with its console (P1.1) and the
-#                  Temporal server with its UI and PostgreSQL (P3.2).
-# Related Docs:    CLAUDE.md (section 2, "shared infrastructure"), ADR-0003
+#                  the Redpanda event bus with its console and topic
+#                  initialisation (P1.1), and the Temporal server with its UI
+#                  and PostgreSQL (P3.2).
+# Related Docs:    CLAUDE.md (sections 2 "shared infrastructure", 4.2, 6.2),
+#                  ADR-0003, ADR-0011, infra/redpanda/README.md
 
 # Profile: core
-# Services are added by the steps named above. Until then this file declares
-# no services; it is included so that `make up` and `docker compose config`
-# exercise the full include chain from the first step on.
-services: {}
+
+# Pinned images shared by several services (multi-arch: arm64 and amd64).
+x-redpanda-image: &redpanda-image redpandadata/redpanda:v26.2.4
+
+services:
+  # --- Event bus (ADR-0011) --------------------------------------------------
+
+  # Single Redpanda broker in development-container mode. Only the Kafka API
+  # (9092) and the Admin API (9644) listen; the bundled HTTP proxy and schema
+  # registry are switched off (the schema registry of AaaS is Apicurio, P3.1).
+  # Automatic topic creation is off: topics exist only if declared in
+  # contracts/events/topics.psv, so a misspelt topic fails instead of
+  # silently creating a new one. No port is published on the host; use
+  # Redpanda Console (8082) or `docker compose exec redpanda rpk ...`.
+  redpanda:
+    image: *redpanda-image
+    profiles: [core]
+    command:
+      - redpanda
+      - start
+      - --mode=dev-container
+      - --smp=1
+      - --memory=512M
+      - --reserve-memory=0M
+      - --default-log-level=warn
+      - --kafka-addr=internal://0.0.0.0:9092
+      - --advertise-kafka-addr=internal://redpanda:9092
+      - --set
+      - redpanda.auto_create_topics_enabled=false
+      - --set
+      - pandaproxy=null
+      - --set
+      - schema_registry=null
+    volumes:
+      - redpanda-data:/var/lib/redpanda/data
+    networks: [services]
+    # Deviation from the 256 MB database default (CLAUDE.md 6.2): Seastar is
+    # given 512 MB (--memory) for the broker; the limit adds headroom for rpk
+    # and the process outside the Seastar allocator. Measured: ADR-0011.
+    mem_limit: 768m
+    cpus: 1.0
+    healthcheck:
+      test: ["CMD-SHELL", "rpk cluster health | grep -qE '^Healthy:[[:space:]]+true'"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  # One-shot job: creates the topics of contracts/events/topics.psv once the
+  # broker is healthy, then exits 0. Services that produce or consume events
+  # depend on it with `condition: service_completed_successfully`.
+  # Re-run with `make topics`; verify with `make topics-check`.
+  redpanda-topics:
+    image: *redpanda-image
+    profiles: [core]
+    entrypoint: ["/opt/aaas/create-topics.sh"]
+    environment:
+      RPK_BROKERS: redpanda:9092
+      RPK_ADMIN_HOSTS: redpanda:9644
+      TOPICS_FILE: /opt/aaas/topics.psv
+    volumes:
+      - ../infra/redpanda/create-topics.sh:/opt/aaas/create-topics.sh:ro
+      - ../contracts/events/topics.psv:/opt/aaas/topics.psv:ro
+    networks: [services]
+    restart: "no"
+    # rpk is a Go binary; the compiled-language default applies.
+    mem_limit: 64m
+    cpus: 0.5
+    depends_on:
+      redpanda:
+        condition: service_healthy
+
+  # Web UI for topics, messages and consumer groups, on http://127.0.0.1:8082
+  # (CLAUDE.md 6.2). Bound to the loopback interface: it is an operator tool
+  # without authentication. It joins `public` because it publishes a port
+  # (ADR-0003) and `services` to reach the broker and its Admin API.
+  redpanda-console:
+    image: redpandadata/console:v3.12.0
+    profiles: [core]
+    environment:
+      KAFKA_BROKERS: redpanda:9092
+      REDPANDA_ADMINAPI_ENABLED: "true"
+      REDPANDA_ADMINAPI_URLS: http://redpanda:9644
+    ports:
+      - "127.0.0.1:8082:8080"
+    networks: [public, services]
+    # Deviation from the 64 MB compiled-language default (CLAUDE.md 6.2): the
+    # Go server also caches cluster metadata and serves the bundled web UI;
+    # measured idle usage is above 50 MB (ADR-0011).
+    mem_limit: 128m
+    cpus: 0.5
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:8080/admin/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 5s
+    # Waiting for the topic job makes `make up --wait` return only after the
+    # topics exist (Compose does not wait for a one-shot job on its own).
+    depends_on:
+      redpanda:
+        condition: service_healthy
+      redpanda-topics:
+        condition: service_completed_successfully
+
+volumes:
+  redpanda-data: {}
