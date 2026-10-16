@@ -93,8 +93,10 @@ step is tagged `step/P<phase>.<step>` and has a log in
 | `frontend/<element>/` | One directory per microfrontend (from Phase 1) |
 | `contracts/` | JSON Schemas, Protobuf and OpenAPI contracts (from Phase 1) |
 | `compose/` | Docker Compose files, one per profile (see `compose/README.md`) |
-| `templates/service/` | Language-agnostic service template rendered by `scripts/new-service.sh` |
-| `scripts/` | Repository scripts (`new-service.sh`, later `e2e.sh`, `doc-check.sh`) |
+| `templates/service/` | Language-agnostic service template and service catalog (`catalog.psv`) rendered by `scripts/new-service.sh` |
+| `templates/docs/` | Templates of the ten documents every service carries (`CLAUDE.md` 6.5.5) |
+| `templates/headers/` | Mandatory file header per file type; render with `scripts/file-header.sh` |
+| `scripts/` | Repository scripts (`new-service.sh`, `file-header.sh`, later `e2e.sh`, `doc-check.sh`) |
 | `scripts/ci/` | CI helpers (`changed-components.sh`: matrix of changed components) |
 | `.github/workflows/` | GitHub Actions CI (`ci.yml`) |
 | `docker-compose.yml` | Root Compose file: project name, networks, includes |
