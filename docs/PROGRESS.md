@@ -12,11 +12,11 @@ Step statuses: `TODO`, `IN_PROGRESS`, `DONE`, `BLOCKED`. At most one step may be
 | Field | Value |
 | --- | --- |
 | Current phase | Phase 1 — End-to-end skeleton |
-| Last completed step | P0.10 — Documentation portal, git-cliff, C4 context diagram |
-| Last completed at | 2026-10-16 21:15 CEST |
-| Snapshot tag | step/P0.10 (also phase-0-done) |
-| Step in progress | P1.1 — Redpanda + Redpanda Console, topic creation script |
-| Next step | P1.1 — Redpanda + Redpanda Console, topic creation script |
+| Last completed step | P1.1 — Redpanda + Redpanda Console, topic creation script |
+| Last completed at | 2026-10-16 22:48 CEST |
+| Snapshot tag | step/P1.1 |
+| Step in progress | none |
+| Next step | P1.2 — `gateway`: Traefik with file configuration, routing `/api` and `/` |
 | Blockers | none |
 | Milestones reached | — (Phase 0 complete: [release notes](releases/phase-0.md); first milestone M1 after Phase 1) |
 
@@ -41,7 +41,7 @@ Step statuses: `TODO`, `IN_PROGRESS`, `DONE`, `BLOCKED`. At most one step may be
 
 | ID | Step | Status | Completed | Snapshot | Log |
 | --- | --- | --- | --- | --- | --- |
-| P1.1 | Redpanda + Redpanda Console in `compose/core.yml`, script creating the topics from CLAUDE.md 4.2 | IN_PROGRESS | | | |
+| P1.1 | Redpanda + Redpanda Console in `compose/core.yml`, script creating the topics from CLAUDE.md 4.2 | DONE | 2026-10-16 | step/P1.1 | [log](progress/steps/P1.1.md) |
 | P1.2 | `gateway`: Traefik with file configuration, routing `/api` and `/` | TODO | | | |
 | P1.3 | Event envelope and JSON Schema for `expression.submitted`, `addition.requested`, `result.voted`, `ledger.appended` in `contracts/events/` + example validation in CI | TODO | | | |
 | P1.4 | `expression-assembler` (C#, SurrealDB): `POST /api/v1/keys`, expression assembly, event publishing, `202 {taskId}` | TODO | | | |
