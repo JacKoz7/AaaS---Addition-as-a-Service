@@ -255,7 +255,7 @@ doc-coverage-%: ## Native documentation coverage of one component (make doc-cove
 temporary: ## List remaining TEMPORARY(P<step>) markers (CLAUDE.md 8.7)
 	@echo "==> TEMPORARY markers"
 	@grep -rnE 'TEMPORARY\(P[0-9]+\.[0-9a-z]+\)' \
-		--exclude-dir=.git --exclude-dir=docs --exclude-dir=node_modules \
+		--exclude-dir=.git --exclude-dir=docs --exclude-dir=build --exclude-dir=node_modules \
 		--exclude=CLAUDE.md --exclude=Makefile . \
 		|| echo "    none"
 
