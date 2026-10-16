@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       repo
+# Module:          .gitattributes
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         Normalizes line endings to LF for every text file regardless
+#                  of the contributor's operating system.
+# Related Docs:    .editorconfig, .pre-commit-config.yaml
+
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.pdf binary
+*.woff2 binary

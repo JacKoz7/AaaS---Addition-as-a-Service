@@ -55,6 +55,20 @@ Requirements: Docker with Compose, `make`, 16 GB RAM minimum (32 GB recommended)
 Targets whose inputs arrive in a later step (for example `make up` before the
 Compose skeleton of step P0.3) fail with a message naming that step.
 
+## Contributing
+
+Install the git hooks once after cloning:
+
+```sh
+brew install pre-commit        # or: pip install pre-commit
+pre-commit install --install-hooks
+```
+
+The hooks enforce LF line endings, lint YAML, shell scripts and Dockerfiles,
+and check every commit message against Conventional Commits with the mandatory
+`Step: P<phase>.<step>` trailer (see `CLAUDE.md`, section 7.1). `make lint`
+runs the same checks on all files.
+
 ## Project status
 
 Progress is tracked in [`docs/PROGRESS.md`](docs/PROGRESS.md). Each completed

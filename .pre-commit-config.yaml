@@ -1,0 +1,81 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       repo
+# Module:          .pre-commit-config.yaml
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         Git hooks run before every commit (file hygiene, YAML,
+#                  shell and Dockerfile linting) and on every commit message
+#                  (Conventional Commits with the mandatory Step trailer).
+#                  Also executed by `make lint-repo` and by CI (P0.6).
+# Related Docs:    CLAUDE.md (sections 6.3, 7.1), ADR-0005, CONTRIBUTING.md
+#
+# Setup:   brew install pre-commit && pre-commit install --install-hooks
+# Run all: pre-commit run --all-files   (or: make lint-repo)
+# Update:  pre-commit autoupdate
+
+minimum_pre_commit_version: "3.0.0"
+default_install_hook_types: [pre-commit, commit-msg]
+default_stages: [pre-commit]
+
+repos:
+  # --- File hygiene and line endings ----------------------------------------
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: mixed-line-ending
+        name: line endings are LF
+        args: [--fix=lf]
+      - id: end-of-file-fixer
+        exclude: \.(svg|typ)$
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+        exclude: \.(cob|cbl)$
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: [--maxkb=512]
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+      - id: check-json
+      - id: detect-private-key
+      - id: no-commit-to-branch
+        args: [--branch, main]
+
+  # --- YAML ------------------------------------------------------------------
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.38.0
+    hooks:
+      - id: yamllint
+        args: [--strict]
+
+  # --- Shell -----------------------------------------------------------------
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.11.0.1-1
+    hooks:
+      - id: shellcheck
+        args: [--severity=style, --external-sources]
+
+  # --- Dockerfile -----------------------------------------------------------
+  # hadolint runs from its pinned Docker Hub image so that no host install is
+  # required; it therefore needs a running Docker daemon. (The upstream
+  # `hadolint-docker` hook pulls `ghcr.io/...:latest`, which is unpinned and
+  # was not reachable from this network; see ADR-0005.)
+  - repo: local
+    hooks:
+      - id: hadolint
+        name: hadolint (Dockerfile)
+        language: docker_image
+        entry: hadolint/hadolint:v2.15.1 hadolint
+        types: [dockerfile]
+        # Templates hold __PLACEHOLDER__ images; rendered Dockerfiles are checked.
+        exclude: \.tmpl$
+
+  # --- Commit messages -------------------------------------------------------
+  - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
+    rev: v9.27.0
+    hooks:
+      - id: commitlint
+        stages: [commit-msg]

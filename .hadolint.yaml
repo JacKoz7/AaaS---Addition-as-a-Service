@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       repo
+# Module:          .hadolint.yaml
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         hadolint rules for every service Dockerfile: pinned base
+#                  images, no `latest`, warnings are failures.
+# Related Docs:    CLAUDE.md (section 6.2), .pre-commit-config.yaml, ADR-0005
+
+failure-threshold: warning
+
+# Every rule stays enabled. Rules that a specific Dockerfile must break are
+# disabled inline with `# hadolint ignore=DLxxxx` and a justification.
+ignored: []
+
+# DL3007 (no `latest`) and DL3006 (tag required) enforce CLAUDE.md 6.2.
+override:
+  error:
+    - DL3006
+    - DL3007

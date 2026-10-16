@@ -1,0 +1,40 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       repo
+# Module:          .yamllint.yaml
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         yamllint rules for Compose files, CI workflows, contracts
+#                  and tool configuration.
+# Related Docs:    .pre-commit-config.yaml, ADR-0005
+
+extends: default
+
+ignore: |
+  docs/site/
+  node_modules/
+
+rules:
+  # Compose files and workflows legitimately omit the `---` marker.
+  document-start: disable
+  # Long image references and healthcheck commands are common in Compose.
+  line-length:
+    max: 120
+    allow-non-breakable-inline-mappings: true
+  # Flow sequences such as `networks: [services, data]` are used on purpose.
+  brackets:
+    min-spaces-inside: 0
+    max-spaces-inside: 0
+  braces:
+    min-spaces-inside: 0
+    max-spaces-inside: 0
+  # GitHub Actions uses the `on:` key, which yamllint treats as a boolean.
+  truthy:
+    allowed-values: ["true", "false", "on", "off"]
+    check-keys: false
+  comments:
+    min-spaces-from-content: 1
+  indentation:
+    spaces: 2
+    indent-sequences: consistent
