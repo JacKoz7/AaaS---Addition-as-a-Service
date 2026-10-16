@@ -43,9 +43,16 @@ linted and tested inside Docker (ADR-0002).
 
 ## 3. Clone and Install the Hooks (10 minutes)
 
+Clone into a directory that no file-sync service manages. On macOS,
+`~/Desktop` and `~/Documents` are synchronised by iCloud Drive when "Desktop
+& Documents Folders" is enabled; iCloud replaces files under git's feet,
+creating copies such as `Makefile 2` and restoring stale versions (this
+happened during P0.9). `~/Developer` is not synchronised.
+
 ```sh
-git clone git@github.com:JacKoz7/AaaS---Addition-as-a-Service.git aaas
-cd aaas
+mkdir -p ~/Developer && cd ~/Developer
+git clone git@github.com:JacKoz7/AaaS---Addition-as-a-Service.git AaaS
+cd AaaS
 cp .env.example .env
 pre-commit install --install-hooks   # needs Docker running; takes about a minute
 make help
