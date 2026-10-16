@@ -15,7 +15,7 @@ Step statuses: `TODO`, `IN_PROGRESS`, `DONE`, `BLOCKED`. At most one step may be
 | Last completed step | P0.9 — Documentation coverage check |
 | Last completed at | 2026-10-16 20:42 CEST |
 | Snapshot tag | step/P0.9 |
-| Step in progress | none |
+| Step in progress | P0.10 — Documentation portal, git-cliff, C4 context diagram |
 | Next step | P0.10 — Documentation portal, git-cliff, C4 context diagram |
 | Blockers | none |
 | Milestones reached | — |
@@ -35,7 +35,7 @@ Step statuses: `TODO`, `IN_PROGRESS`, `DONE`, `BLOCKED`. At most one step may be
 | P0.7 | Document templates in `templates/docs/` (all from CLAUDE.md 6.5.5), file header template per language, copied by `new-service.sh` | DONE | 2026-10-16 | step/P0.7 | [log](progress/steps/P0.7.md) |
 | P0.8 | Repository documents from CLAUDE.md 6.5.6: CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, CODEOWNERS, PR and issue templates, governance, ONBOARDING, GLOSSARY, first RISK_REGISTER entry | DONE | 2026-10-16 | step/P0.8 | [log](progress/steps/P0.8.md) |
 | P0.9 | `scripts/doc-check.sh` and `make doc-coverage`, run in CI | DONE | 2026-10-16 | step/P0.9 | [log](progress/steps/P0.9.md) |
-| P0.10 | MkDocs Material portal (`mkdocs.yml`, `make docs`, `make docs-serve`), git-cliff (`cliff.toml`), C4 context diagram | TODO | | | |
+| P0.10 | MkDocs Material portal (`mkdocs.yml`, `make docs`, `make docs-serve`), git-cliff (`cliff.toml`), C4 context diagram | IN_PROGRESS | | | [log](progress/steps/P0.10.md) |
 
 ### Phase 1 — End-to-end skeleton (M1)
 
