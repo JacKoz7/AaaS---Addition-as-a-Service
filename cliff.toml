@@ -1,0 +1,68 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       repo
+# Module:          cliff.toml
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         git-cliff configuration that renders one release section
+#                  of a component changelog (Keep a Changelog) from the
+#                  Conventional Commits whose scope is that component.
+# Related Docs:    CLAUDE.md (6.5.8, 7.1), ADR-0010, scripts/changelog.sh,
+#                  docs/governance/RELEASE_PROCESS.md
+#
+# Do not run git-cliff directly; use `make changelog-<component>` (or
+# scripts/changelog.sh), which sets AAAS_SCOPE, the tag pattern of the
+# component and the tag of the new version, and inserts the section under
+# `## [Unreleased]` of services/<name>/docs/CHANGELOG.md.
+#
+# Type to Keep a Changelog section:
+#   feat -> Added; fix -> Fixed; perf, refactor, contract, build, infra ->
+#   Changed. docs, test, ci, chore and style do not change the behaviour of
+#   the component and are left out. A breaking change is marked BREAKING.
+
+[changelog]
+# The surrounding document (title, Unreleased heading, older versions) is
+# maintained in the file itself; git-cliff renders only the section.
+header = ""
+footer = ""
+trim = true
+body = """
+{%- set scope = get_env(name="AAAS_SCOPE", default="") -%}
+{%- if version -%}
+## [{{ version | split(pat="/v") | last }}] — {{ timestamp | date(format="%Y-%m-%d") }}
+{%- else -%}
+## [Unreleased]
+{%- endif %}
+{% set scoped = commits | filter(attribute="scope", value=scope) | sort(attribute="group") -%}
+{%- if scoped | length == 0 %}
+No changes with scope `{{ scope }}`.
+{% endif -%}
+{%- for group, items in scoped | group_by(attribute="group") %}
+### {{ group | striptags | trim }}
+{% for commit in items %}
+- {% if commit.breaking %}**BREAKING:** {% endif %}{{ commit.message | split(pat="\n") | first | trim | upper_first }} (`{{ commit.id | truncate(length=7, end="") }}`)
+{%- endfor %}
+{% endfor %}
+### Business Impact
+
+<!-- Written by hand before the release commit (docs/governance/RELEASE_PROCESS.md). -->
+"""
+
+[git]
+conventional_commits = true
+filter_unconventional = true
+split_commits = false
+protect_breaking_commits = true
+filter_commits = true
+# Overridden per component by scripts/changelog.sh (--tag-pattern).
+tag_pattern = "^[a-z0-9-]+/v[0-9]+\\.[0-9]+\\.[0-9]+$"
+topo_order = false
+sort_commits = "oldest"
+# The HTML comment orders the sections; it is stripped when rendered.
+commit_parsers = [
+  { message = "^feat", group = "<!-- 0 -->Added" },
+  { message = "^(perf|refactor|contract|build|infra)", group = "<!-- 1 -->Changed" },
+  { message = "^fix", group = "<!-- 2 -->Fixed" },
+  { message = "^(docs|test|ci|chore|style)", skip = true },
+]

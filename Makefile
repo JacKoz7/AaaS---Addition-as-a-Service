@@ -268,6 +268,10 @@ docs-serve: docs-image ## Serve the portal on http://127.0.0.1:8000 with live re
 	$(DOCS_RUN) $$([ -t 0 ] && echo --interactive --tty) --publish 127.0.0.1:$(DOCS_PORT):8000 \
 		$(DOCS_IMAGE) serve --dev-addr 0.0.0.0:8000
 
+.PHONY: changelog-%
+changelog-%: ## Unreleased changes of a component; with VERSION=X.Y.Z, add them to its CHANGELOG.md
+	scripts/changelog.sh "$*" $(VERSION)
+
 # ---------------------------------------------------------------------------
 # Scaffolding and housekeeping
 # ---------------------------------------------------------------------------
