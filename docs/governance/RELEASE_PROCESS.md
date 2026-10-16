@@ -22,9 +22,12 @@ capability, PATCH for a fix. A new service starts at `0.1.0`.
 ## 2. Releasing a Component
 
 1. All changes are on `main`, CI is green.
-2. Update `services/<name>/docs/CHANGELOG.md`: generate the entries from the
-   commits with scope `<name>` (git-cliff, configured in P0.10), then add the
-   "Business Impact" section by hand.
+2. Update `services/<name>/docs/CHANGELOG.md`: `make changelog-<name>`
+   previews the unreleased commits with scope `<name>`;
+   `make changelog-<name> VERSION=X.Y.Z` inserts them as version `X.Y.Z`
+   under `## [Unreleased]` (git-cliff, `cliff.toml`, ADR-0010). Then write
+   the "Business Impact" section by hand. For a microfrontend the scope and
+   tag prefix are `frontend-<name>`.
 3. Update the version in the component's README and build metadata (OCI
    label `org.opencontainers.image.version`).
 4. Commit `chore(<name>): release vX.Y.Z` with the `Step:` trailer of the

@@ -27,6 +27,10 @@ Read, in this order:
 3. [`GLOSSARY.md`](../GLOSSARY.md) — the vocabulary.
 4. [`docs/adr/`](../adr/) — the decisions taken so far.
 
+Prefer reading online? `make docs-serve` serves all of the above, plus the
+service map and the catalogs, at <http://127.0.0.1:8000> (ADR-0010; use
+`make docs-serve DOCS_PORT=<port>` if 8000 is taken).
+
 ## 2. Prepare Your Workstation (30 minutes)
 
 | Requirement | Why | Check |

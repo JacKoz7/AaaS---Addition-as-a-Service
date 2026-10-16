@@ -80,6 +80,17 @@ GitHub Actions (`.github/workflows/ci.yml`, see ADR-0006) runs the same hooks,
 lints every commit message of the push or pull request, and builds, lints and
 unit-tests each changed service or microfrontend in its own matrix job.
 
+## Documentation portal
+
+```sh
+make docs        # builds the MkDocs Material portal into docs/site (strict)
+make docs-serve  # serves it on http://127.0.0.1:8000 with live rebuild
+```
+
+The portal collects every document of the repository, the service map and
+the service, event, API and changelog catalogs (ADR-0010). Component
+changelogs are generated from commits with `make changelog-<component>`.
+
 ## Project status
 
 Progress is tracked in [`docs/PROGRESS.md`](docs/PROGRESS.md). Each completed

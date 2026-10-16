@@ -32,6 +32,7 @@
 | R-006 | Single maintainer: knowledge is lost between sessions | 3 | 3 | 9 Medium | PEG | Repository is the only source of truth for progress (`CLAUDE.md` 8.1): step logs, snapshot tags, checkpoints, ADRs, onboarding guide | Open |
 | R-007 | A compromised or changed third-party image or action alters the build | 2 | 4 | 8 Medium | TIB | Base images pinned to versions (no `latest`, hadolint DL3006/DL3007 as errors); GitHub Actions pinned to commit SHAs (ADR-0006) | Open |
 | R-008 | The joke invoice is mistaken for a real tax document | 1 | 3 | 3 Low | ROU | Amount 0.00 PLN, fictitious seller without a tax ID, explicit notice that it is not a VAT invoice (P9.2) | Open |
+| R-009 | MkDocs 2.0 removes the plugin and hook system and is announced as incompatible with Material for MkDocs; an unpinned upgrade breaks the portal | 2 | 2 | 4 Low | PEG | MkDocs 1.6.1 and Material 9.7.7 pinned in the tool image `infra/docs-portal/Dockerfile`; the portal logic lives in one hook (`scripts/docs-portal.py`) that produces plain Markdown, so a move to another generator reuses it (ADR-0010) | Open |
 
 ## Closed Risks
 

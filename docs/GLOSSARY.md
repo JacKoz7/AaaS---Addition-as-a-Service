@@ -16,6 +16,7 @@ Extension of `CLAUDE.md` section 11. Terms are in alphabetical order.
 | AppRole | OpenBao authentication method: each service logs in with its own `role_id`/`secret_id` to read its database password (P5.3). |
 | AST | Abstract syntax tree of the expression, built by `parser`. |
 | Bootstrap mode | `AAAS_BOOTSTRAP=env` (configuration from environment variables) or `platform` (config-server, OpenBao, Consul, schema-registry). |
+| C4 model | Notation for architecture diagrams at four levels (system context, containers, components, code); AaaS draws them in Mermaid in `docs/architecture/c4/` (ADR-0010). |
 | Carry | Transfer of one unit to the next higher digit position when a digit wraps from 9 to 0; performed by the `carry` service. |
 | CDC | Change Data Capture: reading database changes from the transaction log; Debezium uses it to publish the outbox. |
 | Checkpoint | Commit `chore(progress): checkpoint ...` on a step branch that saves unfinished work, with "Next actions" in the step log. |
@@ -28,10 +29,12 @@ Extension of `CLAUDE.md` section 11. Terms are in alphabetical order.
 | Definition of Done | Checklist every step must satisfy before it is closed (`CLAUDE.md` 9.1). |
 | Digit service | One of `digit-0` to `digit-9`: returns its value and its successor digit from its own SQLite database. |
 | DLQ | Dead Letter Queue: topic `aaas.dlq.v1` for events that failed after local retries; handled by `dead-letter`. |
+| Documentation portal | MkDocs Material site assembled from every document of the repository plus generated catalogs; `make docs` builds it into `docs/site/`, `make docs-serve` serves it (ADR-0010). |
 | DPIA | Data Protection Impact Assessment under GDPR, in `docs/governance/DPIA.md`. |
 | Event envelope | Common JSON wrapper of every event: `eventId`, `type`, `version`, `occurredAt`, `producer`, `taskId`, `traceparent`, `payload`. |
 | Floci | Local emulator of AWS services, the default target of the infrastructure code. |
 | forwardAuth | Traefik middleware that asks an external service (`rate-limiter`) whether to let a request through. |
+| git-cliff | Changelog generator that renders Conventional Commits through a template (`cliff.toml`); used by `make changelog-<component>` (ADR-0010). |
 | Hash chain | `hash = sha256(prevHash || taskId || a || b || result || timestamp)`; any modification breaks every later hash. |
 | Idempotency key | Header `Idempotency-Key` of the `=` request; the same key always maps to the same task. |
 | Ledger | Immutable record of results in immudb, each entry hashed together with the previous hash. |

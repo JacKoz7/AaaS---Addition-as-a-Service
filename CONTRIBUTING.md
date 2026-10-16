@@ -82,6 +82,8 @@ tests inside Docker through its own Makefile (ADR-0002).
 | `make build-<svc>` / `make test-<svc>` / `make lint-<svc>` | One component |
 | `make lint` | Every linter, scaffold markers, `TEMPORARY` markers |
 | `make doc-coverage` | File headers, documented definitions, native doc tools (ADR-0009) |
+| `make docs` / `make docs-serve` | Build the documentation portal / serve it on port 8000 (ADR-0010) |
+| `make changelog-<svc> [VERSION=X.Y.Z]` | Changelog entries from the commits of a component (ADR-0010) |
 | `make up` / `make e2e` | Run the system / end-to-end tests |
 | `make status` | Current state of the project |
 

@@ -48,4 +48,5 @@ Commits that implement a decision reference it with a `Refs: ADR-NNNN` trailer.
 - New sessions and contributors can read the decision history in order.
 - Writing an ADR adds a small amount of work to steps that make decisions;
   this is intended.
-- ADRs are published in the documentation portal (step P0.10).
+- ADRs are published in the documentation portal with a generated index
+  (`make docs`, ADR-0010).
