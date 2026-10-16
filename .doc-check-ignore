@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       repo
+# Module:          .doc-check-ignore
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         Files exempt from the file header and definition checks of
+#                  scripts/doc-check.sh, as shell glob patterns matched
+#                  against the repository-relative path (`*` also matches
+#                  `/`). Every pattern states why it is exempt.
+# Related Docs:    scripts/doc-check.sh, templates/headers/README.md, ADR-0009
+
+# Documents: Markdown is prose, governed by the document templates, not by
+# the code header (CLAUDE.md 6.5.5, 6.5.6).
+*.md
+
+# JSON has no comment syntax (templates/headers/README.md).
+*.json
+
+# The licence text must stay verbatim.
+LICENSE
+
+# Templates contain placeholders instead of real header values; the files
+# rendered from them are checked.
+*.tmpl
+templates/headers/header.txt
+
+# Placeholder files of empty scaffold directories; they hold a scaffold
+# marker and are deleted when the directory gets real content.
+*.gitkeep

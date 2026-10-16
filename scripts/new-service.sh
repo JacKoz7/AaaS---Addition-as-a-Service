@@ -38,11 +38,13 @@ set -euo pipefail
 # Helpers
 # ---------------------------------------------------------------------------
 
+# usage: print the usage block of this file and exit with status 2.
 usage() {
   sed -n '/^# Usage:/,/^# marker remains/p' "$0" | sed 's/^# \{0,1\}//'
   exit 2
 }
 
+# die <message>: print an error to stderr and exit with status 1.
 die() { echo "error: $*" >&2; exit 1; }
 
 # memory_limit <language>: default mem_limit per language class (CLAUDE.md 6.2)
@@ -57,6 +59,25 @@ memory_limit() {
       MEM="512m"; MEM_REASON="JVM or Node-based platform component: default JVM limit (CLAUDE.md 6.2)." ;;
     *)
       MEM="128m"; MEM_REASON="TODO(scaffold): justify the memory limit for language '$1'." ;;
+  esac
+}
+
+# doc_tool <language>: set DOC_TOOL to the documentation coverage command
+# required for <language> by CLAUDE.md 6.5.4, used as a hint in the
+# Dockerfile `doc-coverage` stage of the scaffold.
+doc_tool() {
+  case "$1" in
+    rust) DOC_TOOL="cargo clippy -- -D missing_docs -D clippy::missing_docs_in_private_items (#![deny(missing_docs)] in the crate root)" ;;
+    python) DOC_TOOL="interrogate --fail-under 100 --verbose src tests" ;;
+    go) DOC_TOOL="revive with the 'exported' rule, plus a check of unexported identifiers" ;;
+    csharp) DOC_TOOL="dotnet build with CS1591 treated as an error (TreatWarningsAsErrors / WarningsAsErrors=CS1591)" ;;
+    kotlin) DOC_TOOL="detekt with the UndocumentedPublicClass/Function/Property rules active" ;;
+    typescript | javascript) DOC_TOOL="eslint with eslint-plugin-jsdoc (jsdoc/require-jsdoc on every declaration)" ;;
+    ruby) DOC_TOOL="yard stats --list-undoc, failing unless 100% documented" ;;
+    php) DOC_TOOL="phpcs with a ruleset requiring file, class, function and property doc comments" ;;
+    elixir) DOC_TOOL="mix doctor (100% moduledoc and doc coverage)" ;;
+    haskell) DOC_TOOL="haddock coverage report at 100% for every module" ;;
+    *) DOC_TOOL="no native tool for ${1}; scripts/doc-check.sh covers it: add a row to scripts/lib/doc-definitions.psv and keep this stage as a native doc build (or a no-op), see ADR-0009" ;;
   esac
 }
 
@@ -77,7 +98,7 @@ render() {
     "TEAM_ABBR=${TEAM_ABBR}" "TEAM=${TEAM}" "DB_KIND=${DB_KIND}" "DB_IMAGE=${DB_IMAGE}" \
     "DB=${DB}" "PURPOSE=${PURPOSE}" "MEM_REASON=${MEM_REASON}" "MEM=${MEM}" \
     "TOOLCHAIN_IMAGE=${TOOLCHAIN_IMAGE}" "RUNTIME_IMAGE=${RUNTIME_IMAGE}" \
-    "FMT_COMMAND=${FMT_COMMAND}" "DATE=${DATE}" "VERSION=${VERSION}"; do
+    "FMT_COMMAND=${FMT_COMMAND}" "DATE=${DATE}" "VERSION=${VERSION}" "DOC_TOOL=${DOC_TOOL}"; do
     key="${pair%%=*}"
     value="${pair#*=}"
     args+=(-e "s|__${key}__|$(sed_escape "$value")|g")
@@ -145,6 +166,7 @@ TOOLCHAIN_IMAGE="TODO-scaffold/${LANGUAGE}-toolchain:pin-me"
 RUNTIME_IMAGE="TODO-scaffold/${LANGUAGE}-runtime:pin-me"
 FMT_COMMAND="echo 'TODO(scaffold): formatter command for ${LANGUAGE}' && exit 1"
 DATE="$(date +%Y-%m-%d)"
+doc_tool "$LANGUAGE"
 VERSION="0.1.0"
 
 # ---------------------------------------------------------------------------
@@ -222,5 +244,6 @@ Next:
      scripts/file-header.sh render <type|path> ${SERVICE} <module> --purpose "..."
   3. Implement GET /health and GET /metrics on port 8080 (CLAUDE.md 6.1).
   4. make build-${SERVICE} && make test-${SERVICE} && make lint-${SERVICE}
+     && make doc-coverage-${SERVICE}
   5. make up and confirm ${SERVICE} is healthy; record RAM in docs/CAPACITY.md.
 MSG

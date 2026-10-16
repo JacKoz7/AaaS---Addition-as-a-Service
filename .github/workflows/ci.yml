@@ -6,11 +6,12 @@
 # Owning Team:     Platform Enablement Guild (PEG)
 # Classification:  INTERNAL
 # Purpose:         Continuous integration: repository linters (pre-commit),
-#                  commit message linting (commitlint), and build, lint and
-#                  unit tests of every changed component as a matrix with one
+#                  commit message linting (commitlint), the documentation
+#                  check, and build, lint, unit tests and documentation
+#                  coverage of every changed component as a matrix with one
 #                  job per services/<name> or frontend/<name> directory.
 # Related Docs:    CLAUDE.md (sections 6.3, 6.4, 7.1, 9.1), ADR-0006,
-#                  ADR-0005, scripts/ci/changed-components.sh
+#                  ADR-0005, ADR-0009, scripts/ci/changed-components.sh
 #
 # Third-party actions are pinned to full commit SHAs; the tag they correspond
 # to is given in the trailing comment. Update them deliberately, never to a
@@ -69,6 +70,8 @@ jobs:
         env:
           SKIP: no-commit-to-branch
         run: make lint-repo lint-scaffold temporary
+      - name: Documentation check (file headers, documented definitions)
+        run: make doc-check
 
   # -------------------------------------------------------------------------
   # Commit messages: every commit of the pushed range or pull request.
@@ -154,6 +157,8 @@ jobs:
         run: make "lint-${{ matrix.component.name }}"
       - name: Unit tests (make test-${{ matrix.component.name }})
         run: make "test-${{ matrix.component.name }}"
+      - name: Documentation coverage (make doc-coverage-${{ matrix.component.name }})
+        run: make "doc-coverage-${{ matrix.component.name }}"
 
   # -------------------------------------------------------------------------
   # Single status for branch protection: green only if nothing failed.

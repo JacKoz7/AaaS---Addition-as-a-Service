@@ -6,7 +6,8 @@
 # Owning Team:     __TEAM__ (__TEAM_ABBR__)
 # Classification:  INTERNAL
 # Purpose:         Component Makefile called by the root Makefile
-#                  (make test-__SERVICE__, lint-__SERVICE__, fmt-__SERVICE__).
+#                  (make test-__SERVICE__, lint-__SERVICE__, fmt-__SERVICE__,
+#                  doc-coverage-__SERVICE__).
 #                  Every target runs inside Docker; no __LANGUAGE__ toolchain
 #                  is required on the host.
 # Related Docs:    ADR-0002, services/__SERVICE__/Dockerfile
@@ -35,6 +36,10 @@ test: ## Run unit tests in the `test` stage
 .PHONY: lint
 lint: ## Run formatter check and linter in the `lint` stage
 	$(DOCKER_BUILD) --target lint --tag $(IMAGE):lint .
+
+.PHONY: doc-coverage
+doc-coverage: ## Run the native documentation coverage tool in the `doc-coverage` stage
+	$(DOCKER_BUILD) --target doc-coverage --tag $(IMAGE):doc-coverage .
 
 .PHONY: fmt
 fmt: ## Format sources in place using the toolchain stage

@@ -98,6 +98,17 @@ repos:
         files: ^(templates/headers/|scripts/file-header\.sh$)
         pass_filenames: false
 
+  # --- Documentation check --------------------------------------------------
+  # File header and documented top-level definitions of every staged file
+  # (scripts/doc-check.sh, ADR-0009); exemptions are in .doc-check-ignore.
+  - repo: local
+    hooks:
+      - id: doc-check
+        name: doc-check (file headers, documented definitions)
+        language: system
+        entry: scripts/doc-check.sh --quiet
+        types: [file]
+
   # --- Commit messages -------------------------------------------------------
   - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
     rev: v9.27.0

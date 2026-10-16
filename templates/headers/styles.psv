@@ -65,4 +65,4 @@ make|Makefile,.mk||# ||80|
 dockerfile|Dockerfile,.dockerfile,.dockerignore||# ||80|
 yaml|.yml,.yaml||# ||80|
 toml|.toml||# ||80|
-conf|CODEOWNERS,.conf,.ini,.cfg,.env,.example,.psv,.gitignore,.gitattributes,.editorconfig||# ||80|
+conf|CODEOWNERS,.doc-check-ignore,.conf,.ini,.cfg,.env,.example,.psv,.gitignore,.gitattributes,.editorconfig||# ||80|

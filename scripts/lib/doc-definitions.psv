@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       repo
+# Module:          scripts/lib/doc-definitions.psv
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         Top-level definitions that scripts/doc-check.sh requires to
+#                  be preceded by a comment (CLAUDE.md 6.5.4, "remaining
+#                  languages"), per header type. A row is added together with
+#                  the first file of a language that has no native coverage
+#                  tool.
+# Related Docs:    scripts/doc-check.sh, ADR-0009
+#
+# Columns: type|definition|comment|skip|inline
+#   type        Header type from templates/headers/styles.psv.
+#   definition  POSIX ERE matching a line that starts a top-level definition.
+#   comment     ERE matching a comment line; the nearest preceding line that
+#               is not matched by `skip` must match it.
+#   skip        ERE of lines allowed between the comment and the definition
+#               (attributes, decorators, .PHONY); empty when none.
+#   inline      ERE that documents the definition on its own line (for
+#               example `## help` after a make target); empty when none.
+# Patterns may not contain `|`; use bracket expressions instead.
+shell|^[A-Za-z_][A-Za-z0-9_]*[(][)][[:space:]]*[{]|^[[:space:]]*#||
+make|^[A-Za-z0-9_%][A-Za-z0-9_%./-]*:([^=].*)?$|^#|^[.]PHONY:|##[[:space:]]

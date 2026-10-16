@@ -15,6 +15,8 @@
 #   toolchain — base image with the __LANGUAGE__ toolchain and dependencies.
 #   lint      — runs the formatter check and linter; fails the build on findings.
 #   test      — runs unit tests; fails the build on failures.
+#   doc-coverage — runs the native documentation coverage tool of the
+#               language (CLAUDE.md 6.5.4); fails below 100%.
 #   build     — produces the release artifact.
 #   runtime   — minimal image, non-root user, port 8080 (HTTP) and 9090 (gRPC).
 
@@ -32,6 +34,10 @@ RUN echo "TODO(scaffold): lint __SERVICE__" && exit 1
 FROM toolchain AS test
 # TODO(scaffold): run the unit tests from tests/.
 RUN echo "TODO(scaffold): test __SERVICE__" && exit 1
+
+FROM toolchain AS doc-coverage
+# TODO(scaffold): __DOC_TOOL__
+RUN echo "TODO(scaffold): doc-coverage __SERVICE__" && exit 1
 
 FROM toolchain AS build
 # TODO(scaffold): build the release artifact into /out.

@@ -7,8 +7,8 @@
 # Classification:  INTERNAL
 # Purpose:         Single entry point for building, running, testing and
 #                  inspecting the AaaS system on a developer workstation.
-# Related Docs:    CLAUDE.md (sections 6.2, 6.4, 8.1, 9.3), ADR-0002,
-#                  docs/PROGRESS.md
+# Related Docs:    CLAUDE.md (sections 6.2, 6.4, 6.5.4, 8.1, 9.3), ADR-0002,
+#                  ADR-0009, docs/PROGRESS.md
 #
 # Conventions:
 #   - `make <verb>` acts on the whole system; `make <verb>-<name>` acts on one
@@ -193,6 +193,24 @@ fmt: ## Format the code of every component
 .PHONY: fmt-%
 fmt-%: ## Format one component (make fmt-successor)
 	$(call delegate,$*,fmt)
+
+# ---------------------------------------------------------------------------
+# Documentation coverage (CLAUDE.md 6.5.4, ADR-0009)
+# ---------------------------------------------------------------------------
+
+.PHONY: doc-check
+doc-check: ## Check file headers and comments before top-level definitions in every file
+	@echo "==> doc-check (headers and definitions)"
+	scripts/doc-check.sh
+
+.PHONY: doc-coverage
+doc-coverage: doc-check ## doc-check plus the native documentation tool of every component
+	@if [ -z "$(COMPONENT_NAMES)" ]; then echo "no components with a Makefile yet; native coverage tools: nothing to run."; fi
+	@for name in $(COMPONENT_NAMES); do $(MAKE) doc-coverage-$$name; done
+
+.PHONY: doc-coverage-%
+doc-coverage-%: ## Native documentation coverage of one component (make doc-coverage-successor)
+	$(call delegate,$*,doc-coverage)
 
 .PHONY: temporary
 temporary: ## List remaining TEMPORARY(P<step>) markers (CLAUDE.md 8.7)
