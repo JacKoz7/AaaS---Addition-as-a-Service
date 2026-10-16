@@ -73,7 +73,8 @@ step is tagged `step/P<phase>.<step>` and has a log in
 | `services/<service>/` | One directory per microservice (from Phase 1) |
 | `frontend/<element>/` | One directory per microfrontend (from Phase 1) |
 | `contracts/` | JSON Schemas, Protobuf and OpenAPI contracts (from Phase 1) |
-| `compose/` | Docker Compose files (from step P0.3) |
+| `compose/` | Docker Compose files, one per profile (see `compose/README.md`) |
+| `docker-compose.yml` | Root Compose file: project name, networks, includes |
 
 ## Cost
 
