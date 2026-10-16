@@ -11,14 +11,14 @@ Step statuses: `TODO`, `IN_PROGRESS`, `DONE`, `BLOCKED`. At most one step may be
 
 | Field | Value |
 | --- | --- |
-| Current phase | Phase 0 — Repository foundation |
-| Last completed step | P0.9 — Documentation coverage check |
-| Last completed at | 2026-10-16 20:42 CEST |
-| Snapshot tag | step/P0.9 |
-| Step in progress | P0.10 — Documentation portal, git-cliff, C4 context diagram |
-| Next step | P0.10 — Documentation portal, git-cliff, C4 context diagram |
+| Current phase | Phase 1 — End-to-end skeleton |
+| Last completed step | P0.10 — Documentation portal, git-cliff, C4 context diagram |
+| Last completed at | 2026-10-16 21:15 CEST |
+| Snapshot tag | step/P0.10 (also phase-0-done) |
+| Step in progress | none |
+| Next step | P1.1 — Redpanda + Redpanda Console, topic creation script |
 | Blockers | none |
-| Milestones reached | — |
+| Milestones reached | — (Phase 0 complete: [release notes](releases/phase-0.md); first milestone M1 after Phase 1) |
 
 ## Steps
 
@@ -35,7 +35,7 @@ Step statuses: `TODO`, `IN_PROGRESS`, `DONE`, `BLOCKED`. At most one step may be
 | P0.7 | Document templates in `templates/docs/` (all from CLAUDE.md 6.5.5), file header template per language, copied by `new-service.sh` | DONE | 2026-10-16 | step/P0.7 | [log](progress/steps/P0.7.md) |
 | P0.8 | Repository documents from CLAUDE.md 6.5.6: CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, CODEOWNERS, PR and issue templates, governance, ONBOARDING, GLOSSARY, first RISK_REGISTER entry | DONE | 2026-10-16 | step/P0.8 | [log](progress/steps/P0.8.md) |
 | P0.9 | `scripts/doc-check.sh` and `make doc-coverage`, run in CI | DONE | 2026-10-16 | step/P0.9 | [log](progress/steps/P0.9.md) |
-| P0.10 | MkDocs Material portal (`mkdocs.yml`, `make docs`, `make docs-serve`), git-cliff (`cliff.toml`), C4 context diagram | IN_PROGRESS | | | [log](progress/steps/P0.10.md) |
+| P0.10 | MkDocs Material portal (`mkdocs.yml`, `make docs`, `make docs-serve`), git-cliff (`cliff.toml`), C4 context diagram | DONE | 2026-10-16 | step/P0.10 | [log](progress/steps/P0.10.md) |
 
 ### Phase 1 — End-to-end skeleton (M1)
 
