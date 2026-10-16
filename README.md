@@ -72,7 +72,9 @@ pre-commit install --install-hooks
 The hooks enforce LF line endings, lint YAML, shell scripts and Dockerfiles,
 and check every commit message against Conventional Commits with the mandatory
 `Step: P<phase>.<step>` trailer (see `CLAUDE.md`, section 7.1). `make lint`
-runs the same checks on all files.
+runs the same checks on all files. `make doc-coverage` verifies that every
+file has the mandatory header and every definition is documented
+(ADR-0009).
 
 GitHub Actions (`.github/workflows/ci.yml`, see ADR-0006) runs the same hooks,
 lints every commit message of the push or pull request, and builds, lints and
@@ -107,7 +109,8 @@ step is tagged `step/P<phase>.<step>` and has a log in
 | `templates/service/` | Language-agnostic service template and service catalog (`catalog.psv`) rendered by `scripts/new-service.sh` |
 | `templates/docs/` | Templates of the ten documents every service carries (`CLAUDE.md` 6.5.5) |
 | `templates/headers/` | Mandatory file header per file type; render with `scripts/file-header.sh` |
-| `scripts/` | Repository scripts (`new-service.sh`, `file-header.sh`, later `e2e.sh`, `doc-check.sh`) |
+| `scripts/` | Repository scripts (`new-service.sh`, `file-header.sh`, `doc-check.sh`, later `e2e.sh`) |
+| `scripts/lib/` | Shared shell functions and data of the scripts (header styles, definition patterns) |
 | `scripts/ci/` | CI helpers (`changed-components.sh`: matrix of changed components) |
 | `.github/workflows/` | GitHub Actions CI (`ci.yml`) |
 | `docker-compose.yml` | Root Compose file: project name, networks, includes |

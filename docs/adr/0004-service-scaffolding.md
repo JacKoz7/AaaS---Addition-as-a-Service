@@ -2,7 +2,7 @@
 
 | Field | Value |
 | --- | --- |
-| Status | Accepted; amended by ADR-0007 (catalog file, document templates) |
+| Status | Accepted; amended by ADR-0007 (catalog file, document templates) and ADR-0009 (doc-coverage stage) |
 | Date | 2026-10-16 |
 | Deciders | Platform Enablement Guild (PEG) |
 | Step | P0.4 |

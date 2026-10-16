@@ -81,6 +81,7 @@ tests inside Docker through its own Makefile (ADR-0002).
 | `scripts/file-header.sh render ...` | Mandatory file header (ADR-0007) |
 | `make build-<svc>` / `make test-<svc>` / `make lint-<svc>` | One component |
 | `make lint` | Every linter, scaffold markers, `TEMPORARY` markers |
+| `make doc-coverage` | File headers, documented definitions, native doc tools (ADR-0009) |
 | `make up` / `make e2e` | Run the system / end-to-end tests |
 | `make status` | Current state of the project |
 
