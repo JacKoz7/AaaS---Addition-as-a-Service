@@ -69,6 +69,10 @@ and check every commit message against Conventional Commits with the mandatory
 `Step: P<phase>.<step>` trailer (see `CLAUDE.md`, section 7.1). `make lint`
 runs the same checks on all files.
 
+GitHub Actions (`.github/workflows/ci.yml`, see ADR-0006) runs the same hooks,
+lints every commit message of the push or pull request, and builds, lints and
+unit-tests each changed service or microfrontend in its own matrix job.
+
 ## Project status
 
 Progress is tracked in [`docs/PROGRESS.md`](docs/PROGRESS.md). Each completed
@@ -91,6 +95,8 @@ step is tagged `step/P<phase>.<step>` and has a log in
 | `compose/` | Docker Compose files, one per profile (see `compose/README.md`) |
 | `templates/service/` | Language-agnostic service template rendered by `scripts/new-service.sh` |
 | `scripts/` | Repository scripts (`new-service.sh`, later `e2e.sh`, `doc-check.sh`) |
+| `scripts/ci/` | CI helpers (`changed-components.sh`: matrix of changed components) |
+| `.github/workflows/` | GitHub Actions CI (`ci.yml`) |
 | `docker-compose.yml` | Root Compose file: project name, networks, includes |
 
 ## Cost

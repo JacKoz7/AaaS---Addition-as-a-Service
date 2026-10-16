@@ -6,7 +6,7 @@
 # Owning Team:     Platform Enablement Guild (PEG)
 # Classification:  INTERNAL
 # Purpose:         Git hooks run before every commit (file hygiene, YAML,
-#                  shell and Dockerfile linting) and on every commit message
+#                  shell, Dockerfile and workflow linting) and on every commit message
 #                  (Conventional Commits with the mandatory Step trailer).
 #                  Also executed by `make lint-repo` and by CI (P0.6).
 # Related Docs:    CLAUDE.md (sections 6.3, 7.1), ADR-0005, CONTRIBUTING.md
@@ -72,6 +72,17 @@ repos:
         types: [dockerfile]
         # Templates hold __PLACEHOLDER__ images; rendered Dockerfiles are checked.
         exclude: \.tmpl$
+
+  # --- GitHub Actions workflows ----------------------------------------------
+  # actionlint (with its bundled shellcheck for `run:` blocks) from its pinned
+  # Docker Hub image, for the same reasons as hadolint above (ADR-0006).
+  - repo: local
+    hooks:
+      - id: actionlint
+        name: actionlint (GitHub Actions)
+        language: docker_image
+        entry: rhysd/actionlint:1.7.12
+        files: ^\.github/workflows/.+\.ya?ml$
 
   # --- Commit messages -------------------------------------------------------
   - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook

@@ -1,0 +1,176 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       repo
+# Module:          .github/workflows/ci.yml
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         Continuous integration: repository linters (pre-commit),
+#                  commit message linting (commitlint), and build, lint and
+#                  unit tests of every changed component as a matrix with one
+#                  job per services/<name> or frontend/<name> directory.
+# Related Docs:    CLAUDE.md (sections 6.3, 6.4, 7.1, 9.1), ADR-0006,
+#                  ADR-0005, scripts/ci/changed-components.sh
+#
+# Third-party actions are pinned to full commit SHAs; the tag they correspond
+# to is given in the trailing comment. Update them deliberately, never to a
+# moving tag.
+
+name: ci
+
+on:
+  push:
+    branches: [main, "step/**"]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      all-components:
+        description: Build and test every component, not only the changed ones
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Versions of the tools installed by this workflow (not by pre-commit).
+  PRE_COMMIT_VERSION: "4.7.0"
+  COMMITLINT_VERSION: "21.2.3"
+  NODE_VERSION: "24"
+  PYTHON_VERSION: "3.13"
+
+jobs:
+  # -------------------------------------------------------------------------
+  # Repository-level linters: the same hooks developers run on commit.
+  # -------------------------------------------------------------------------
+  lint:
+    name: lint (repository)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Cache pre-commit environments
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('.pre-commit-config.yaml') }}
+      - name: Install pre-commit
+        run: python -m pip install "pre-commit==${PRE_COMMIT_VERSION}"
+      - name: Run pre-commit, scaffold-marker and TEMPORARY-marker checks
+        # no-commit-to-branch protects local commits on main; CI checks out
+        # main after the fact, so the hook is meaningless here.
+        env:
+          SKIP: no-commit-to-branch
+        run: make lint-repo lint-scaffold temporary
+
+  # -------------------------------------------------------------------------
+  # Commit messages: every commit of the pushed range or pull request.
+  # -------------------------------------------------------------------------
+  commitlint:
+    name: commitlint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1  # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install commitlint
+        run: npm install --global --no-audit --no-fund "@commitlint/cli@${COMMITLINT_VERSION}"
+      - name: Lint commit messages
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          ZERO_SHA: "0000000000000000000000000000000000000000"
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            from="$PR_BASE"; to="$PR_HEAD"
+          elif [ "$EVENT_NAME" = "push" ] && [ -n "$PUSH_BEFORE" ] && [ "$PUSH_BEFORE" != "$ZERO_SHA" ]; then
+            from="$PUSH_BEFORE"; to="$GITHUB_SHA"
+          else
+            # New branch or manual run: lint what is not on main yet, or only
+            # the last commit when HEAD is main itself.
+            from="$(git merge-base origin/main HEAD)"; to="$GITHUB_SHA"
+            if [ "$from" = "$to" ]; then from="${to}~1"; fi
+          fi
+          echo "Linting commits ${from}..${to}:"
+          git log --oneline "${from}..${to}"
+          commitlint --from "$from" --to "$to" --verbose
+
+  # -------------------------------------------------------------------------
+  # Which components changed: feeds the matrix below.
+  # -------------------------------------------------------------------------
+  changes:
+    name: detect changed components
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      components: ${{ steps.detect.outputs.components }}
+      count: ${{ steps.detect.outputs.count }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          fetch-depth: 0
+      - id: detect
+        name: Compute the component matrix
+        env:
+          BASE: >-
+            ${{ inputs.all-components && 'all'
+            || github.event.pull_request.base.sha
+            || github.event.before }}
+        run: scripts/ci/changed-components.sh "$BASE"
+
+  # -------------------------------------------------------------------------
+  # Build, lint and test each changed component (one job per directory).
+  # -------------------------------------------------------------------------
+  component:
+    name: ${{ matrix.component.path }}
+    needs: changes
+    if: needs.changes.outputs.count != '0'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        component: ${{ fromJSON(needs.changes.outputs.components) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - name: Prepare .env from the example
+        run: cp .env.example .env
+      - name: Build (make build-${{ matrix.component.service }})
+        run: make "build-${{ matrix.component.service }}"
+      - name: Lint (make lint-${{ matrix.component.name }})
+        run: make "lint-${{ matrix.component.name }}"
+      - name: Unit tests (make test-${{ matrix.component.name }})
+        run: make "test-${{ matrix.component.name }}"
+
+  # -------------------------------------------------------------------------
+  # Single status for branch protection: green only if nothing failed.
+  # -------------------------------------------------------------------------
+  ci-ok:
+    name: ci-ok
+    needs: [lint, commitlint, changes, component]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check results of all jobs
+        env:
+          RESULTS: ${{ toJSON(needs.*.result) }}
+        run: |
+          echo "Job results: ${RESULTS}"
+          if echo "$RESULTS" | grep -qE '"(failure|cancelled)"'; then
+            echo "error: at least one CI job failed or was cancelled." >&2
+            exit 1
+          fi
