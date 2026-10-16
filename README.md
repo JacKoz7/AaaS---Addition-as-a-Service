@@ -43,13 +43,16 @@ service catalog, contracts and request flow are described in [`CLAUDE.md`](CLAUD
 ## Running it
 
 ```sh
+make help    # lists every target
+make status  # current step, latest snapshots, container state
 make up      # starts everything except the aws-local profile
 make e2e     # proves that 2 + 3 = 5
 make down
 ```
 
 Requirements: Docker with Compose, `make`, 16 GB RAM minimum (32 GB recommended).
-The `Makefile` arrives in step P0.2; until then, there is nothing to run.
+Targets whose inputs arrive in a later step (for example `make up` before the
+Compose skeleton of step P0.3) fail with a message naming that step.
 
 ## Project status
 
@@ -66,6 +69,7 @@ step is tagged `step/P<phase>.<step>` and has a log in
 | `docs/PROGRESS.md` | Current state and the checklist of every step |
 | `docs/progress/steps/` | One log per step |
 | `docs/adr/` | Architecture Decision Records |
+| `Makefile` | Entry point: `make help` |
 | `services/<service>/` | One directory per microservice (from Phase 1) |
 | `frontend/<element>/` | One directory per microfrontend (from Phase 1) |
 | `contracts/` | JSON Schemas, Protobuf and OpenAPI contracts (from Phase 1) |
