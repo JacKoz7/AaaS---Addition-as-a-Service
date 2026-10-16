@@ -158,7 +158,7 @@ Mikrofrontendy komunikują się wyłącznie przez **wspólną szynę zdarzeń pr
                   |              |
                   v              v
           stopwatch (stop)   billing (faktura, distributed-lock)
-                         
+
    błąd w dowolnym kroku --> aaas.dlq.v1 --> dead-letter --> retry / sygnał kompensacji do sagi
 ```
 
