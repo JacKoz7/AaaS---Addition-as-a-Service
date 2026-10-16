@@ -47,6 +47,7 @@ make help    # lists every target
 make status  # current step, latest snapshots, container state
 make new-service NAME=successor LANG=haskell   # scaffold a service
 make up      # starts everything except the aws-local profile
+make topics-check   # Redpanda topics match contracts/events/topics.psv
 make e2e     # proves that 2 + 3 = 5
 make down
 ```
@@ -115,8 +116,9 @@ step is tagged `step/P<phase>.<step>` and has a log in
 | `Makefile` | Entry point: `make help` |
 | `services/<service>/` | One directory per microservice (from Phase 1) |
 | `frontend/<element>/` | One directory per microfrontend (from Phase 1) |
-| `contracts/` | JSON Schemas, Protobuf and OpenAPI contracts (from Phase 1) |
+| `contracts/` | Contracts: topic registry `events/topics.psv`; JSON Schemas, Protobuf and OpenAPI from later Phase 1 and 2 steps |
 | `compose/` | Docker Compose files, one per profile (see `compose/README.md`) |
+| `infra/` | Configuration of shared infrastructure and tools: `redpanda/` (topic job, ADR-0011), `docs-portal/` (portal tool image, ADR-0010) |
 | `templates/service/` | Language-agnostic service template and service catalog (`catalog.psv`) rendered by `scripts/new-service.sh` |
 | `templates/docs/` | Templates of the ten documents every service carries (`CLAUDE.md` 6.5.5) |
 | `templates/headers/` | Mandatory file header per file type; render with `scripts/file-header.sh` |

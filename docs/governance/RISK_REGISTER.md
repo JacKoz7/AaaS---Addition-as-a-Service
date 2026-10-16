@@ -33,6 +33,7 @@
 | R-007 | A compromised or changed third-party image or action alters the build | 2 | 4 | 8 Medium | TIB | Base images pinned to versions (no `latest`, hadolint DL3006/DL3007 as errors); GitHub Actions pinned to commit SHAs (ADR-0006) | Open |
 | R-008 | The joke invoice is mistaken for a real tax document | 1 | 3 | 3 Low | ROU | Amount 0.00 PLN, fictitious seller without a tax ID, explicit notice that it is not a VAT invoice (P9.2) | Open |
 | R-009 | MkDocs 2.0 removes the plugin and hook system and is announced as incompatible with Material for MkDocs; an unpinned upgrade breaks the portal | 2 | 2 | 4 Low | PEG | MkDocs 1.6.1 and Material 9.7.7 pinned in the tool image `infra/docs-portal/Dockerfile`; the portal logic lives in one hook (`scripts/docs-portal.py`) that produces plain Markdown, so a move to another generator reuses it (ADR-0010) | Open |
+| R-010 | The single Redpanda broker has no replica; removing its volume (`make clean`) or a disk fault loses every event not yet consumed | 2 | 2 | 4 Low | PEG | Events are transport, not the system of record: results live in the ledger (immudb), task state in the saga database; topics are recreated from `contracts/events/topics.psv`; consumers are idempotent by `eventId` (`CLAUDE.md` 4.2, ADR-0011) | Open |
 
 ## Closed Risks
 

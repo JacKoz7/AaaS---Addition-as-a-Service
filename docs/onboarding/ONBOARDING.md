@@ -84,8 +84,9 @@ make ps
 make down
 ```
 
-Current state (Phase 0): no service is defined yet, so `make up` reports that
-there is nothing to start.
+Current state (Phase 1): `make up` starts the Redpanda event bus, creates its
+topics and serves Redpanda Console on <http://127.0.0.1:8082>;
+`make topics-check` confirms the topics. The services follow in the next steps.
 
 From milestone **M1** (step P1.9): open <http://localhost/>, press `2`, `+`,
 `3`, `=` and wait for the display to show `5`. `make e2e` runs the same
