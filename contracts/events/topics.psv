@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       contracts
+# Module:          contracts/events/topics.psv
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         Registry of every Redpanda topic of AaaS (CLAUDE.md 4.2):
+#                  one pipe-separated row per topic. Read by
+#                  infra/redpanda/create-topics.sh, which creates the topics,
+#                  and by scripts/docs-portal.py (event catalog).
+# Related Docs:    CLAUDE.md (section 4.2), ADR-0011, infra/redpanda/README.md,
+#                  contracts/events/README.md
+#
+# Columns: topic|partitions|producer|consumers|purpose
+#   topic:      aaas.<entity>.<past-tense-verb>.v<N>; a breaking change is a
+#               new row with .v<N+1>, never an edit of an existing name.
+#   partitions: number of partitions (messages are keyed by taskId); it may
+#               only grow, because Redpanda cannot remove partitions.
+#   producer:   the one service that publishes, or `every consumer`.
+#   consumers:  comma-separated services, or `(audit)` when no service
+#               consumes the topic yet.
+# Lines starting with `#` and blank lines are ignored.
+aaas.key.pressed.v1|3|expression-assembler|(audit)|Every key press of a calculator session.
+aaas.expression.submitted.v1|3|expression-assembler|parser, stopwatch|An expression completed by "=" and accepted as a new task.
+aaas.addition.requested.v1|3|parser|saga-orchestrator|A parsed and validated addition of a and b, with b the smaller operand.
+aaas.successor.called.v1|3|successor|(audit)|One computation of n + 1 by the successor service.
+aaas.carry.propagated.v1|3|carry|(audit)|One carry propagated to a higher digit position.
+aaas.result.voted.v1|3|outbox-relay|ledger|The sum computed by Peano and confirmed by the consensus vote.
+aaas.ledger.appended.v1|3|ledger|stopwatch, billing|A result appended to the hash-chained ledger.
+aaas.invoice.issued.v1|3|billing|(audit)|A 0.00 PLN invoice issued for a recorded addition.
+aaas.dlq.v1|3|every consumer|dead-letter|An event whose processing failed after local retries.
