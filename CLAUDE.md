@@ -388,7 +388,7 @@ AaaS jest dokumentowany jak system krytyczny dla korporacji z listy Fortune 500.
 
 #### 6.5.1 Fikcyjna struktura organizacyjna
 
-Wszystkie dokumenty odwołują się do zespołów. Każdy zespół to w praktyce właściciel repozytorium (`@aaas-owner` w CODEOWNERS), ale w dokumentacji występują osobno.
+Wszystkie dokumenty odwołują się do zespołów. Każdy zespół to w praktyce właściciel repozytorium (`@JacKoz7` w CODEOWNERS; GitHub wymaga istniejącego konta, patrz ADR-0008), ale w dokumentacji występują osobno.
 
 | Zespół | Obszar | Serwisy |
 | --- | --- | --- |
@@ -552,7 +552,7 @@ Szablony wszystkich dokumentów są w `templates/docs/` i `scripts/new-service.s
 | `CONTRIBUTING.md` | Proces zmian, kroki, commity, review |
 | `CODE_OF_CONDUCT.md` | Kodeks postępowania (Contributor Covenant) |
 | `SECURITY.md` | Zgłaszanie podatności |
-| `CODEOWNERS` | Każdy katalog przypisany do zespołu (w praktyce `@aaas-owner`) |
+| `CODEOWNERS` | Każdy katalog przypisany do zespołu (w praktyce `@JacKoz7`, ADR-0008) |
 | `.github/pull_request_template.md` | Checklista z Definition of Done |
 | `.github/ISSUE_TEMPLATE/` | Bug, feature request (zawsze odrzucany, patrz sekcja 1), incydent |
 | `docs/governance/RFC_PROCESS.md` | Proces RFC dla zmian obejmujących więcej niż jeden serwis (`docs/rfc/NNNN-tytul.md`) |
