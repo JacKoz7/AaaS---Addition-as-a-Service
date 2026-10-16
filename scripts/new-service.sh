@@ -7,11 +7,12 @@
 # Owning Team:     Platform Enablement Guild (PEG)
 # Classification:  INTERNAL
 # Purpose:         Scaffolds a new service from templates/service/: directory
-#                  layout, Dockerfile, Makefile, README, .dockerignore, Compose
-#                  blocks in compose/services.yml and the database password
-#                  placeholder in .env.example.
-# Related Docs:    CLAUDE.md (sections 2, 6.1, 6.2), ADR-0002, ADR-0004,
-#                  templates/service/
+#                  layout, Dockerfile, Makefile, README, .dockerignore, the
+#                  corporate documents from templates/docs/, Compose blocks in
+#                  compose/services.yml and the database password placeholder
+#                  in .env.example.
+# Related Docs:    CLAUDE.md (sections 2, 6.1, 6.2, 6.5), ADR-0002, ADR-0004,
+#                  ADR-0007, templates/service/, templates/docs/
 #
 # Usage:
 #   scripts/new-service.sh <name> <language> [--team "<Team Name> (ABBR)"]
@@ -29,46 +30,9 @@
 set -euo pipefail
 
 # ---------------------------------------------------------------------------
-# Catalog: name|language|team|abbr|database|kind|purpose
-# kind: container (database runs as <name>-db) or embedded (in-process).
+# Catalog: templates/service/catalog.psv (name|language|team|abbr|database|
+# kind|purpose), shared with scripts/file-header.sh.
 # ---------------------------------------------------------------------------
-CATALOG='
-gateway|traefik|Platform Enablement Guild|PEG|Redis|container|Single entry point, routing and forwardAuth middleware.
-auth|keycloak|Trust & Identity Board|TIB|PostgreSQL|container|OAuth2/OIDC provider with one-click guest login.
-rate-limiter|ruby|Trust & Identity Board|TIB|Redis|container|forwardAuth endpoint: JWT verification and per-user addition limits.
-idempotency|typescript|Trust & Identity Board|TIB|Valkey|container|Maps an Idempotency-Key of "=" to exactly one task.
-feature-flags|unleash|Trust & Identity Board|TIB|PostgreSQL|container|Feature flag server holding addition_enabled.
-service-discovery|consul|Platform Enablement Guild|PEG|Raft|embedded|Service registry with health checks.
-config-server|php|Platform Enablement Guild|PEG|MongoDB|container|Configuration fetched by every service at startup.
-secrets|openbao|Platform Enablement Guild|PEG|Raft|embedded|Database credentials and AppRole per service.
-schema-registry|apicurio|Platform Enablement Guild|PEG|PostgreSQL|container|JSON Schema registry for every event.
-parser|ocaml|Arithmetic Excellence Center|AEC|SQLite|embedded|Turns the text expression into an AST.
-validator|rust|Arithmetic Excellence Center|AEC|MariaDB|container|Checks that both operands are within 0-99999.
-operator-registry|crystal|Arithmetic Excellence Center|AEC|PostgreSQL|container|Resolves "+" to the addition saga and checks the feature flag.
-digit-0|c|Arithmetic Excellence Center|AEC|SQLite|embedded|Authoritative source for the value and successor of digit 0.
-digit-1|cpp|Arithmetic Excellence Center|AEC|SQLite|embedded|Authoritative source for the value and successor of digit 1.
-digit-2|fortran|Arithmetic Excellence Center|AEC|SQLite|embedded|Authoritative source for the value and successor of digit 2.
-digit-3|pascal|Arithmetic Excellence Center|AEC|SQLite|embedded|Authoritative source for the value and successor of digit 3.
-digit-4|lua|Arithmetic Excellence Center|AEC|SQLite|embedded|Authoritative source for the value and successor of digit 4.
-digit-5|dart|Arithmetic Excellence Center|AEC|SQLite|embedded|Authoritative source for the value and successor of digit 5.
-digit-6|swift|Arithmetic Excellence Center|AEC|SQLite|embedded|Authoritative source for the value and successor of digit 6.
-digit-7|gleam|Arithmetic Excellence Center|AEC|SQLite|embedded|Authoritative source for the value and successor of digit 7.
-digit-8|d|Arithmetic Excellence Center|AEC|SQLite|embedded|Authoritative source for the value and successor of digit 8.
-digit-9|racket|Arithmetic Excellence Center|AEC|SQLite|embedded|Authoritative source for the value and successor of digit 9 (next is 0 with carry).
-successor|haskell|Arithmetic Excellence Center|AEC|CouchDB|container|Computes n+1 through the digit services and carry.
-carry|elixir|Arithmetic Excellence Center|AEC|Mnesia|embedded|Propagates a carry to higher digit positions.
-saga-orchestrator|go|Transaction Integrity Office|TIO|PostgreSQL|container|Temporal workflow of one addition, compensation and task status.
-consensus|go|Transaction Integrity Office|TIO|BoltDB|embedded|Three replicas compute independently; Raft commits the majority.
-distributed-lock|etcd|Transaction Integrity Office|TIO|Raft|embedded|Locks ordering ledger appends and invoice numbering.
-outbox-relay|debezium|Transaction Integrity Office|TIO|PostgreSQL|container|Publishes the saga outbox to Redpanda via CDC.
-dead-letter|perl|Transaction Integrity Office|TIO|MongoDB|container|Retries failed events and signals compensation.
-ledger|nim|Transaction Integrity Office|TIO|immudb|container|Immutable hash-chained record of every result.
-expression-assembler|csharp|Customer Experience Tribe|CXT|SurrealDB|container|Turns key presses into an expression and starts a task.
-commutator|zig|Arithmetic Excellence Center|AEC|LMDB|embedded|Swaps operands so that b is the smaller one.
-cloud-notary|python|Cloud Governance Committee|CGC|DynamoDB|container|AWS Lambda verifying the hash chain and storing a copy.
-stopwatch|kotlin|Customer Experience Tribe|CXT|TimescaleDB|container|Measures the official waiting time and streams it over SSE.
-billing|lisp|Revenue Operations Unit|ROU|Firebird|container|Issues the 0.00 PLN invoice as PDF.
-'
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -96,23 +60,29 @@ memory_limit() {
   esac
 }
 
-# render <template> : substitutes every __PLACEHOLDER__ and prints to stdout.
+# sed_escape <value>: escapes the characters that are special in the
+# replacement part of a sed `s|...|...|` command (backslash, `|` and `&`).
+sed_escape() {
+  printf '%s' "$1" | sed -e 's/[\\|&]/\\&/g'
+}
+
+# render <template>: substitutes every __PLACEHOLDER__ and prints to stdout.
+# Longer placeholders come first so that __SERVICE_UPPER__ is not consumed by
+# __SERVICE__, and __TEAM_ABBR__ not by __TEAM__.
 render() {
-  sed -e "s|__SERVICE_UPPER__|${SERVICE_UPPER}|g" \
-      -e "s|__SERVICE__|${SERVICE}|g" \
-      -e "s|__LANGUAGE__|${LANGUAGE}|g" \
-      -e "s|__TEAM_ABBR__|${TEAM_ABBR}|g" \
-      -e "s|__TEAM__|${TEAM}|g" \
-      -e "s|__DB_KIND__|${DB_KIND}|g" \
-      -e "s|__DB_IMAGE__|${DB_IMAGE}|g" \
-      -e "s|__DB__|${DB}|g" \
-      -e "s|__PURPOSE__|${PURPOSE}|g" \
-      -e "s|__MEM_REASON__|${MEM_REASON}|g" \
-      -e "s|__MEM__|${MEM}|g" \
-      -e "s|__TOOLCHAIN_IMAGE__|${TOOLCHAIN_IMAGE}|g" \
-      -e "s|__RUNTIME_IMAGE__|${RUNTIME_IMAGE}|g" \
-      -e "s|__FMT_COMMAND__|${FMT_COMMAND}|g" \
-      "$1"
+  local -a args=()
+  local pair key value
+  for pair in \
+    "SERVICE_UPPER=${SERVICE_UPPER}" "SERVICE=${SERVICE}" "LANGUAGE=${LANGUAGE}" \
+    "TEAM_ABBR=${TEAM_ABBR}" "TEAM=${TEAM}" "DB_KIND=${DB_KIND}" "DB_IMAGE=${DB_IMAGE}" \
+    "DB=${DB}" "PURPOSE=${PURPOSE}" "MEM_REASON=${MEM_REASON}" "MEM=${MEM}" \
+    "TOOLCHAIN_IMAGE=${TOOLCHAIN_IMAGE}" "RUNTIME_IMAGE=${RUNTIME_IMAGE}" \
+    "FMT_COMMAND=${FMT_COMMAND}" "DATE=${DATE}" "VERSION=${VERSION}"; do
+    key="${pair%%=*}"
+    value="${pair#*=}"
+    args+=(-e "s|__${key}__|$(sed_escape "$value")|g")
+  done
+  sed "${args[@]}" "$1"
 }
 
 # ---------------------------------------------------------------------------
@@ -145,11 +115,12 @@ COMPOSE_FILE="compose/services.yml"
 ENV_EXAMPLE=".env.example"
 
 [ -d "$TEMPLATES" ] || die "$TEMPLATES not found"
+[ -n "$(ls templates/docs/*.md.tmpl 2>/dev/null)" ] || die "templates/docs/*.md.tmpl not found"
 [ -e "$SERVICE_DIR" ] && die "$SERVICE_DIR already exists"
 grep -qE "^  ${SERVICE}:" "$COMPOSE_FILE" && die "$COMPOSE_FILE already defines '${SERVICE}'"
 
 # Catalog lookup.
-ENTRY="$(printf '%s\n' "$CATALOG" | grep -E "^${SERVICE}\|" || true)"
+ENTRY="$(grep -E "^${SERVICE}\|" "$TEMPLATES/catalog.psv" || true)"
 if [ -n "$ENTRY" ]; then
   IFS='|' read -r _ CAT_LANG CAT_TEAM CAT_ABBR CAT_DB CAT_KIND CAT_PURPOSE <<<"$ENTRY"
   if [ "$CAT_LANG" != "$LANGUAGE" ]; then
@@ -172,7 +143,9 @@ memory_limit "$LANGUAGE"
 DB_IMAGE="TODO-scaffold/$(printf '%s' "$DB" | tr '[:upper:]' '[:lower:]'):pin-me"
 TOOLCHAIN_IMAGE="TODO-scaffold/${LANGUAGE}-toolchain:pin-me"
 RUNTIME_IMAGE="TODO-scaffold/${LANGUAGE}-runtime:pin-me"
-FMT_COMMAND="echo 'TODO(scaffold): formatter command for ${LANGUAGE}' \&\& exit 1"
+FMT_COMMAND="echo 'TODO(scaffold): formatter command for ${LANGUAGE}' && exit 1"
+DATE="$(date +%Y-%m-%d)"
+VERSION="0.1.0"
 
 # ---------------------------------------------------------------------------
 # Generate
@@ -188,16 +161,11 @@ for d in src migrations tests; do
   printf '# TODO(scaffold): %s of %s go here; remove this file.\n' "$d" "$SERVICE" > "$SERVICE_DIR/$d/.gitkeep"
 done
 
-# Corporate documents (templates/docs/ arrives in step P0.7).
-if [ -d templates/docs ] && [ -n "$(ls -A templates/docs 2>/dev/null)" ]; then
-  for t in templates/docs/*.md.tmpl; do
-    render "$t" > "$SERVICE_DIR/docs/$(basename "${t%.tmpl}")"
-  done
-  echo "    docs/ populated from templates/docs/"
-else
-  printf '# TODO(scaffold): service documents (templates/docs/ arrives in step P0.7).\n' > "$SERVICE_DIR/docs/.gitkeep"
-  echo "    docs/ left empty: templates/docs/ not available yet (step P0.7)"
-fi
+# Corporate documents (CLAUDE.md 6.5.5): one file per template.
+for t in templates/docs/*.md.tmpl; do
+  render "$t" > "$SERVICE_DIR/docs/$(basename "${t%.tmpl}")"
+done
+echo "    docs/ populated from templates/docs/ ($(find "$SERVICE_DIR/docs" -name '*.md' | wc -l | tr -d ' ') documents)"
 
 # Compose blocks: service (+ depends_on or embedded volume), database, volume.
 {
@@ -248,8 +216,11 @@ grep -rn 'TODO(scaffold)' "$SERVICE_DIR" "$COMPOSE_FILE" | sed 's/^/    /'
 cat <<MSG
 
 Next:
-  1. Replace every TODO(scaffold) above (make lint fails while any remains).
-  2. Implement GET /health and GET /metrics on port 8080 (CLAUDE.md 6.1).
-  3. make build-${SERVICE} && make test-${SERVICE} && make lint-${SERVICE}
-  4. make up and confirm ${SERVICE} is healthy; record RAM in docs/CAPACITY.md.
+  1. Replace every TODO(scaffold) above, including those in docs/
+     (make lint fails while any remains).
+  2. Start every new source file with a header in its language's syntax:
+     scripts/file-header.sh render <type|path> ${SERVICE} <module> --purpose "..."
+  3. Implement GET /health and GET /metrics on port 8080 (CLAUDE.md 6.1).
+  4. make build-${SERVICE} && make test-${SERVICE} && make lint-${SERVICE}
+  5. make up and confirm ${SERVICE} is healthy; record RAM in docs/CAPACITY.md.
 MSG

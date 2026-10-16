@@ -1,0 +1,50 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       repo
+# Module:          templates/service/catalog.psv
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         Machine-readable service catalog (CLAUDE.md section 2):
+#                  one pipe-separated row per service. Read by
+#                  scripts/new-service.sh and scripts/file-header.sh.
+# Related Docs:    CLAUDE.md (sections 2, 6.5.1), ADR-0004, ADR-0007
+#
+# Columns: name|language|team|abbr|database|kind|purpose
+#   kind: container (database runs as <name>-db) or embedded (in-process).
+# Lines starting with `#` and blank lines are ignored.
+gateway|traefik|Platform Enablement Guild|PEG|Redis|container|Single entry point, routing and forwardAuth middleware.
+auth|keycloak|Trust & Identity Board|TIB|PostgreSQL|container|OAuth2/OIDC provider with one-click guest login.
+rate-limiter|ruby|Trust & Identity Board|TIB|Redis|container|forwardAuth endpoint: JWT verification and per-user addition limits.
+idempotency|typescript|Trust & Identity Board|TIB|Valkey|container|Maps an Idempotency-Key of "=" to exactly one task.
+feature-flags|unleash|Trust & Identity Board|TIB|PostgreSQL|container|Feature flag server holding addition_enabled.
+service-discovery|consul|Platform Enablement Guild|PEG|Raft|embedded|Service registry with health checks.
+config-server|php|Platform Enablement Guild|PEG|MongoDB|container|Configuration fetched by every service at startup.
+secrets|openbao|Platform Enablement Guild|PEG|Raft|embedded|Database credentials and AppRole per service.
+schema-registry|apicurio|Platform Enablement Guild|PEG|PostgreSQL|container|JSON Schema registry for every event.
+parser|ocaml|Arithmetic Excellence Center|AEC|SQLite|embedded|Turns the text expression into an AST.
+validator|rust|Arithmetic Excellence Center|AEC|MariaDB|container|Checks that both operands are within 0-99999.
+operator-registry|crystal|Arithmetic Excellence Center|AEC|PostgreSQL|container|Resolves "+" to the addition saga and checks the feature flag.
+digit-0|c|Arithmetic Excellence Center|AEC|SQLite|embedded|Authoritative source for the value and successor of digit 0.
+digit-1|cpp|Arithmetic Excellence Center|AEC|SQLite|embedded|Authoritative source for the value and successor of digit 1.
+digit-2|fortran|Arithmetic Excellence Center|AEC|SQLite|embedded|Authoritative source for the value and successor of digit 2.
+digit-3|pascal|Arithmetic Excellence Center|AEC|SQLite|embedded|Authoritative source for the value and successor of digit 3.
+digit-4|lua|Arithmetic Excellence Center|AEC|SQLite|embedded|Authoritative source for the value and successor of digit 4.
+digit-5|dart|Arithmetic Excellence Center|AEC|SQLite|embedded|Authoritative source for the value and successor of digit 5.
+digit-6|swift|Arithmetic Excellence Center|AEC|SQLite|embedded|Authoritative source for the value and successor of digit 6.
+digit-7|gleam|Arithmetic Excellence Center|AEC|SQLite|embedded|Authoritative source for the value and successor of digit 7.
+digit-8|d|Arithmetic Excellence Center|AEC|SQLite|embedded|Authoritative source for the value and successor of digit 8.
+digit-9|racket|Arithmetic Excellence Center|AEC|SQLite|embedded|Authoritative source for the value and successor of digit 9 (next is 0 with carry).
+successor|haskell|Arithmetic Excellence Center|AEC|CouchDB|container|Computes n+1 through the digit services and carry.
+carry|elixir|Arithmetic Excellence Center|AEC|Mnesia|embedded|Propagates a carry to higher digit positions.
+saga-orchestrator|go|Transaction Integrity Office|TIO|PostgreSQL|container|Temporal workflow of one addition, compensation and task status.
+consensus|go|Transaction Integrity Office|TIO|BoltDB|embedded|Three replicas compute independently; Raft commits the majority.
+distributed-lock|etcd|Transaction Integrity Office|TIO|Raft|embedded|Locks ordering ledger appends and invoice numbering.
+outbox-relay|debezium|Transaction Integrity Office|TIO|PostgreSQL|container|Publishes the saga outbox to Redpanda via CDC.
+dead-letter|perl|Transaction Integrity Office|TIO|MongoDB|container|Retries failed events and signals compensation.
+ledger|nim|Transaction Integrity Office|TIO|immudb|container|Immutable hash-chained record of every result.
+expression-assembler|csharp|Customer Experience Tribe|CXT|SurrealDB|container|Turns key presses into an expression and starts a task.
+commutator|zig|Arithmetic Excellence Center|AEC|LMDB|embedded|Swaps operands so that b is the smaller one.
+cloud-notary|python|Cloud Governance Committee|CGC|DynamoDB|container|AWS Lambda verifying the hash chain and storing a copy.
+stopwatch|kotlin|Customer Experience Tribe|CXT|TimescaleDB|container|Measures the official waiting time and streams it over SSE.
+billing|lisp|Revenue Operations Unit|ROU|Firebird|container|Issues the 0.00 PLN invoice as PDF.

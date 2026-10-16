@@ -1,0 +1,38 @@
+# Capacity Plan — `__SERVICE__`
+
+| Field | Value |
+| --- | --- |
+| Document | Capacity Plan |
+| Component | `__SERVICE__` |
+| Owning Team | __TEAM__ (__TEAM_ABBR__) |
+| Classification | INTERNAL |
+| Document Version | 1.0 |
+| Last Reviewed | __DATE__ |
+
+## 1. Limits
+
+| Container | `mem_limit` | `cpus` | Justification |
+| --- | --- | --- | --- |
+| `__SERVICE__` | __MEM__ | 0.5 | __MEM_REASON__ |
+
+## 2. Measured Usage
+
+Measured with `docker stats --no-stream` after `make up`, idle and during an
+addition (CLAUDE.md section 8, rule 10).
+
+| Container | Idle RAM | Peak RAM | Peak CPU | Scenario | Measured On |
+| --- | --- | --- | --- | --- | --- |
+
+<!-- TODO(scaffold): record the measurement for every container of this
+     service (including its database container, if any) with the scenario
+     used, for example "1000 + 1000". -->
+
+## 3. Scaling Notes
+
+AaaS runs one replica of every container on a single host (16 GB RAM
+minimum). The waiting time of an addition grows linearly with the smaller
+operand (CLAUDE.md section 1); capacity is planned for the largest addition,
+99 999 + 99 999.
+
+<!-- TODO(scaffold): how the service's resource usage grows with the operand
+     size, if at all. -->

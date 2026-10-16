@@ -1,0 +1,72 @@
+# Service Charter — `__SERVICE__`
+
+| Field | Value |
+| --- | --- |
+| Document | Service Charter |
+| Component | `__SERVICE__` |
+| Owning Team | __TEAM__ (__TEAM_ABBR__) |
+| Classification | INTERNAL |
+| Document Version | 1.0 |
+| Service Version | __VERSION__ |
+| Last Reviewed | __DATE__ |
+| Review Cadence | On every minor version of the service, and at least once per phase |
+
+## 1. Mission
+
+__PURPOSE__
+
+<!-- TODO(scaffold): restate the mission in two or three sentences: what the
+     service does in the addition flow (CLAUDE.md section 3) and nothing else. -->
+
+## 2. Business Value
+
+AaaS exists to add two non-negative integers with a level of rigour no native
+`+` operator can offer. `__SERVICE__` contributes to that proposition as
+described below.
+
+<!-- TODO(scaffold): explain which property of the addition this service
+     guarantees (correctness, consistency, reliability, security or
+     observability) and what the user would lose without it. -->
+
+## 3. Stakeholders
+
+| Stakeholder | Interest |
+| --- | --- |
+| __TEAM__ (__TEAM_ABBR__) | Owns, builds and operates the service |
+| End user of the calculator | Receives a correct result of the addition |
+
+<!-- TODO(scaffold): add upstream and downstream teams from DEPENDENCIES.md
+     (for example the team owning the producer of the events consumed here). -->
+
+## 4. Scope
+
+### In Scope
+
+<!-- TODO(scaffold): bullet list of responsibilities, one per contract in
+     API.md. -->
+
+### Out of Scope
+
+- Any user-visible feature beyond the calculator keypad, display, timer and
+  invoice download (CLAUDE.md section 1).
+- Access to the database of any other service (CLAUDE.md section 1, rule 4).
+
+<!-- TODO(scaffold): add responsibilities that belong to neighbouring
+     services and are therefore explicitly excluded. -->
+
+## 5. Key Performance Indicators
+
+| KPI | Definition | Target | Source |
+| --- | --- | --- | --- |
+| Availability | Share of successful `GET /health` probes | See SLO.md | Prometheus |
+
+<!-- TODO(scaffold): add KPIs specific to the service (for example successor
+     calls per second, carry propagations, events processed). Every KPI must
+     be measurable from an existing metric. -->
+
+## 6. Related Documents
+
+[RACI](RACI.md) · [SLO](SLO.md) · [Runbook](RUNBOOK.md) ·
+[Threat Model](THREAT_MODEL.md) · [Data Classification](DATA_CLASSIFICATION.md) ·
+[Dependencies](DEPENDENCIES.md) · [Capacity](CAPACITY.md) · [API](API.md) ·
+[Changelog](CHANGELOG.md) · [README](../README.md)

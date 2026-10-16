@@ -1,0 +1,38 @@
+# Dependencies — `__SERVICE__`
+
+| Field | Value |
+| --- | --- |
+| Document | Dependency Register |
+| Component | `__SERVICE__` |
+| Owning Team | __TEAM__ (__TEAM_ABBR__) |
+| Classification | INTERNAL |
+| Document Version | 1.0 |
+| Last Reviewed | __DATE__ |
+
+## 1. Upstream (this service depends on)
+
+| Dependency | Kind | Contract | Effect of Failure |
+| --- | --- | --- | --- |
+| __DB__ | Database (__DB_KIND__) | Private schema in `migrations/` | The service reports unhealthy and stops serving requests |
+
+<!-- TODO(scaffold): add every service, topic and platform component this
+     service calls or consumes (Redpanda topics, gRPC/HTTP services; from
+     Phase 5 config-server, secrets, service-discovery, schema-registry),
+     with the timeout/retry/DLQ behaviour of CLAUDE.md 6.1. -->
+
+## 2. Downstream (depends on this service)
+
+| Dependant | Kind | Contract | Effect of Our Failure |
+| --- | --- | --- | --- |
+
+<!-- TODO(scaffold): add every service or microfrontend that calls this
+     service or consumes its events, from CLAUDE.md sections 3 and 4. -->
+
+## 3. Build-Time Dependencies
+
+| Dependency | Version | Licence |
+| --- | --- | --- |
+
+<!-- TODO(scaffold): base images and libraries pinned in the Dockerfile and
+     the __LANGUAGE__ dependency manifest. Only open-source licences are
+     allowed (CLAUDE.md section 1, rule 3). -->

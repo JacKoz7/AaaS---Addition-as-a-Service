@@ -1,0 +1,40 @@
+# RACI Matrix — `__SERVICE__`
+
+| Field | Value |
+| --- | --- |
+| Document | RACI Matrix |
+| Component | `__SERVICE__` |
+| Owning Team | __TEAM__ (__TEAM_ABBR__) |
+| Classification | INTERNAL |
+| Document Version | 1.0 |
+| Last Reviewed | __DATE__ |
+
+**R** Responsible (does the work) · **A** Accountable (one per activity,
+signs off) · **C** Consulted (two-way, before the decision) · **I** Informed
+(one-way, after the decision).
+
+In practice every team is represented by the repository owner
+(`@aaas-owner` in `CODEOWNERS`); the matrix records which organisational role
+each decision belongs to.
+
+| Activity | __TEAM_ABBR__ | PEG | TIB | OSG | TIO |
+| --- | --- | --- | --- | --- | --- |
+| Code change within the service | R, A | I | I | I | I |
+| Contract change (`contracts/`) | R, A | C | I | I | C |
+| Deployment (`make up`, release tag) | R, A | C | I | I | I |
+| Incident response | R, A | C | C | C | I |
+| Database migration | R, A | C | I | I | I |
+| Security finding | R | I | A | I | I |
+| Alert and dashboard change | R | I | I | A | I |
+| Capacity (memory limit) change | R, A | C | I | C | I |
+
+<!-- TODO(scaffold): confirm the matrix for this service. Replace the
+     consulted teams with the owners of the services listed in
+     DEPENDENCIES.md; if __TEAM_ABBR__ is one of the column teams, merge the
+     duplicate column. -->
+
+## Escalation Path
+
+1. __TEAM__ (__TEAM_ABBR__), service owner.
+2. Platform Enablement Guild (PEG) for platform and infrastructure issues.
+3. Repository owner (`@aaas-owner`).

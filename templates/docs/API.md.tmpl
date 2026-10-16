@@ -1,0 +1,35 @@
+<!-- GENERATED FILE: produced from the contracts in contracts/ and the
+     service's native documentation tool by `make docs` (wired in P0.10).
+     Until then it is kept in sync by hand with the contracts; do not add
+     content that is not in a contract. -->
+# API Reference — `__SERVICE__`
+
+| Field | Value |
+| --- | --- |
+| Document | API Reference |
+| Component | `__SERVICE__` |
+| Owning Team | __TEAM__ (__TEAM_ABBR__) |
+| Classification | INTERNAL |
+| Service Version | __VERSION__ |
+
+## 1. HTTP (port 8080)
+
+| Method | Path | Description | Response |
+| --- | --- | --- | --- |
+| `GET` | `/health` | Liveness and readiness | `200 { "status": "ok", "checks": { ... } }`, `503` when a check fails |
+| `GET` | `/metrics` | Prometheus metrics | `200 text/plain; version=0.0.4` |
+
+Errors use RFC 9457 (`application/problem+json`).
+
+## 2. gRPC (port 9090)
+
+<!-- TODO(scaffold): methods from contracts/proto/aaas/__SERVICE__/v1/, or
+     "None" if the service has no gRPC interface. -->
+
+## 3. Events
+
+| Topic | Direction | Schema |
+| --- | --- | --- |
+
+<!-- TODO(scaffold): topics produced and consumed (CLAUDE.md 4.2), with links
+     to contracts/events/, or "None". -->

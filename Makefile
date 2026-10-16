@@ -163,9 +163,12 @@ lint: lint-repo lint-scaffold ## Run every linter (repository-level and per comp
 .PHONY: lint-scaffold
 lint-scaffold: ## Fail if any TODO(scaffold) marker from new-service.sh remains
 	@echo "==> TODO(scaffold) markers"
-	@if grep -rn 'TODO(scaffold)' --exclude-dir=.git --exclude-dir=templates \
-		--exclude-dir=node_modules --exclude=Makefile --exclude=new-service.sh \
-		--exclude=CLAUDE.md --exclude-dir=docs . ; then \
+	@# Exclusions are root-relative pathspecs: the root Makefile, CLAUDE.md,
+	@# the generator, templates/ and the top-level docs/ (step logs and ADRs
+	@# mention the marker). services/*/docs/ and services/*/Makefile are checked.
+	@if git grep -n -F --untracked 'TODO(scaffold)' -- . \
+		':(exclude)Makefile' ':(exclude)CLAUDE.md' ':(exclude)scripts/new-service.sh' \
+		':(exclude)templates' ':(exclude)docs'; then \
 		echo "error: unfinished scaffold; replace the markers above." >&2; exit 1; \
 	else echo "    none"; fi
 

@@ -1,0 +1,36 @@
+# Threat Model — `__SERVICE__`
+
+| Field | Value |
+| --- | --- |
+| Document | Threat Model (STRIDE) |
+| Component | `__SERVICE__` |
+| Owning Team | __TEAM__ (__TEAM_ABBR__) |
+| Classification | INTERNAL |
+| Document Version | 1.0 |
+| Last Reviewed | __DATE__ |
+| Security Reviewer | Trust & Identity Board (TIB) |
+
+## 1. System Context
+
+- Network: `services` (service-to-service traffic) and `data` (own database
+  only). No port is published on the host (CLAUDE.md 6.2).
+- Data store: __DB__ (__DB_KIND__), reachable only by this service.
+
+<!-- TODO(scaffold): list trust boundaries crossed by this service: callers,
+     events consumed, services called. -->
+
+## 2. STRIDE Analysis
+
+| Category | Threat | Mitigation | Residual Risk |
+| --- | --- | --- | --- |
+| Spoofing | A container on the `services` network impersonates a legitimate caller | Network segmentation; JWT verification at the gateway (P6.2) | <!-- TODO(scaffold) --> |
+| Tampering | Results or events are altered in transit or at rest | Hash chain in the ledger (P3.7), consensus voting (P4.5), schema validation (P3.1) | <!-- TODO(scaffold) --> |
+| Repudiation | An operation cannot be traced to a task | Structured logs with `taskId` and `traceId` (CLAUDE.md 6.1) | <!-- TODO(scaffold) --> |
+| Information Disclosure | Database credentials leak | Credentials from env, moved to OpenBao in P5.3; `.env` git-ignored | <!-- TODO(scaffold) --> |
+| Denial of Service | A large addition exhausts memory or CPU | `mem_limit` and `cpus` per container; rate limits at the gateway (P6.2) | <!-- TODO(scaffold) --> |
+| Elevation of Privilege | A compromised process gains host access | Non-root user in the runtime image; minimal base image | <!-- TODO(scaffold) --> |
+
+<!-- TODO(scaffold): confirm each row for this service, remove mitigations
+     that do not apply, add service-specific threats and rate the residual
+     risk (Low / Medium / High). Register High risks in
+     docs/governance/RISK_REGISTER.md. -->

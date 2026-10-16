@@ -1,0 +1,50 @@
+# Runbook — `__SERVICE__`
+
+| Field | Value |
+| --- | --- |
+| Document | Operational Runbook |
+| Component | `__SERVICE__` |
+| Owning Team | __TEAM__ (__TEAM_ABBR__) |
+| Classification | INTERNAL |
+| Document Version | 1.0 |
+| Last Reviewed | __DATE__ |
+
+## 1. Quick Reference
+
+| Item | Command |
+| --- | --- |
+| State | `make ps` |
+| Logs | `make logs SVC=__SERVICE__` |
+| Health | `docker compose exec __SERVICE__ wget -qO- http://127.0.0.1:8080/health` |
+| Metrics | `GET /metrics` on port 8080 |
+| Restart | `docker compose restart __SERVICE__` |
+| Rebuild | `make build-__SERVICE__ && make up` |
+
+## 2. Alerts
+
+Every alert defined for this service has one section below: meaning,
+diagnosis step by step, remediation, escalation. Alerting is introduced in
+step P7.4; until then this section lists the failure modes detected by the
+Compose healthcheck.
+
+### 2.1 Container unhealthy
+
+- **Meaning**: the Compose healthcheck (`GET /health`, every 10 s, 2 s
+  timeout) failed five times in a row after the 30 s start period;
+  dependants that wait with `condition: service_healthy` do not start.
+- **Diagnosis**:
+  1. `make ps` — confirm the state of `__SERVICE__`.
+  2. `make logs SVC=__SERVICE__` — look for `level":"error"` entries.
+  3. Check the `checks` object of the last `/health` response for the failing
+     dependency.
+- **Remediation**: fix the failing dependency, then
+  `docker compose restart __SERVICE__`.
+- **Escalation**: __TEAM__ (__TEAM_ABBR__), then PEG (RACI.md).
+
+<!-- TODO(scaffold): add one section per service-specific failure mode and,
+     from P7.4, per alert (name, PromQL expression, threshold). -->
+
+## 3. Database (__DB__, __DB_KIND__)
+
+<!-- TODO(scaffold): how to inspect the database, how to restore it from the
+     `__SERVICE__-data` volume, and what happens to in-flight additions. -->

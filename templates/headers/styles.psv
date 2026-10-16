@@ -1,0 +1,68 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       repo
+# Module:          templates/headers/styles.psv
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         Comment syntax of the mandatory file header (CLAUDE.md
+#                  6.5.2) for every file type used in the repository. Read by
+#                  scripts/file-header.sh (and by the documentation check in
+#                  P0.9) to render, generate and detect headers.
+# Related Docs:    templates/headers/README.md, ADR-0007
+#
+# Columns: type|matches|open|prefix|close|width|preamble
+#   type      Header type name; also the template file name <type>.tmpl.
+#   matches   Comma-separated file extensions (`.c`) or exact base names
+#             (`Dockerfile`) that use this type. Empty: chosen explicitly only.
+#   open      Line opening a block comment; empty for line comments.
+#   prefix    Text put before every header line (trailing spaces are trimmed
+#             on empty lines).
+#   close     Line closing a block comment; empty for line comments.
+#   width     Maximum line length of the rendered header.
+#   preamble  Line that must precede the header (shebang, `#lang`, `<?php`,
+#             magic comment); empty when none. A preamble other than a
+#             shebang is followed by one blank line.
+# A single space at the end of `prefix` is significant and is kept.
+c|.c,.h|/*| * | */|80|
+cpp|.cpp,.cc,.cxx,.hpp,.hh||// ||80|
+fortran|.f90,.f95,.f03,.f08||! ||80|
+pascal|.pas,.pp,.lpr||// ||80|
+lua|.lua||-- ||80|
+dart|.dart||// ||80|
+swift|.swift||// ||80|
+gleam|.gleam||// ||80|
+d|.d||// ||80|
+racket|.rkt||;; ||80|#lang racket/base
+haskell|.hs,.cabal||-- ||80|
+elixir|.ex,.exs||# ||80|
+go|.go||// ||80|
+python|.py||# ||80|
+rust|.rs||// ||80|
+cobol|.cob,.cbl,.cpy||      * ||72|
+nim|.nim,.nims,.nimble||# ||80|
+csharp|.cs||// ||80|
+zig|.zig,.zon||// ||80|
+kotlin|.kt,.kts|/*| * | */|80|
+java|.java|/*| * | */|80|
+lisp|.lisp,.asd,.cl||;;;; ||80|
+ocaml|.ml,.mli|(*|   | *)|80|
+dune|dune,dune-project,.opam||; ||80|
+crystal|.cr||# ||80|
+ruby|.rb,Gemfile,Rakefile,.gemspec||# ||80|# frozen_string_literal: true
+php|.php|/**| * | */|80|<?php
+perl|.pl,.pm,.t||# ||80|
+typescript|.ts,.tsx,.mts||// ||80|
+javascript|.js,.jsx,.mjs,.cjs||// ||80|
+elm|.elm||-- ||80|
+html|.html,.htm,.vue,.svelte,.marko,.xml,.svg|<!--|  |-->|80|
+css|.css,.scss|/*| * | */|80|
+typst|.typ||// ||80|
+proto|.proto||// ||80|
+sql|.sql||-- ||80|
+shell|.sh,.bash||# ||80|#!/usr/bin/env bash
+make|Makefile,.mk||# ||80|
+dockerfile|Dockerfile,.dockerfile,.dockerignore||# ||80|
+yaml|.yml,.yaml||# ||80|
+toml|.toml||# ||80|
+conf|.conf,.ini,.cfg,.env,.example,.psv,.gitignore,.gitattributes,.editorconfig||# ||80|

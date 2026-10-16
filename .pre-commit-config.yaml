@@ -37,6 +37,8 @@ repos:
         args: [--maxkb=512]
       - id: check-executables-have-shebangs
       - id: check-shebang-scripts-are-executable
+        # Header templates carry a shebang for the file they start, not their own.
+        exclude: ^templates/headers/
       - id: check-yaml
         args: [--allow-multiple-documents]
       - id: check-json
@@ -83,6 +85,18 @@ repos:
         language: docker_image
         entry: rhysd/actionlint:1.7.12
         files: ^\.github/workflows/.+\.ya?ml$
+
+  # --- File header templates ------------------------------------------------
+  # templates/headers/*.tmpl are generated from header.txt and styles.psv;
+  # this hook fails when they are edited by hand or not regenerated (ADR-0007).
+  - repo: local
+    hooks:
+      - id: file-header-templates
+        name: file header templates in sync
+        language: system
+        entry: scripts/file-header.sh check
+        files: ^(templates/headers/|scripts/file-header\.sh$)
+        pass_filenames: false
 
   # --- Commit messages -------------------------------------------------------
   - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
