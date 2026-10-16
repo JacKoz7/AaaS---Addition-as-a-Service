@@ -42,6 +42,7 @@ watch:
   - SECURITY.md
   - docs
   - templates/service/catalog.psv
+  - contracts
   - scripts/docs-portal.py
 
 # Fail on links to missing pages and anchors (warnings are fatal in --strict).

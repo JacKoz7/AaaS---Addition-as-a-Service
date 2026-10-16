@@ -11,8 +11,8 @@
 #                  event, API and changelog catalogs and the ADR, RFC, step
 #                  log and release note indexes. Runs as an MkDocs hook
 #                  before every build.
-# Related Docs:    ADR-0010, mkdocs.yml, CLAUDE.md (6.5.7),
-#                  templates/service/catalog.psv
+# Related Docs:    ADR-0010, ADR-0011, mkdocs.yml, CLAUDE.md (6.5.7),
+#                  templates/service/catalog.psv, contracts/events/topics.psv
 """Documentation portal assembler (MkDocs hook and command-line tool).
 
 Summary:
@@ -22,7 +22,7 @@ Description:
     The portal shows documents that live all over the repository (root
     documents, ``docs/``, ``services/*/docs/``, ``frontend/*/docs/``,
     ``contracts/``) and pages generated from machine-readable sources (the
-    service catalog, JSON Schemas, OpenAPI and proto files, ADR metadata).
+    service catalog, the topic registry, JSON Schemas, OpenAPI and proto files, ADR metadata).
     MkDocs reads a single directory, so this module mirrors the documents
     into ``build/portal/`` under their repository paths, with two
     exceptions: the root ``README.md`` becomes the home page ``index.md``,
@@ -42,6 +42,8 @@ Business Justification:
 
 Owner: Platform Enablement Guild (PEG)
 Since: docs-portal 0.1.0
+Versions: 0.1.0 (P0.10) first release; 0.2.0 (P1.1) topic registry in the
+    event catalog.
 See Also: mkdocs.yml, ADR-0010, Makefile targets ``docs`` and ``docs-serve``.
 """
 
@@ -85,6 +87,9 @@ ASSET_SUFFIXES = (".png", ".svg", ".jpg", ".jpeg", ".gif", ".webp")
 
 #: Service catalog (CLAUDE.md section 2), shared with scripts/new-service.sh.
 CATALOG = PurePosixPath("templates/service/catalog.psv")
+
+#: Topic registry (CLAUDE.md 4.2), shared with infra/redpanda/create-topics.sh.
+TOPICS = PurePosixPath("contracts/events/topics.psv")
 
 #: Corporate documents of a component (CLAUDE.md 6.5.5), in display order.
 COMPONENT_DOCUMENTS = (
@@ -445,6 +450,64 @@ def read_catalog(root: Path) -> list[Service]:
             raise ValueError(f"{CATALOG}: expected 7 columns, got {len(columns)}: {line}")
         services.append(Service(len(services) + 1, *columns))
     return services
+
+
+def read_topics(root: Path) -> list[list[str]]:
+    """Read the topic registry.
+
+    Summary:
+        Parses ``contracts/events/topics.psv`` into rows of five columns.
+
+    Description:
+        Blank lines and lines starting with ``#`` are skipped. Every other
+        line must have exactly five ``|``-separated columns: topic,
+        partitions, producer, consumers and purpose. A missing registry
+        yields an empty list, so the portal builds before the file exists.
+
+    Business Justification:
+        The registry that creates the topics on the broker also documents
+        them, so the event catalog cannot drift from the running system.
+
+    Parameters:
+        root (Path): repository root.
+
+    Returns:
+        list[list[str]]: one ``[topic, partitions, producer, consumers,
+        purpose]`` row per topic, in registry order.
+
+    Errors:
+        OSError: the registry exists but cannot be read.
+        ValueError: a line does not have five columns.
+
+    Side Effects:
+        Reads one file.
+
+    Complexity: O(n) time and memory in the number of rows.
+    Thread Safety: safe (no shared state).
+    Owner: Platform Enablement Guild (PEG)
+    Since: docs-portal 0.2.0
+
+    Example:
+        >>> root = Path(__file__).resolve().parent.parent
+        >>> read_topics(root)[0][:2]
+        ['aaas.key.pressed.v1', '3']
+        >>> read_topics(Path("/nonexistent"))
+        []
+
+    See Also: generate_event_catalog, infra/redpanda/create-topics.sh.
+    """
+    path = root.joinpath(*TOPICS.parts)
+    if not path.is_file():
+        return []
+    rows: list[list[str]] = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if not line.strip() or line.startswith("#"):
+            continue
+        columns = line.split("|")
+        if len(columns) != 5:
+            raise ValueError(f"{TOPICS}: expected 5 columns, got {len(columns)}: {line}")
+        rows.append(columns)
+    return rows
 
 
 def github_url(repo_path: str, is_dir: bool) -> str:
@@ -1151,16 +1214,21 @@ def generate_event_catalog(root: Path) -> str:
     """Render the event catalog page.
 
     Summary:
-        Table of every JSON Schema in ``contracts/events/``.
+        Tables of every topic in the registry and every JSON Schema in
+        ``contracts/events/``.
 
     Description:
-        For each ``*.json`` file: the schema ``title`` (the topic), its
+        The topic table comes from ``contracts/events/topics.psv``: topic,
+        partitions, producer, consumers, purpose, and the schema file whose
+        ``title`` equals the topic, if any. The schema table lists, for each
+        ``*.json`` file, the schema ``title`` (the topic), its
         ``description`` and ``$id``, and a link to the source file on GitHub.
         A file that is not valid JSON is reported with a warning, which fails
         the strict build.
 
     Business Justification:
-        CLAUDE.md 6.5.7: event catalog generated from JSON Schema.
+        CLAUDE.md 6.5.7: event catalog generated from JSON Schema; the topic
+        registry adds who produces and consumes each event.
 
     Parameters:
         root (Path): repository root.
@@ -1169,31 +1237,38 @@ def generate_event_catalog(root: Path) -> str:
         str: Markdown of ``catalog/events.md``.
 
     Errors:
-        None (invalid schemas are logged, not raised).
+        ValueError: a topic registry line does not have five columns
+        (invalid schemas are logged, not raised).
 
     Side Effects:
-        Reads schema files; logs a warning per invalid file.
+        Reads the topic registry and schema files; logs a warning per
+        invalid schema file.
 
-    Complexity: O(total schema size) time and memory.
+    Complexity: O(total registry and schema size) time and memory.
     Thread Safety: safe (no shared state).
     Owner: Platform Enablement Guild (PEG)
     Since: docs-portal 0.1.0
 
     Example:
-        >>> "No event schema" in generate_event_catalog(Path("/nonexistent"))
+        >>> page = generate_event_catalog(Path("/nonexistent"))
+        >>> "No topic is registered" in page and "No event schema" in page
         True
 
-    See Also: CLAUDE.md 4.2, contracts/events/.
+    See Also: read_topics, CLAUDE.md 4.2, contracts/events/.
     """
     page = (
         "# Event Catalog\n\n"
         "Events published on Redpanda (CLAUDE.md, section 4.2), generated from "
-        "the JSON Schemas in `contracts/events/`.\n\n"
+        "the topic registry `contracts/events/topics.psv` and the JSON Schemas "
+        "in `contracts/events/`. Messages are keyed by `taskId`; every topic has "
+        "replication factor 1, `cleanup.policy=delete` and seven days of "
+        "retention (ADR-0011).\n\n"
     )
     schemas = (
         sorted((root / "contracts" / "events").rglob("*.json")) if (root / "contracts" / "events").is_dir() else []
     )
-    rows = []
+    schema_rows = []
+    schema_by_topic: dict[str, str] = {}
     for path in schemas:
         rel = path.relative_to(root).as_posix()
         try:
@@ -1204,17 +1279,29 @@ def generate_event_catalog(root: Path) -> str:
         if not isinstance(schema, dict):
             LOG.warning("%s: a JSON Schema must be an object", rel)
             continue
-        rows.append(
+        link = f"[{path.name}]({github_url(rel, False)})"
+        schema_by_topic[str(schema.get("title", path.stem))] = link
+        schema_rows.append(
             [
                 f"`{schema.get('title', path.stem)}`",
                 str(schema.get("description", "—")).replace("\n", " "),
                 f"`{schema.get('$id', '—')}`",
-                f"[{path.name}]({github_url(rel, False)})",
+                link,
             ]
         )
-    if not rows:
+    topic_rows = [
+        [f"`{topic}`", partitions, producer, consumers, purpose, schema_by_topic.get(topic, "—")]
+        for topic, partitions, producer, consumers, purpose in read_topics(root)
+    ]
+    page += "## Topics\n\n"
+    if topic_rows:
+        page += table(["Topic", "Partitions", "Producer", "Consumers", "Purpose", "Schema"], topic_rows)
+    else:
+        page += "No topic is registered in `contracts/events/topics.psv` yet.\n"
+    page += "\n## Schemas\n\n"
+    if not schema_rows:
         return page + "No event schema exists in `contracts/events/` yet.\n"
-    return page + table(["Event", "Description", "Schema ID", "Source"], rows)
+    return page + table(["Event", "Description", "Schema ID", "Source"], schema_rows)
 
 
 def generate_api_catalog(root: Path, portal_files: set[str]) -> str:
