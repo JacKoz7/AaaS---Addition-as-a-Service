@@ -57,6 +57,11 @@ Compose skeleton of step P0.3) fail with a message naming that step.
 
 ## Contributing
 
+Start with [`docs/onboarding/ONBOARDING.md`](docs/onboarding/ONBOARDING.md) and
+[`CONTRIBUTING.md`](CONTRIBUTING.md). Participation is governed by the
+[Code of Conduct](CODE_OF_CONDUCT.md); vulnerabilities are reported as described
+in [`SECURITY.md`](SECURITY.md).
+
 Install the git hooks once after cloning:
 
 ```sh
@@ -88,6 +93,12 @@ step is tagged `step/P<phase>.<step>` and has a log in
 | `docs/PROGRESS.md` | Current state and the checklist of every step |
 | `docs/progress/steps/` | One log per step |
 | `docs/adr/` | Architecture Decision Records |
+| `docs/rfc/` | Requests for Comments for cross-service changes (`TEMPLATE.md`) |
+| `docs/governance/` | RFC process, risk register, DPIA, release process, postmortem template |
+| `docs/onboarding/` | First-day guide |
+| `docs/GLOSSARY.md` | Glossary of terms |
+| `CODEOWNERS` | Directory-to-team mapping (ADR-0008) |
+| `.github/` | CI workflow, pull request and issue templates |
 | `Makefile` | Entry point: `make help` |
 | `services/<service>/` | One directory per microservice (from Phase 1) |
 | `frontend/<element>/` | One directory per microfrontend (from Phase 1) |
