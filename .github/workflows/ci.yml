@@ -7,12 +7,14 @@
 # Classification:  INTERNAL
 # Purpose:         Continuous integration: repository linters (pre-commit),
 #                  commit message linting (commitlint), the documentation
-#                  check, the strict build of the documentation portal, and
-#                  build, lint, unit tests and documentation
+#                  check, the strict build of the documentation portal, a
+#                  smoke test of the core Compose profile (event bus and
+#                  topics), and build, lint, unit tests and documentation
 #                  coverage of every changed component as a matrix with one
 #                  job per services/<name> or frontend/<name> directory.
 # Related Docs:    CLAUDE.md (sections 6.3, 6.4, 6.5.7, 7.1, 9.1), ADR-0006,
-#                  ADR-0005, ADR-0009, ADR-0010, scripts/ci/changed-components.sh
+#                  ADR-0005, ADR-0009, ADR-0010, ADR-0011,
+#                  scripts/ci/changed-components.sh
 #
 # Third-party actions are pinned to full commit SHAs; the tag they correspond
 # to is given in the trailing comment. Update them deliberately, never to a
@@ -90,6 +92,27 @@ jobs:
         run: make docs-portal
       - name: Docstring coverage and doctests (make doc-coverage-repo)
         run: make doc-coverage-repo
+
+  # -------------------------------------------------------------------------
+  # Shared infrastructure: the core profile starts, the broker is healthy and
+  # every topic of contracts/events/topics.psv exists (ADR-0011).
+  # -------------------------------------------------------------------------
+  compose-core:
+    name: compose (core)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - name: Start the core profile (make up PROFILES=core)
+        run: make up PROFILES=core
+      - name: Verify the topics (make topics-check)
+        run: make topics-check PROFILES=core
+      - name: Show container logs
+        if: failure()
+        run: docker compose --profile core logs --no-color
+      - name: Remove containers and volumes
+        if: always()
+        run: make clean PROFILES=core
 
   # -------------------------------------------------------------------------
   # Commit messages: every commit of the pushed range or pull request.
@@ -185,7 +208,7 @@ jobs:
   # -------------------------------------------------------------------------
   ci-ok:
     name: ci-ok
-    needs: [lint, docs, commitlint, changes, component]
+    needs: [lint, docs, compose-core, commitlint, changes, component]
     if: always()
     runs-on: ubuntu-24.04
     timeout-minutes: 5
