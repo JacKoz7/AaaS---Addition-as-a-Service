@@ -1,7 +1,8 @@
   # --- __SERVICE__ (__LANGUAGE__, __TEAM_ABBR__) ---------------------------------
   __SERVICE__:
     build:
-      context: services/__SERVICE__
+      # Relative to compose/, the directory of the included file.
+      context: ../services/__SERVICE__
       dockerfile: Dockerfile
       target: runtime
     image: aaas/__SERVICE__:dev
