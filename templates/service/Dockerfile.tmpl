@@ -17,6 +17,9 @@
 #   test      — runs unit tests; fails the build on failures.
 #   doc-coverage — runs the native documentation coverage tool of the
 #               language (CLAUDE.md 6.5.4); fails below 100%.
+#   api-docs  — the native API documentation (CLAUDE.md 6.5.3) as HTML with
+#               an index.html at the root; exported by `make api-docs` and
+#               published in the portal (ADR-0010).
 #   build     — produces the release artifact.
 #   runtime   — minimal image, non-root user, port 8080 (HTTP) and 9090 (gRPC).
 
@@ -38,6 +41,13 @@ RUN echo "TODO(scaffold): test __SERVICE__" && exit 1
 FROM toolchain AS doc-coverage
 # TODO(scaffold): __DOC_TOOL__
 RUN echo "TODO(scaffold): doc-coverage __SERVICE__" && exit 1
+
+FROM toolchain AS api-docs-build
+# TODO(scaffold): __API_DOC_TOOL__
+RUN mkdir -p /api-docs && echo "TODO(scaffold): api-docs __SERVICE__" && exit 1
+
+FROM scratch AS api-docs
+COPY --from=api-docs-build /api-docs /
 
 FROM toolchain AS build
 # TODO(scaffold): build the release artifact into /out.

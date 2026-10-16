@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       repo
+# Module:          ruff.toml
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         Linter and formatter settings (ruff) for the repository-level
+#                  Python scripts; services carry their own configuration.
+# Related Docs:    CLAUDE.md (6.3), ADR-0010, .pre-commit-config.yaml
+
+# The scripts run in the documentation tool image (Python 3.11).
+target-version = "py311"
+line-length = 120
+
+[lint]
+# pycodestyle, Pyflakes, isort, bugbear, pyupgrade.
+select = ["E", "W", "F", "I", "B", "UP"]

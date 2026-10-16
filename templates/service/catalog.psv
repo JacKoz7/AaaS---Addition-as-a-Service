@@ -7,8 +7,10 @@
 # Classification:  INTERNAL
 # Purpose:         Machine-readable service catalog (CLAUDE.md section 2):
 #                  one pipe-separated row per service. Read by
-#                  scripts/new-service.sh and scripts/file-header.sh.
-# Related Docs:    CLAUDE.md (sections 2, 6.5.1), ADR-0004, ADR-0007
+#                  scripts/new-service.sh, scripts/file-header.sh and
+#                  scripts/docs-portal.py (service map and catalog).
+# Related Docs:    CLAUDE.md (sections 2, 6.5.1), ADR-0004, ADR-0007,
+#                  ADR-0010
 #
 # Columns: name|language|team|abbr|database|kind|purpose
 #   kind: container (database runs as <name>-db) or embedded (in-process).

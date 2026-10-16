@@ -12,7 +12,7 @@
 #                  compose/services.yml and the database password placeholder
 #                  in .env.example.
 # Related Docs:    CLAUDE.md (sections 2, 6.1, 6.2, 6.5), ADR-0002, ADR-0004,
-#                  ADR-0007, templates/service/, templates/docs/
+#                  ADR-0007, ADR-0010, templates/service/, templates/docs/
 #
 # Usage:
 #   scripts/new-service.sh <name> <language> [--team "<Team Name> (ABBR)"]
@@ -81,6 +81,41 @@ doc_tool() {
   esac
 }
 
+# api_doc_tool <language>: set API_DOC_TOOL to the native API documentation
+# generator of <language> (CLAUDE.md 6.5.3), used as a hint in the Dockerfile
+# `api-docs-build` stage of the scaffold (ADR-0010).
+api_doc_tool() {
+  local out="write the HTML with an index.html at the root into /api-docs"
+  case "$1" in
+    go) API_DOC_TOOL="go doc / pkgsite (static export of the package docs): ${out}" ;;
+    rust) API_DOC_TOOL="cargo doc --no-deps --document-private-items, copy target/doc: ${out}" ;;
+    haskell) API_DOC_TOOL="cabal haddock --haddock-all: ${out}" ;;
+    ocaml) API_DOC_TOOL="dune build @doc (odoc), copy _build/default/_doc/_html: ${out}" ;;
+    elixir) API_DOC_TOOL="mix docs (ExDoc), copy doc/: ${out}" ;;
+    gleam) API_DOC_TOOL="gleam docs build, copy build/dev/docs/<package>: ${out}" ;;
+    csharp) API_DOC_TOOL="docfx (XML doc comments): ${out}" ;;
+    kotlin) API_DOC_TOOL="Dokka (dokkaHtml): ${out}" ;;
+    ruby) API_DOC_TOOL="yard doc --private, copy doc/: ${out}" ;;
+    php) API_DOC_TOOL="phpDocumentor (phpdoc -d src -t /api-docs): ${out}" ;;
+    python) API_DOC_TOOL="pdoc --docformat google -o /api-docs <package>: ${out}" ;;
+    typescript | javascript) API_DOC_TOOL="TypeDoc (TSDoc/JSDoc): ${out}" ;;
+    nim) API_DOC_TOOL="nim doc --project --index:on: ${out}" ;;
+    crystal) API_DOC_TOOL="crystal docs, copy docs/: ${out}" ;;
+    zig) API_DOC_TOOL="zig build-lib -femit-docs: ${out}" ;;
+    d) API_DOC_TOOL="ddoc (dmd -D) or adrdox: ${out}" ;;
+    dart) API_DOC_TOOL="dart doc, copy doc/api: ${out}" ;;
+    swift) API_DOC_TOOL="DocC (swift package generate-documentation --transform-for-static-hosting): ${out}" ;;
+    c | cpp) API_DOC_TOOL="Doxygen (HTML output): ${out}" ;;
+    fortran) API_DOC_TOOL="FORD: ${out}" ;;
+    pascal) API_DOC_TOOL="PasDoc (--format html): ${out}" ;;
+    lua) API_DOC_TOOL="LDoc: ${out}" ;;
+    racket) API_DOC_TOOL="scribble --html: ${out}" ;;
+    perl) API_DOC_TOOL="pod2html for every module: ${out}" ;;
+    lisp | cobol) API_DOC_TOOL="the repository export script for ${1} doc comments (CLAUDE.md 6.5.3): ${out}" ;;
+    *) API_DOC_TOOL="no source code of its own (${1} is a platform product): render an index.html describing its configuration and linking to the upstream reference, ${out}" ;;
+  esac
+}
+
 # sed_escape <value>: escapes the characters that are special in the
 # replacement part of a sed `s|...|...|` command (backslash, `|` and `&`).
 sed_escape() {
@@ -98,7 +133,8 @@ render() {
     "TEAM_ABBR=${TEAM_ABBR}" "TEAM=${TEAM}" "DB_KIND=${DB_KIND}" "DB_IMAGE=${DB_IMAGE}" \
     "DB=${DB}" "PURPOSE=${PURPOSE}" "MEM_REASON=${MEM_REASON}" "MEM=${MEM}" \
     "TOOLCHAIN_IMAGE=${TOOLCHAIN_IMAGE}" "RUNTIME_IMAGE=${RUNTIME_IMAGE}" \
-    "FMT_COMMAND=${FMT_COMMAND}" "DATE=${DATE}" "VERSION=${VERSION}" "DOC_TOOL=${DOC_TOOL}"; do
+    "FMT_COMMAND=${FMT_COMMAND}" "DATE=${DATE}" "VERSION=${VERSION}" "API_DOC_TOOL=${API_DOC_TOOL}" \
+    "DOC_TOOL=${DOC_TOOL}"; do
     key="${pair%%=*}"
     value="${pair#*=}"
     args+=(-e "s|__${key}__|$(sed_escape "$value")|g")
@@ -167,6 +203,7 @@ RUNTIME_IMAGE="TODO-scaffold/${LANGUAGE}-runtime:pin-me"
 FMT_COMMAND="echo 'TODO(scaffold): formatter command for ${LANGUAGE}' && exit 1"
 DATE="$(date +%Y-%m-%d)"
 doc_tool "$LANGUAGE"
+api_doc_tool "$LANGUAGE"
 VERSION="0.1.0"
 
 # ---------------------------------------------------------------------------

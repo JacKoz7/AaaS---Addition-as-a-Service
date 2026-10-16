@@ -7,11 +7,12 @@
 # Classification:  INTERNAL
 # Purpose:         Continuous integration: repository linters (pre-commit),
 #                  commit message linting (commitlint), the documentation
-#                  check, and build, lint, unit tests and documentation
+#                  check, the strict build of the documentation portal, and
+#                  build, lint, unit tests and documentation
 #                  coverage of every changed component as a matrix with one
 #                  job per services/<name> or frontend/<name> directory.
-# Related Docs:    CLAUDE.md (sections 6.3, 6.4, 7.1, 9.1), ADR-0006,
-#                  ADR-0005, ADR-0009, scripts/ci/changed-components.sh
+# Related Docs:    CLAUDE.md (sections 6.3, 6.4, 6.5.7, 7.1, 9.1), ADR-0006,
+#                  ADR-0005, ADR-0009, ADR-0010, scripts/ci/changed-components.sh
 #
 # Third-party actions are pinned to full commit SHAs; the tag they correspond
 # to is given in the trailing comment. Update them deliberately, never to a
@@ -72,6 +73,23 @@ jobs:
         run: make lint-repo lint-scaffold temporary
       - name: Documentation check (file headers, documented definitions)
         run: make doc-check
+
+  # -------------------------------------------------------------------------
+  # Documentation portal: strict MkDocs build (any warning fails), docstring
+  # coverage and doctests of the repository Python scripts (ADR-0010).
+  # Native API docs of components are built in the component jobs instead
+  # (they need each component's toolchain), so they are not exported here.
+  # -------------------------------------------------------------------------
+  docs:
+    name: docs (portal)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - name: Build the portal (make docs-portal, mkdocs build --strict)
+        run: make docs-portal
+      - name: Docstring coverage and doctests (make doc-coverage-repo)
+        run: make doc-coverage-repo
 
   # -------------------------------------------------------------------------
   # Commit messages: every commit of the pushed range or pull request.
@@ -159,13 +177,15 @@ jobs:
         run: make "test-${{ matrix.component.name }}"
       - name: Documentation coverage (make doc-coverage-${{ matrix.component.name }})
         run: make "doc-coverage-${{ matrix.component.name }}"
+      - name: Native API documentation (make api-docs-${{ matrix.component.name }})
+        run: make "api-docs-${{ matrix.component.name }}"
 
   # -------------------------------------------------------------------------
   # Single status for branch protection: green only if nothing failed.
   # -------------------------------------------------------------------------
   ci-ok:
     name: ci-ok
-    needs: [lint, commitlint, changes, component]
+    needs: [lint, docs, commitlint, changes, component]
     if: always()
     runs-on: ubuntu-24.04
     timeout-minutes: 5

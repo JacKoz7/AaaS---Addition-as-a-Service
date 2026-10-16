@@ -1,0 +1,131 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       repo
+# Module:          mkdocs.yml
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         Configuration of the MkDocs Material documentation portal:
+#                  sources assembled into build/portal by the hook
+#                  scripts/docs-portal.py, site generated into docs/site,
+#                  theme, navigation and Markdown extensions.
+# Related Docs:    ADR-0010, CLAUDE.md (6.5.7), scripts/docs-portal.py,
+#                  infra/docs-portal/Dockerfile
+#
+# Build:  make docs        (strict: any warning fails the build)
+# Serve:  make docs-serve  (http://127.0.0.1:8000, rebuilds on changes)
+
+site_name: AaaS — Addition as a Service
+site_description: >-
+  Enterprise documentation portal of AaaS, the platform that adds two
+  non-negative integers with 35 microservices.
+site_author: AaaS Contributors
+copyright: Copyright &copy; 2026 AaaS Contributors — MIT License
+repo_url: https://github.com/JacKoz7/AaaS---Addition-as-a-Service
+repo_name: AaaS
+# Documents are edited in the repository, not through the portal (most pages
+# are copies or generated), so no "edit this page" button.
+edit_uri: ""
+
+# The portal sources are assembled from all over the repository by the hook
+# below; docs/ itself cannot be the docs_dir because docs/site lies inside it.
+docs_dir: build/portal
+site_dir: docs/site
+hooks:
+  - scripts/docs-portal.py
+
+# Rebuild `make docs-serve` when the sources of the portal change.
+watch:
+  - README.md
+  - CONTRIBUTING.md
+  - CODE_OF_CONDUCT.md
+  - SECURITY.md
+  - docs
+  - templates/service/catalog.psv
+  - scripts/docs-portal.py
+
+# Fail on links to missing pages and anchors (warnings are fatal in --strict).
+validation:
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
+
+theme:
+  name: material
+  language: en
+  icon:
+    logo: material/plus-box
+  features:
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+# Pages not listed here (service documents, individual ADRs and step logs)
+# are reached from the catalogs and indexes.
+nav:
+  - Home: index.md
+  - Catalog:
+      - Services: catalog/services.md
+      - Events: catalog/events.md
+      - APIs: catalog/api.md
+      - Changelogs: catalog/changelogs.md
+  - Architecture:
+      - C4 system context: docs/architecture/c4/context.md
+  - Decisions:
+      - Architecture decision records: docs/adr/index.md
+      - Requests for comments: docs/rfc/index.md
+  - Governance:
+      - Risk register: docs/governance/RISK_REGISTER.md
+      - Data protection impact assessment: docs/governance/DPIA.md
+      - RFC process: docs/governance/RFC_PROCESS.md
+      - Release process: docs/governance/RELEASE_PROCESS.md
+      - Incident postmortem template: docs/governance/INCIDENT_POSTMORTEM_TEMPLATE.md
+  - Engineering:
+      - Onboarding: docs/onboarding/ONBOARDING.md
+      - Contributing: CONTRIBUTING.md
+      - Glossary: docs/GLOSSARY.md
+      - Progress: docs/PROGRESS.md
+      - Step logs: docs/progress/steps/index.md
+      - Code of conduct: CODE_OF_CONDUCT.md
+      - Security policy: SECURITY.md

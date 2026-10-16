@@ -7,8 +7,8 @@
 # Classification:  INTERNAL
 # Purpose:         Single entry point for building, running, testing and
 #                  inspecting the AaaS system on a developer workstation.
-# Related Docs:    CLAUDE.md (sections 6.2, 6.4, 6.5.4, 8.1, 9.3), ADR-0002,
-#                  ADR-0009, docs/PROGRESS.md
+# Related Docs:    CLAUDE.md (sections 6.2, 6.4, 6.5.4, 6.5.7, 6.5.8, 8.1,
+#                  9.3), ADR-0002, ADR-0009, ADR-0010, docs/PROGRESS.md
 #
 # Conventions:
 #   - `make <verb>` acts on the whole system; `make <verb>-<name>` acts on one
@@ -50,6 +50,15 @@ COMPONENT_NAMES := $(notdir $(patsubst %/,%,$(COMPONENT_DIRS)))
 
 # Number of lines of `docker compose logs` shown by `make logs`.
 TAIL ?= 100
+
+# Documentation portal (ADR-0010): tool image, how it is run (repository at
+# /docs, caller's UID so that generated files are not owned by root), the
+# directory that collects the native API docs of components, and the port of
+# `make docs-serve`.
+DOCS_IMAGE := aaas/docs-portal:dev
+DOCS_RUN := docker run --rm --user "$$(id -u):$$(id -g)" --volume "$(CURDIR)":/docs
+API_DOCS_DIR := build/api-docs
+DOCS_PORT ?= 8000
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -204,9 +213,15 @@ doc-check: ## Check file headers and comments before top-level definitions in ev
 	scripts/doc-check.sh
 
 .PHONY: doc-coverage
-doc-coverage: doc-check ## doc-check plus the native documentation tool of every component
+doc-coverage: doc-check doc-coverage-repo ## doc-check, repository Python and the native tool of every component
 	@if [ -z "$(COMPONENT_NAMES)" ]; then echo "no components with a Makefile yet; native coverage tools: nothing to run."; fi
 	@for name in $(COMPONENT_NAMES); do $(MAKE) doc-coverage-$$name; done
+
+.PHONY: doc-coverage-repo
+doc-coverage-repo: docs-image ## interrogate (100%) and doctests of the repository Python scripts
+	@echo "==> interrogate and doctests (scripts/*.py)"
+	$(DOCS_RUN) --entrypoint sh $(DOCS_IMAGE) -c \
+		'interrogate --verbose --fail-under 100 scripts/ && for f in scripts/*.py; do python3 -m doctest "$$f" || exit 1; done && echo "    doctests passed"'
 
 .PHONY: doc-coverage-%
 doc-coverage-%: ## Native documentation coverage of one component (make doc-coverage-successor)
@@ -221,6 +236,39 @@ temporary: ## List remaining TEMPORARY(P<step>) markers (CLAUDE.md 8.7)
 		|| echo "    none"
 
 # ---------------------------------------------------------------------------
+# Documentation portal and changelogs (CLAUDE.md 6.5.7, 6.5.8, ADR-0010)
+# ---------------------------------------------------------------------------
+
+.PHONY: docs-image
+docs-image: ## Build the documentation tool image (MkDocs Material, interrogate)
+	@docker build --quiet --tag $(DOCS_IMAGE) infra/docs-portal >/dev/null
+
+.PHONY: api-docs
+api-docs: ## Export the native API documentation of every component to build/api-docs
+	@if [ -z "$(COMPONENT_NAMES)" ]; then echo "no components with a Makefile yet; no native API documentation to export."; fi
+	@for name in $(COMPONENT_NAMES); do $(MAKE) api-docs-$$name; done
+
+.PHONY: api-docs-%
+api-docs-%: ## Export the native API documentation of one component (make api-docs-successor)
+	@rm -rf "$(API_DOCS_DIR)/$*"
+	$(call delegate,$*,api-docs API_DOCS_DIR=$(CURDIR)/$(API_DOCS_DIR)/$*)
+
+.PHONY: docs
+docs: api-docs docs-portal ## Native API docs of every component, then the portal into docs/site (strict)
+
+.PHONY: docs-portal
+docs-portal: docs-image ## Build the portal from what is in build/api-docs, without exporting API docs (strict)
+	@mkdir -p build/portal
+	$(DOCS_RUN) $(DOCS_IMAGE) build --strict
+	@echo "portal built: docs/site/index.html (make docs-serve to browse it)"
+
+.PHONY: docs-serve
+docs-serve: docs-image ## Serve the portal on http://127.0.0.1:8000 with live rebuild
+	@mkdir -p build/portal
+	$(DOCS_RUN) $$([ -t 0 ] && echo --interactive --tty) --publish 127.0.0.1:$(DOCS_PORT):8000 \
+		$(DOCS_IMAGE) serve --dev-addr 0.0.0.0:8000
+
+# ---------------------------------------------------------------------------
 # Scaffolding and housekeeping
 # ---------------------------------------------------------------------------
 
@@ -233,13 +281,13 @@ new-service: ## Scaffold a service: make new-service NAME=<name> LANG=<language>
 	$(NEW_SERVICE_SCRIPT) "$(NAME)" "$(LANG)"
 
 .PHONY: clean
-clean: ## Remove containers, volumes, orphan networks and generated docs
+clean: ## Remove containers, volumes, orphan networks and generated docs and portal sources
 	@if [ -e "$(COMPOSE_FILE)" ]; then \
 		$(COMPOSE) down --volumes --remove-orphans; \
 	else \
 		echo "$(COMPOSE_FILE) not present; no containers to remove."; \
 	fi
-	rm -rf docs/site
+	rm -rf docs/site build/portal $(API_DOCS_DIR)
 
 # ---------------------------------------------------------------------------
 # Project status

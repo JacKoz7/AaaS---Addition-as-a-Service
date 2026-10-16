@@ -7,10 +7,10 @@
 # Classification:  INTERNAL
 # Purpose:         Component Makefile called by the root Makefile
 #                  (make test-__SERVICE__, lint-__SERVICE__, fmt-__SERVICE__,
-#                  doc-coverage-__SERVICE__).
+#                  doc-coverage-__SERVICE__, api-docs-__SERVICE__).
 #                  Every target runs inside Docker; no __LANGUAGE__ toolchain
 #                  is required on the host.
-# Related Docs:    ADR-0002, services/__SERVICE__/Dockerfile
+# Related Docs:    ADR-0002, ADR-0010, services/__SERVICE__/Dockerfile
 
 SHELL := /bin/bash
 .SHELLFLAGS := -eu -o pipefail -c
@@ -19,6 +19,10 @@ SHELL := /bin/bash
 SERVICE := __SERVICE__
 IMAGE := aaas/$(SERVICE)
 DOCKER_BUILD := docker build --file Dockerfile
+
+# Where `api-docs` exports the native API documentation; the root Makefile
+# passes build/api-docs/__SERVICE__ of the repository (ADR-0010).
+API_DOCS_DIR ?= $(CURDIR)/../../build/api-docs/$(SERVICE)
 
 .PHONY: help
 help: ## Show this help
@@ -40,6 +44,10 @@ lint: ## Run formatter check and linter in the `lint` stage
 .PHONY: doc-coverage
 doc-coverage: ## Run the native documentation coverage tool in the `doc-coverage` stage
 	$(DOCKER_BUILD) --target doc-coverage --tag $(IMAGE):doc-coverage .
+
+.PHONY: api-docs
+api-docs: ## Export the native API documentation (HTML, index.html) to $(API_DOCS_DIR)
+	$(DOCKER_BUILD) --target api-docs --output type=local,dest=$(API_DOCS_DIR) .
 
 .PHONY: fmt
 fmt: ## Format sources in place using the toolchain stage

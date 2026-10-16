@@ -6,10 +6,11 @@
 # Owning Team:     Platform Enablement Guild (PEG)
 # Classification:  INTERNAL
 # Purpose:         Git hooks run before every commit (file hygiene, YAML,
-#                  shell, Dockerfile and workflow linting) and on every commit message
+#                  shell, Python, Dockerfile and workflow linting) and on every commit message
 #                  (Conventional Commits with the mandatory Step trailer).
 #                  Also executed by `make lint-repo` and by CI (P0.6).
-# Related Docs:    CLAUDE.md (sections 6.3, 7.1), ADR-0005, CONTRIBUTING.md
+# Related Docs:    CLAUDE.md (sections 6.3, 7.1), ADR-0005, ADR-0010,
+#                  CONTRIBUTING.md
 #
 # Setup:   brew install pre-commit && pre-commit install --install-hooks
 # Run all: pre-commit run --all-files   (or: make lint-repo)
@@ -41,6 +42,9 @@ repos:
         exclude: ^templates/headers/
       - id: check-yaml
         args: [--allow-multiple-documents]
+        # mkdocs.yml uses the !!python/name tag of pymdownx (ADR-0010), which
+        # a safe YAML loader rejects; yamllint still checks its syntax.
+        exclude: ^mkdocs\.yml$
       - id: check-json
       - id: detect-private-key
       - id: no-commit-to-branch
@@ -59,6 +63,14 @@ repos:
     hooks:
       - id: shellcheck
         args: [--severity=style, --external-sources]
+
+  # --- Python (repository scripts) ------------------------------------------
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.1
+    hooks:
+      - id: ruff-check
+      - id: ruff-format
+        args: [--check, --diff]
 
   # --- Dockerfile -----------------------------------------------------------
   # hadolint runs from its pinned Docker Hub image so that no host install is
