@@ -15,8 +15,8 @@ Step statuses: `TODO`, `IN_PROGRESS`, `DONE`, `BLOCKED`. At most one step may be
 | Last completed step | P0.2 — Makefile |
 | Last completed at | 2026-10-16 15:32 CEST |
 | Snapshot tag | step/P0.2 |
-| Step in progress | none |
-| Next step | P0.3 — Compose skeleton |
+| Step in progress | P0.3 — Compose skeleton |
+| Next step | P0.4 — Service template and new-service.sh |
 | Blockers | none |
 | Milestones reached | — |
 
@@ -28,7 +28,7 @@ Step statuses: `TODO`, `IN_PROGRESS`, `DONE`, `BLOCKED`. At most one step may be
 | --- | --- | --- | --- | --- | --- |
 | P0.1 | Repository initialization: `.gitignore`, `.editorconfig`, `README.md`, `CLAUDE.md`, `docs/PROGRESS.md`, step log template, ADR-0001 | DONE | 2026-10-16 | step/P0.1 | [log](progress/steps/P0.1.md) |
 | P0.2 | `Makefile`: `up`, `down`, `ps`, `logs`, `build`, `build-%`, `test`, `test-%`, `e2e`, `lint`, `fmt`, `new-service`, `clean`, `status` | DONE | 2026-10-16 | step/P0.2 | [log](progress/steps/P0.2.md) |
-| P0.3 | Compose skeleton: `docker-compose.yml` with `include`, files in `compose/`, networks `public`/`services`/`data`, profiles, `.env.example` | TODO | | | |
+| P0.3 | Compose skeleton: `docker-compose.yml` with `include`, files in `compose/`, networks `public`/`services`/`data`, profiles, `.env.example` | IN_PROGRESS | | | [log](progress/steps/P0.3.md) |
 | P0.4 | Service template `templates/service/` and `scripts/new-service.sh <name> <language>` | TODO | | | |
 | P0.5 | Pre-commit: commitlint, hadolint, yamllint, shellcheck, line-ending check | TODO | | | |
 | P0.6 | GitHub Actions: lint, build of changed services (matrix per directory), tests, commitlint on PR | TODO | | | |
