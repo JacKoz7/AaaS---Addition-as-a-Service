@@ -59,8 +59,8 @@ Three constraints shape the solution:
     `catalog/events.md` (from `contracts/events/**/*.json`),
     `catalog/api.md` (from `contracts/http/*.yaml`, `contracts/proto/**`
     and the native API documentation), `catalog/changelogs.md`, and the
-    indexes `docs/adr/index.md`, `docs/rfc/index.md` and
-    `docs/progress/steps/index.md` (title and metadata of every record);
+    indexes `docs/adr/index.md`, `docs/rfc/index.md`,
+    `docs/progress/steps/index.md` and `docs/releases/index.md` (title and metadata of every record);
   - writes a file only when its content changes and deletes stale files, so
     the development server, which watches `build/portal`, does not rebuild
     in a loop; it refuses any output directory other than `build/portal`,

@@ -115,6 +115,7 @@ nav:
   - Decisions:
       - Architecture decision records: docs/adr/index.md
       - Requests for comments: docs/rfc/index.md
+      - Release notes: docs/releases/index.md
   - Governance:
       - Risk register: docs/governance/RISK_REGISTER.md
       - Data protection impact assessment: docs/governance/DPIA.md

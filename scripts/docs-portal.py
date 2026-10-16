@@ -8,8 +8,9 @@
 # Purpose:         Assembles the sources of the documentation portal into
 #                  build/portal/: copies the repository documents, rewrites
 #                  their links, and generates the service map, the service,
-#                  event, API and changelog catalogs and the ADR, RFC and
-#                  step log indexes. Runs as an MkDocs hook before every build.
+#                  event, API and changelog catalogs and the ADR, RFC, step
+#                  log and release note indexes. Runs as an MkDocs hook
+#                  before every build.
 # Related Docs:    ADR-0010, mkdocs.yml, CLAUDE.md (6.5.7),
 #                  templates/service/catalog.psv
 """Documentation portal assembler (MkDocs hook and command-line tool).
@@ -1422,7 +1423,7 @@ def title(text: str, fallback: str) -> str:
 
 
 def generate_record_index(root: Path, directory: str, heading: str, intro: str, pattern: str, fields: list[str]) -> str:
-    """Render an index of numbered records (ADRs, RFCs, step logs).
+    """Render an index of numbered records (ADRs, RFCs, step logs, releases).
 
     Summary:
         Table of the documents in ``directory`` whose names match ``pattern``.
@@ -1430,6 +1431,7 @@ def generate_record_index(root: Path, directory: str, heading: str, intro: str, 
     Description:
         Each row links the document (relative to the index in the same
         directory) with its H1 title and the requested metadata fields.
+        Used for ADRs, RFCs, step logs and phase release notes.
 
     Business Justification:
         CLAUDE.md 6.5.7 requires the ADRs and RFCs in the portal; the step
@@ -1577,6 +1579,7 @@ def assemble(root: Path, out: Path) -> tuple[int, int]:
         "docs/adr/index.md": None,
         "docs/rfc/index.md": None,
         "docs/progress/steps/index.md": None,
+        "docs/releases/index.md": None,
         "catalog/services.md": None,
         "catalog/events.md": None,
         "catalog/api.md": None,
@@ -1625,6 +1628,17 @@ def assemble(root: Path, out: Path) -> tuple[int, int]:
             "Snapshot log of every step ([progress](../../PROGRESS.md), [template](TEMPLATE.md)).",
             r"P\d+\.\d+[a-z]?\.md",
             ["Status", "Completed", "Snapshot tag"],
+        ),
+    )
+    portal.add_text(
+        "docs/releases/index.md",
+        generate_record_index(
+            root,
+            "docs/releases",
+            "Release Notes",
+            "Announcement of every completed phase ([release process](../governance/RELEASE_PROCESS.md)).",
+            r"phase-\d+\.md",
+            ["Date", "Milestone", "Tag"],
         ),
     )
     portal.add_text("catalog/services.md", generate_service_catalog(services, root, portal_files))
