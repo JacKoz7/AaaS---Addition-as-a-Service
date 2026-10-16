@@ -1,0 +1,66 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       repo
+# Module:          .github/ISSUE_TEMPLATE/incident_report.yml
+# Owning Team:     Transaction Integrity Office (TIO)
+# Classification:  INTERNAL
+# Purpose:         Issue form opening an incident: an ongoing or past outage,
+#                  data integrity problem or security event. Also the
+#                  reporting channel of SECURITY.md while the repo is private.
+# Related Docs:    SECURITY.md, docs/governance/INCIDENT_POSTMORTEM_TEMPLATE.md
+
+name: Incident report
+description: >-
+  An outage, a broken hash chain, a failed saga or a security event.
+  Prefix the title with [Security] for vulnerabilities.
+title: "[Incident] "
+labels: [incident]
+body:
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: >-
+        SEV1 wrong result recorded or ledger integrity lost; SEV2 additions cannot complete;
+        SEV3 degraded (slow, retries, alerts); SEV4 cosmetic.
+      options:
+        - SEV1
+        - SEV2
+        - SEV3
+        - SEV4
+    validations:
+      required: true
+  - type: input
+    id: started
+    attributes:
+      label: Detected at
+      description: Date and time with time zone.
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: Which additions, tasks or services are affected.
+    validations:
+      required: true
+  - type: textarea
+    id: timeline
+    attributes:
+      label: Timeline so far
+      description: What happened and what has been done, with times.
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Logs, alert names, task IDs, `GET /api/v1/ledger/verify` output. Remove secrets.
+      render: text
+  - type: checkboxes
+    id: postmortem
+    attributes:
+      label: Follow-up
+      options:
+        - label: >-
+            A blameless postmortem will be written for SEV1 and SEV2
+            (docs/governance/INCIDENT_POSTMORTEM_TEMPLATE.md).

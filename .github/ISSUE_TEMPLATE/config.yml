@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       repo
+# Module:          .github/ISSUE_TEMPLATE/config.yml
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         Issue chooser configuration: only the three structured
+#                  templates (bug, feature request, incident) may be used.
+# Related Docs:    CONTRIBUTING.md, SECURITY.md
+
+blank_issues_enabled: false

@@ -1,0 +1,95 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       repo
+# Module:          CODEOWNERS
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         Assigns every directory of the repository to one of the
+#                  teams of CLAUDE.md 6.5.1. GitHub requires existing
+#                  accounts, so every team is represented by the repository
+#                  owner; the team is named in the comment above each block.
+# Related Docs:    CLAUDE.md (section 6.5.1), ADR-0008, CONTRIBUTING.md
+#
+# The last matching pattern wins, so the catch-all `*` comes first.
+
+# --- Platform Enablement Guild (PEG): platform: repository, build, Compose, contracts, templates
+*                             @JacKoz7
+/Makefile                     @JacKoz7
+/docker-compose.yml           @JacKoz7
+/compose/                     @JacKoz7
+/contracts/                   @JacKoz7
+/templates/                   @JacKoz7
+/scripts/                     @JacKoz7
+/.github/                     @JacKoz7
+/infra/traefik/               @JacKoz7
+/infra/consul/                @JacKoz7
+/infra/openbao/               @JacKoz7
+/services/gateway/            @JacKoz7
+/services/service-discovery/  @JacKoz7
+/services/config-server/      @JacKoz7
+/services/secrets/            @JacKoz7
+/services/schema-registry/    @JacKoz7
+
+# --- Trust & Identity Board (TIB): security
+/SECURITY.md              @JacKoz7
+/infra/keycloak/          @JacKoz7
+/services/auth/           @JacKoz7
+/services/rate-limiter/   @JacKoz7
+/services/idempotency/    @JacKoz7
+/services/feature-flags/  @JacKoz7
+
+# --- Arithmetic Excellence Center (AEC): counting
+/services/parser/             @JacKoz7
+/services/validator/          @JacKoz7
+/services/operator-registry/  @JacKoz7
+/services/commutator/         @JacKoz7
+/services/digit-0/            @JacKoz7
+/services/digit-1/            @JacKoz7
+/services/digit-2/            @JacKoz7
+/services/digit-3/            @JacKoz7
+/services/digit-4/            @JacKoz7
+/services/digit-5/            @JacKoz7
+/services/digit-6/            @JacKoz7
+/services/digit-7/            @JacKoz7
+/services/digit-8/            @JacKoz7
+/services/digit-9/            @JacKoz7
+/services/successor/          @JacKoz7
+/services/carry/              @JacKoz7
+
+# --- Transaction Integrity Office (TIO): consistency and reliability
+/services/saga-orchestrator/  @JacKoz7
+/services/consensus/          @JacKoz7
+/services/distributed-lock/   @JacKoz7
+/services/outbox-relay/       @JacKoz7
+/services/dead-letter/        @JacKoz7
+/services/ledger/             @JacKoz7
+/tests/chaos/                 @JacKoz7
+
+# --- Customer Experience Tribe (CXT): frontend and time
+/services/expression-assembler/  @JacKoz7
+/services/stopwatch/             @JacKoz7
+/frontend/                       @JacKoz7
+/tests/e2e/                      @JacKoz7
+
+# --- Revenue Operations Unit (ROU): revenue (0.00 PLN)
+/services/billing/  @JacKoz7
+
+# --- Cloud Governance Committee (CGC): AWS
+/services/cloud-notary/  @JacKoz7
+/infra/aws/              @JacKoz7
+
+# --- Observability Steering Group (OSG): monitoring
+/infra/grafana/             @JacKoz7
+/infra/prometheus/          @JacKoz7
+/infra/loki/                @JacKoz7
+/infra/alertmanager/        @JacKoz7
+/compose/observability.yml  @JacKoz7
+
+# --- Platform Enablement Guild (PEG): governance and progress tracking (all teams consulted, see RACI)
+/docs/               @JacKoz7
+/CLAUDE.md           @JacKoz7
+/README.md           @JacKoz7
+/CONTRIBUTING.md     @JacKoz7
+/CODE_OF_CONDUCT.md  @JacKoz7
+/CODEOWNERS          @JacKoz7

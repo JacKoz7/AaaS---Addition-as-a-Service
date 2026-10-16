@@ -1,0 +1,54 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       repo
+# Module:          .github/ISSUE_TEMPLATE/feature_request.yml
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         Issue form for feature requests. The product scope is
+#                  fixed by CLAUDE.md section 1; every request filed here is
+#                  declined, and the form says so before it is submitted.
+# Related Docs:    CLAUDE.md (section 1), CONTRIBUTING.md
+
+name: Feature request
+description: Propose a new user-visible feature. Please read the notice below first.
+title: "[Feature] "
+labels: [feature-request, wontfix]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Notice of Product Scope
+
+        AaaS adds two non-negative integers between 0 and 99 999. The user
+        interface consists of digit keys, `+`, `=`, `C`, a display, a
+        waiting-time counter and an invoice download button. This scope is
+        final (`CLAUDE.md`, section 1).
+
+        In accordance with that policy, **every feature request is declined**.
+        Requests for subtraction, multiplication, calculation history, number
+        trivia, translations, e-mails, charts or faster additions will be
+        closed with the `wontfix` label.
+
+        Internal improvements that make the addition more correct, more
+        reliable, more secure or more observable are not feature requests;
+        propose them through an RFC (`docs/governance/RFC_PROCESS.md`).
+  - type: checkboxes
+    id: acknowledgement
+    attributes:
+      label: Acknowledgement
+      options:
+        - label: I understand that this request will be declined.
+          required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed feature
+      description: For the record.
+    validations:
+      required: true
+  - type: textarea
+    id: justification
+    attributes:
+      label: Business justification
+      description: How the feature would help add two integers.

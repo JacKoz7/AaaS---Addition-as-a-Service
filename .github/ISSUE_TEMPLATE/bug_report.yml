@@ -1,0 +1,76 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       repo
+# Module:          .github/ISSUE_TEMPLATE/bug_report.yml
+# Owning Team:     Platform Enablement Guild (PEG)
+# Classification:  INTERNAL
+# Purpose:         Issue form for defects: a wrong result, a failing service,
+#                  a broken command or documentation that is not true.
+# Related Docs:    CONTRIBUTING.md, docs/governance/RISK_REGISTER.md
+
+name: Bug report
+description: An addition returned a wrong result, a service failed, or something does not work as documented.
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping AaaS uphold its commitment to arithmetic excellence.
+        A wrong sum is treated with the highest severity.
+  - type: input
+    id: expression
+    attributes:
+      label: Expression
+      description: The addition that was performed, if any.
+      placeholder: "2+3"
+  - type: input
+    id: expected
+    attributes:
+      label: Expected result
+      placeholder: "5"
+  - type: input
+    id: actual
+    attributes:
+      label: Actual result or behaviour
+    validations:
+      required: true
+  - type: input
+    id: task-id
+    attributes:
+      label: Task ID
+      description: The taskId returned by the "=" key (UUIDv7), if available.
+  - type: dropdown
+    id: component
+    attributes:
+      label: Affected area
+      options:
+        - Calculator UI (frontend)
+        - Result (wrong sum)
+        - Waiting-time counter
+        - Invoice
+        - A specific service
+        - Tooling (make, scripts, CI)
+        - Documentation
+        - Unknown
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Commands run (e.g. `make up`) and keys pressed, in order.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Relevant output of `make logs SVC=<service>` or `make status`. Remove secrets.
+      render: text
+  - type: input
+    id: commit
+    attributes:
+      label: Commit or snapshot tag
+      description: Output of `git describe --tags --always`.
