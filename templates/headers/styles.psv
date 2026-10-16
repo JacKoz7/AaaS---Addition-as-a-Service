@@ -37,6 +37,7 @@ racket|.rkt||;; ||80|#lang racket/base
 haskell|.hs,.cabal||-- ||80|
 elixir|.ex,.exs||# ||80|
 go|.go||// ||80|
+gomod|go.mod,go.work||// ||80|
 python|.py||# ||80|
 rust|.rs||// ||80|
 cobol|.cob,.cbl,.cpy||      * ||72|
