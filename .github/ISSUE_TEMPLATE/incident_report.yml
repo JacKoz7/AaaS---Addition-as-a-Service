@@ -5,15 +5,15 @@
 # Module:          .github/ISSUE_TEMPLATE/incident_report.yml
 # Owning Team:     Transaction Integrity Office (TIO)
 # Classification:  INTERNAL
-# Purpose:         Issue form opening an incident: an ongoing or past outage,
-#                  data integrity problem or security event. Also the
-#                  reporting channel of SECURITY.md while the repo is private.
+# Purpose:         Issue form opening a public incident: an ongoing or past
+#                  outage or data integrity problem. Vulnerabilities are
+#                  reported privately instead (SECURITY.md).
 # Related Docs:    SECURITY.md, docs/governance/INCIDENT_POSTMORTEM_TEMPLATE.md
 
 name: Incident report
 description: >-
-  An outage, a broken hash chain, a failed saga or a security event.
-  Prefix the title with [Security] for vulnerabilities.
+  An outage, a broken hash chain or a failed saga. Report vulnerabilities
+  privately as described in SECURITY.md, not here.
 title: "[Incident] "
 labels: [incident]
 body:

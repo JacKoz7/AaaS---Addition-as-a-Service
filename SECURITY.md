@@ -39,14 +39,13 @@ Out of scope:
 
 ## Reporting a Vulnerability
 
-The repository is private. Report a vulnerability by opening an issue with
-the **Incident report** template, prefixing the title with `[Security]`;
-issues of a private repository are visible only to its collaborators. Do not
-include working credentials or tokens in the report.
+Report vulnerabilities **privately** through GitHub private vulnerability
+reporting: [Report a vulnerability](https://github.com/JacKoz7/AaaS---Addition-as-a-Service/security/advisories/new) (repository tab **Security** →
+**Report a vulnerability**). The report is visible only to the maintainers.
 
-If the repository is ever made public (Phase 12 of the plan), GitHub private
-vulnerability reporting will be enabled first and this section will be
-updated to use it exclusively.
+Do not open a public issue for a vulnerability, and do not include working
+credentials or tokens in any report. Incidents without a security aspect
+(outages, failed additions) use the public **Incident report** issue form.
 
 ## Handling
 

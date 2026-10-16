@@ -2,7 +2,7 @@
 
 | Field | Value |
 | --- | --- |
-| Status | Accepted |
+| Status | Accepted; reporting channels updated 2026-10-16 (repository made public) |
 | Date | 2026-10-16 |
 | Deciders | Platform Enablement Guild (PEG), Trust & Identity Board (TIB) |
 | Step | P0.8 |
@@ -42,3 +42,10 @@ repositories, and this repository is private.
 - If the repository moves to an organisation, the blocks can be reassigned
   to real GitHub teams named after the eight AaaS teams without changing the
   structure of the file.
+
+## Amendment (2026-10-16): repository made public
+
+The owner made the repository public. As planned above, GitHub private
+vulnerability reporting was enabled, and `SECURITY.md` and
+`CODE_OF_CONDUCT.md` now direct reports to it. The incident issue form is no
+longer a security reporting channel. The `CODEOWNERS` decision is unchanged.
