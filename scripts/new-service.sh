@@ -167,9 +167,9 @@ fi
 DB_KIND="${DB_KIND:-container}"
 PURPOSE="${PURPOSE:-TODO(scaffold): one-sentence purpose of ${SERVICE}.}"
 
-SERVICE_UPPER="$(printf '%s' "$SERVICE" | tr 'a-z-' 'A-Z_')"
+SERVICE_UPPER="$(printf '%s' "$SERVICE" | tr '[:lower:]-' '[:upper:]_')"
 memory_limit "$LANGUAGE"
-DB_IMAGE="TODO-scaffold/$(printf '%s' "$DB" | tr 'A-Z' 'a-z'):pin-me"
+DB_IMAGE="TODO-scaffold/$(printf '%s' "$DB" | tr '[:upper:]' '[:lower:]'):pin-me"
 TOOLCHAIN_IMAGE="TODO-scaffold/${LANGUAGE}-toolchain:pin-me"
 RUNTIME_IMAGE="TODO-scaffold/${LANGUAGE}-runtime:pin-me"
 FMT_COMMAND="echo 'TODO(scaffold): formatter command for ${LANGUAGE}' \&\& exit 1"
