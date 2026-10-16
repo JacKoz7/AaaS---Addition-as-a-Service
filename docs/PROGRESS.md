@@ -12,10 +12,10 @@ Step statuses: `TODO`, `IN_PROGRESS`, `DONE`, `BLOCKED`. At most one step may be
 | Field | Value |
 | --- | --- |
 | Current phase | Phase 0 — Repository foundation |
-| Last completed step | none |
-| Last completed at | — |
-| Snapshot tag | — |
-| Step in progress | P0.1 — Repository initialization |
+| Last completed step | P0.1 — Repository initialization |
+| Last completed at | 2026-10-16 15:29 CEST |
+| Snapshot tag | step/P0.1 |
+| Step in progress | none |
 | Next step | P0.2 — Makefile |
 | Blockers | none |
 | Milestones reached | — |
@@ -26,7 +26,7 @@ Step statuses: `TODO`, `IN_PROGRESS`, `DONE`, `BLOCKED`. At most one step may be
 
 | ID | Step | Status | Completed | Snapshot | Log |
 | --- | --- | --- | --- | --- | --- |
-| P0.1 | Repository initialization: `.gitignore`, `.editorconfig`, `README.md`, `CLAUDE.md`, `docs/PROGRESS.md`, step log template, ADR-0001 | IN_PROGRESS | | | [log](progress/steps/P0.1.md) |
+| P0.1 | Repository initialization: `.gitignore`, `.editorconfig`, `README.md`, `CLAUDE.md`, `docs/PROGRESS.md`, step log template, ADR-0001 | DONE | 2026-10-16 | step/P0.1 | [log](progress/steps/P0.1.md) |
 | P0.2 | `Makefile`: `up`, `down`, `ps`, `logs`, `build`, `build-%`, `test`, `test-%`, `e2e`, `lint`, `fmt`, `new-service`, `clean`, `status` | TODO | | | |
 | P0.3 | Compose skeleton: `docker-compose.yml` with `include`, files in `compose/`, networks `public`/`services`/`data`, profiles, `.env.example` | TODO | | | |
 | P0.4 | Service template `templates/service/` and `scripts/new-service.sh <name> <language>` | TODO | | | |
