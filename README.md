@@ -124,7 +124,7 @@ step is tagged `step/P<phase>.<step>` and has a log in
 | `templates/service/` | Language-agnostic service template and service catalog (`catalog.psv`) rendered by `scripts/new-service.sh` |
 | `templates/docs/` | Templates of the ten documents every service carries (`CLAUDE.md` 6.5.5) |
 | `templates/headers/` | Mandatory file header per file type; render with `scripts/file-header.sh` |
-| `scripts/` | Repository scripts (`new-service.sh`, `file-header.sh`, `doc-check.sh`, later `e2e.sh`) |
+| `scripts/` | Repository scripts (`new-service.sh`, `file-header.sh`, `doc-check.sh`, `e2e.sh`) |
 | `scripts/lib/` | Shared shell functions and data of the scripts (header styles, definition patterns) |
 | `scripts/ci/` | CI helpers (`changed-components.sh`: matrix of changed components) |
 | `.github/workflows/` | GitHub Actions CI (`ci.yml`) |
