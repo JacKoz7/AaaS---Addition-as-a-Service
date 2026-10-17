@@ -23,7 +23,7 @@
 # Lines starting with `#` and blank lines are ignored.
 aaas.key.pressed.v1|3|expression-assembler|(audit)|Every key press of a calculator session.
 aaas.expression.submitted.v1|3|expression-assembler|parser, stopwatch|An expression completed by "=" and accepted as a new task.
-aaas.addition.requested.v1|3|parser|saga-orchestrator|A parsed addition of a and b; from P2.17 validated, with b the smaller operand.
+aaas.addition.requested.v1|3|parser|saga-orchestrator (from P3.3), ledger (until P3.4)|A parsed addition of a and b; from P2.17 validated, with b the smaller operand.
 aaas.successor.called.v1|3|successor|(audit)|One computation of n + 1 by the successor service.
 aaas.carry.propagated.v1|3|carry|(audit)|One carry propagated to a higher digit position.
 aaas.result.voted.v1|3|outbox-relay|ledger|The sum computed by Peano and confirmed by the consensus vote.
