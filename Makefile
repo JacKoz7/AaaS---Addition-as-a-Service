@@ -194,8 +194,13 @@ lint: lint-repo lint-scaffold contracts-check ## Run every linter (repository-le
 	@$(MAKE) temporary
 
 .PHONY: contracts-check
-contracts-check: docs-image ## Validate the event schemas and their examples in contracts/events (ADR-0013)
+contracts-check: docs-image ## Validate the event schemas and examples, and that generated API.md sections are current
 	$(DOCS_RUN) --entrypoint python3 $(DOCS_IMAGE) scripts/validate-events.py
+	$(DOCS_RUN) --entrypoint python3 $(DOCS_IMAGE) scripts/service-api.py --check
+
+.PHONY: api-md
+api-md: docs-image ## Regenerate the events section of every service API.md from contracts/events
+	$(DOCS_RUN) --entrypoint python3 $(DOCS_IMAGE) scripts/service-api.py
 
 .PHONY: lint-scaffold
 lint-scaffold: ## Fail if any TODO(scaffold) marker from new-service.sh remains

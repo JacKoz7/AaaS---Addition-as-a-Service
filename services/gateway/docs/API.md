@@ -1,8 +1,9 @@
-<!-- GENERATED FILE: produced from the contracts in contracts/ by the
-     steps that introduce each contract type (events P1.3, proto P2.1,
-     OpenAPI P2.2; ADR-0010). Until then it is kept in sync by hand with the
-     contracts; do not add content that is not in a contract. The native API
-     documentation is published in the portal by `make docs`. -->
+<!-- GENERATED FILE: the events section is generated from contracts/events
+     by `make api-md` (scripts/service-api.py) and checked by
+     `make contracts-check`; the HTTP and gRPC sections are generated once
+     their contracts exist (proto P2.1, OpenAPI P2.2) and are kept in sync by
+     hand with CLAUDE.md 4.1 until then. Do not add content that is not in a
+     contract. The native API documentation is published by `make docs`. -->
 # API Reference — `gateway`
 
 | Field | Value |
@@ -70,4 +71,7 @@ None. The gateway has no gRPC interface.
 
 ## 4. Events
 
-None. The gateway neither produces nor consumes events.
+<!-- BEGIN GENERATED: events (scripts/service-api.py, do not edit) -->
+`gateway` neither produces nor consumes events.
+
+<!-- END GENERATED: events -->
