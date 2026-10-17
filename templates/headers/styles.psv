@@ -56,11 +56,11 @@ perl|.pl,.pm,.t||# ||80|
 typescript|.ts,.tsx,.mts||// ||80|
 javascript|.js,.jsx,.mjs,.cjs||// ||80|
 elm|.elm||-- ||80|
-html|.html,.htm,.vue,.svelte,.marko,.xml,.svg|<!--|  |-->|80|
+html|.html,.htm,.vue,.svelte,.marko,.xml,.svg,.csproj,.props,.targets,.slnx|<!--|  |-->|80|
 css|.css,.scss|/*| * | */|80|
 typst|.typ||// ||80|
 proto|.proto||// ||80|
-sql|.sql||-- ||80|
+sql|.sql,.surql||-- ||80|
 shell|.sh,.bash||# ||80|#!/usr/bin/env bash
 make|Makefile,.mk||# ||80|
 dockerfile|Dockerfile,.dockerfile,.dockerignore||# ||80|

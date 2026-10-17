@@ -24,3 +24,4 @@
 # Patterns may not contain `|`; use bracket expressions instead.
 shell|^[A-Za-z_][A-Za-z0-9_]*[(][)][[:space:]]*[{]|^[[:space:]]*#||
 make|^[A-Za-z0-9_%][A-Za-z0-9_%./-]*:([^=].*)?$|^#|^[.]PHONY:|##[[:space:]]
+sql|^DEFINE [A-Z]+ |^--||COMMENT "
