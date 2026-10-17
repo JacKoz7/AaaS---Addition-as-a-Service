@@ -10,7 +10,9 @@
 #                  AaaS conventions, requires every valid example to pass and
 #                  every invalid example to fail at the expected location,
 #                  and verifies the arithmetic and the hash chain of the
-#                  examples. Runs in `make contracts-check` and in CI.
+#                  examples. Runs in `make contracts-check` and in CI. With
+#                  --events, validates events produced by a service's tests
+#                  instead.
 # Related Docs:    ADR-0013, CLAUDE.md (4.2, 6.4), contracts/events/README.md,
 #                  contracts/events/topics.psv
 """Event contract validator (command-line tool).
@@ -46,6 +48,11 @@ Description:
     impossible date such as 30 February is rejected. All problems are
     reported before the tool exits.
 
+    With ``--events FILE...`` the tool instead validates events written by
+    the unit tests of a producer (for example the parser, ADR-0015): each
+    file must pass the schema of the topic named by its ``type`` and
+    ``version`` and tell the truth as in check 4.
+
 Business Justification:
     CLAUDE.md 6.4 requires contract tests that validate the example events
     in CI. A schema that silently accepts a malformed event would let an
@@ -53,7 +60,7 @@ Business Justification:
 
 Owner: Platform Enablement Guild (PEG)
 Since: validate-events 0.1.0
-Versions: 0.1.0 (P1.3) first release.
+Versions: 0.1.0 (P1.3) first release; 0.2.0 (P1.5) ``--events`` mode.
 See Also: ADR-0013, Makefile target ``contracts-check``, scripts/docs-portal.py.
 """
 
@@ -515,6 +522,141 @@ def check_examples(topic: str, validator: Draft202012Validator, examples: Path) 
     return problems, len(valid) + len(invalid)
 
 
+def load_schemas(root: Path) -> tuple[dict[str, dict[str, Any]], Registry, list[str]]:
+    """Load and check every schema of the repository.
+
+    Summary:
+        Reads the schemas of ``contracts/events/`` into one registry.
+
+    Description:
+        Checks every schema with ``check_schema`` and requires the envelope.
+        The registry resolves the envelope by its ``$id`` from the event
+        schemas. When any problem is found the registry is empty.
+
+    Business Justification:
+        Shared by the contract check (``validate``) and the validation of
+        produced events (``validate_events``).
+
+    Parameters:
+        root (Path): repository root.
+
+    Returns:
+        tuple[dict[str, dict[str, Any]], Registry, list[str]]: the schemas by
+        file name, the registry and the problems found.
+
+    Errors:
+        OSError: ``topics.psv`` cannot be read.
+
+    Side Effects:
+        Reads the contract files.
+
+    Complexity: O(n) time and memory in the total size of the schemas.
+    Thread Safety: safe (no shared state).
+    Owner: Platform Enablement Guild (PEG)
+    Since: validate-events 0.2.0
+
+    Example:
+        >>> schemas, _, problems = load_schemas(Path(__file__).resolve().parent.parent)
+        >>> problems, ENVELOPE_FILE in schemas
+        ([], True)
+
+    See Also: validate, validate_events, check_schema.
+    """
+    events_dir = root / EVENTS_DIR
+    producers = read_producers(events_dir)
+    schemas: dict[str, dict[str, Any]] = {}
+    problems: list[str] = []
+    for path in sorted(events_dir.glob(f"*{SCHEMA_SUFFIX}")):
+        try:
+            schema = load_json(path)
+        except (OSError, ValueError) as error:
+            problems.append(f"{path.name}: unreadable: {error}")
+            continue
+        schemas[path.name] = schema
+        problems += check_schema(path.name, schema, producers)
+    if ENVELOPE_FILE not in schemas:
+        problems.append(f"{ENVELOPE_FILE}: missing")
+    if problems:
+        return schemas, Registry(), problems
+    registry = Registry().with_resources(
+        (schema["$id"], Resource.from_contents(schema, default_specification=DRAFT202012))
+        for schema in schemas.values()
+    )
+    return schemas, registry, []
+
+
+def validate_events(root: Path, files: list[Path]) -> list[str]:
+    """Validate events produced by a service.
+
+    Summary:
+        Checks each event file against the schema of its topic.
+
+    Description:
+        The topic of an event is ``<type>.v<version>``; an event whose topic
+        has no schema is a problem. Every event must pass its schema (with
+        the ``date-time`` format asserted) and the truth check of valid
+        examples (``check_truth``). An empty file list is a problem too, so
+        that a test that silently produced nothing cannot pass.
+
+    Business Justification:
+        Contract test of producers (CLAUDE.md 6.4): an event a service
+        really publishes is checked by the same schema as the examples.
+
+    Parameters:
+        root (Path): repository root.
+        files (list[Path]): JSON files, one event each.
+
+    Returns:
+        list[str]: problems, empty when every event is valid.
+
+    Errors:
+        OSError: ``topics.psv`` cannot be read.
+
+    Side Effects:
+        Reads the contract files and the event files; prints one line per
+        file to stdout.
+
+    Complexity: O(n) time and memory in the total size of the files.
+    Thread Safety: safe (no shared state).
+    Owner: Platform Enablement Guild (PEG)
+    Since: validate-events 0.2.0
+
+    Example:
+        >>> import contextlib, io
+        >>> root = Path(__file__).resolve().parent.parent
+        >>> example = root / EVENTS_DIR / "examples/aaas.addition.requested.v1/valid/claude-md-example.json"
+        >>> with contextlib.redirect_stdout(io.StringIO()):
+        ...     problems = validate_events(root, [example])
+        >>> problems
+        []
+
+    See Also: load_schemas, check_truth, main.
+    """
+    schemas, registry, problems = load_schemas(root)
+    if problems:
+        return problems
+    if not files:
+        return ["--events: no event files given"]
+    for path in files:
+        try:
+            event = load_json(path)
+        except (OSError, ValueError) as error:
+            problems.append(f"{path}: unreadable: {error}")
+            continue
+        topic = f"{event.get('type')}.v{event.get('version')}" if isinstance(event, dict) else "?"
+        schema = schemas.get(f"{topic}{SCHEMA_SUFFIX}")
+        if schema is None:
+            problems.append(f"{path}: no schema for topic {topic}")
+            continue
+        validator = Draft202012Validator(schema, registry=registry, format_checker=FormatChecker())
+        found = [f"{path}: {error.json_path}: {error.message}" for error in validator.iter_errors(event)]
+        if not found:
+            found = [f"{path}: {problem}" for problem in check_truth(event)]
+        problems += found
+        print(f"  {'ok  ' if not found else 'FAIL'} {path.name} ({topic})")
+    return problems
+
+
 def validate(root: Path) -> list[str]:
     """Validate every event contract of the repository.
 
@@ -522,9 +664,8 @@ def validate(root: Path) -> list[str]:
         Runs all checks and returns every problem found.
 
     Description:
-        Loads all schemas into one ``referencing`` registry (so that event
-        schemas resolve the envelope by its ``$id``), then checks schemas
-        and examples. Prints one summary line per event schema.
+        Loads all schemas into one ``referencing`` registry
+        (``load_schemas``), then checks the examples. Prints one summary line per event schema.
 
     Business Justification:
         One entry point for ``make contracts-check`` and CI.
@@ -556,25 +697,9 @@ def validate(root: Path) -> list[str]:
     See Also: main, check_schema, check_examples.
     """
     events_dir = root / EVENTS_DIR
-    producers = read_producers(events_dir)
-    schemas: dict[str, dict[str, Any]] = {}
-    problems: list[str] = []
-    for path in sorted(events_dir.glob(f"*{SCHEMA_SUFFIX}")):
-        try:
-            schema = load_json(path)
-        except (OSError, ValueError) as error:
-            problems.append(f"{path.name}: unreadable: {error}")
-            continue
-        schemas[path.name] = schema
-        problems += check_schema(path.name, schema, producers)
-    if ENVELOPE_FILE not in schemas:
-        problems.append(f"{ENVELOPE_FILE}: missing")
+    schemas, registry, problems = load_schemas(root)
     if problems:
         return problems
-    registry = Registry().with_resources(
-        (schema["$id"], Resource.from_contents(schema, default_specification=DRAFT202012))
-        for schema in schemas.values()
-    )
     topics = sorted(name.removesuffix(SCHEMA_SUFFIX) for name in schemas if name != ENVELOPE_FILE)
     for topic in topics:
         schema = schemas[f"{topic}{SCHEMA_SUFFIX}"]
@@ -587,23 +712,27 @@ def validate(root: Path) -> list[str]:
     return problems
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     """Run the validator from the command line.
 
     Summary:
-        Validates the contracts of the repository containing this script.
+        Validates the contracts, or the given produced events.
 
     Description:
-        Prints every problem to stderr and returns 1 if there is any.
+        Without arguments validates the contracts of the repository
+        containing this script. With ``--events FILE...`` validates those
+        event files instead (``validate_events``). Prints every problem to
+        stderr and returns 1 if there is any.
 
     Business Justification:
         Gives CI and developers one command with a clear exit code.
 
     Parameters:
-        None.
+        argv (list[str] | None): arguments without the program name;
+            ``sys.argv[1:]`` when ``None``.
 
     Returns:
-        int: 0 when every contract is valid, 1 otherwise.
+        int: 0 when everything is valid, 1 on problems, 2 on a usage error.
 
     Errors:
         OSError: ``topics.psv`` cannot be read (propagated).
@@ -611,7 +740,7 @@ def main() -> int:
     Side Effects:
         Reads the contract files; writes to stdout and stderr.
 
-    Complexity: as validate.
+    Complexity: as validate or validate_events.
     Thread Safety: not applicable (process entry point).
     Owner: Platform Enablement Guild (PEG)
     Since: validate-events 0.1.0
@@ -619,22 +748,34 @@ def main() -> int:
     Example:
         >>> import contextlib, io
         >>> with contextlib.redirect_stdout(io.StringIO()):
-        ...     code = main()
+        ...     code = main([])
         >>> code
         0
 
-    See Also: validate.
+    See Also: validate, validate_events.
     """
-    print("==> event contracts (contracts/events)")
-    sys.stdout.flush()
-    problems = validate(Path(__file__).resolve().parent.parent)
+    args = sys.argv[1:] if argv is None else argv
+    root = Path(__file__).resolve().parent.parent
+    if args and args[0] == "--events":
+        print("==> produced events")
+        sys.stdout.flush()
+        problems = validate_events(root, [Path(arg) for arg in args[1:]])
+        what = "produced events"
+    elif args:
+        print("usage: validate-events.py [--events FILE...]", file=sys.stderr)
+        return 2
+    else:
+        print("==> event contracts (contracts/events)")
+        sys.stdout.flush()
+        problems = validate(root)
+        what = "event contracts"
     sys.stdout.flush()
     for problem in problems:
         print(f"error: {problem}", file=sys.stderr)
     if problems:
-        print(f"{len(problems)} problem(s) in the event contracts", file=sys.stderr)
+        print(f"{len(problems)} problem(s) in the {what}", file=sys.stderr)
         return 1
-    print("    all event contracts are valid")
+    print(f"    all {what} are valid")
     return 0
 
 
