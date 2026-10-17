@@ -238,8 +238,103 @@ services:
       timeout: 2s
       retries: 10
       start_period: 20s
+  # --- ledger (nim, TIO) ---------------------------------
+  # Hash-chained record of every result (CLAUDE.md 3, step 10, ADR-0017).
+  # TEMPORARY(P3.3): also counts additions by calling successor b times and
+  # answers GET /api/v1/tasks/{taskId} (the gateway's `tasks` upstream).
+  ledger:
+    build:
+      # Relative to compose/, the directory of the included file.
+      context: ../services/ledger
+      dockerfile: Dockerfile
+      target: runtime
+    image: aaas/ledger:dev
+    profiles: [services]
+    # `services` for the gateway, successor and Redpanda, `data` for its own
+    # database.
+    networks: [services, data]
+    environment:
+      AAAS_SERVICE: ledger
+      AAAS_ENV: ${AAAS_ENV:-local}
+      AAAS_BOOTSTRAP: ${AAAS_BOOTSTRAP:-env}
+      AAAS_KAFKA_BROKERS: redpanda:9092
+      AAAS_DB_URL: http://ledger-db:8080
+      AAAS_DB_USER: ledger
+      AAAS_SUCCESSOR_URL: http://successor:8080
+      LEDGER_DB_PASSWORD: ${LEDGER_DB_PASSWORD:-change-me}
+    # Compiled language (Nim, ORC memory management): default limit for
+    # compiled services (CLAUDE.md 6.2). Measured usage:
+    # services/ledger/docs/CAPACITY.md.
+    mem_limit: 64m
+    cpus: 0.5
+    # Counting tasks checkpoint and Kafka is closed within 8 s.
+    stop_grace_period: 10s
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      ledger-db-init:
+        condition: service_completed_successfully
+      successor:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+      redpanda-topics:
+        condition: service_completed_successfully
+  ledger-db:
+    # immudb: tamper-evident database that keeps every version of every row.
+    # The ledger uses its SQL engine through the REST API of the web server
+    # (port 8080 of the container, ADR-0017); the gRPC port 3322 serves only
+    # the health check (immuadmin status). Multi-arch (amd64, arm64).
+    image: codenotary/immudb:1.11.2
+    profiles: [services]
+    networks: [data]
+    environment:
+      # Superadmin password, applied when the data directory is created;
+      # only ledger-db-init uses it.
+      IMMUDB_ADMIN_PASSWORD: ${LEDGER_DB_ADMIN_PASSWORD:-change-me-admin}
+      # The image defaults to dev mode; without it every request needs a
+      # session.
+      IMMUDB_DEVMODE: "false"
+      # The PostgreSQL wire protocol is not used.
+      IMMUDB_PGSQL_SERVER: "false"
+    volumes:
+      - ledger-data:/var/lib/immudb
+    mem_limit: 256m
+    cpus: 0.5
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/immuadmin", "status"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 20s
+  ledger-db-init:
+    # One-shot provisioning: the ledger database and its read-write user,
+    # created with the superadmin credentials, which the service never sees
+    # (services/ledger/immudb/provision.sh). Idempotent; exits 0.
+    image: curlimages/curl:8.17.0
+    profiles: [services]
+    networks: [data]
+    entrypoint: ["/bin/sh", "/provision.sh"]
+    environment:
+      IMMUDB_URL: http://ledger-db:8080
+      IMMUDB_ADMIN_PASSWORD: ${LEDGER_DB_ADMIN_PASSWORD:-change-me-admin}
+      LEDGER_DB_USER: ledger
+      LEDGER_DB_PASSWORD: ${LEDGER_DB_PASSWORD:-change-me}
+    volumes:
+      - ../services/ledger/immudb/provision.sh:/provision.sh:ro
+    mem_limit: 32m
+    cpus: 0.25
+    restart: "no"
+    depends_on:
+      ledger-db:
+        condition: service_healthy
 # AAAS:VOLUMES
 volumes:
   expression-assembler-data: {}
   parser-data: {}
   successor-data: {}
+  ledger-data: {}
