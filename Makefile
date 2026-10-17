@@ -8,7 +8,7 @@
 # Purpose:         Single entry point for building, running, testing and
 #                  inspecting the AaaS system on a developer workstation.
 # Related Docs:    CLAUDE.md (sections 4.2, 6.2, 6.4, 6.5.4, 6.5.7, 6.5.8,
-#                  8.1, 9.3), ADR-0002, ADR-0009, ADR-0010, ADR-0011,
+#                  6.6, 8.1, 9.3), ADR-0002, ADR-0009, ADR-0010, ADR-0011,
 #                  ADR-0013, docs/PROGRESS.md
 #
 # Conventions:
@@ -48,6 +48,15 @@ SERVICE_DIRS := $(sort $(dir $(wildcard services/*/Makefile)))
 FRONTEND_DIRS := $(sort $(dir $(wildcard frontend/*/Makefile)))
 COMPONENT_DIRS := $(SERVICE_DIRS) $(FRONTEND_DIRS)
 COMPONENT_NAMES := $(notdir $(patsubst %/,%,$(COMPONENT_DIRS)))
+
+# Components that `make test`, `lint`, `fmt`, `doc-coverage` and `api-docs`
+# iterate over. All of them by default (CI); on a workstation a step passes
+# only the components it changed (make lint COMPONENTS=ledger), so that the
+# toolchain images of the other languages are not rebuilt (CLAUDE.md 6.6).
+COMPONENTS ?= $(COMPONENT_NAMES)
+
+# Free space below which `make disk` warns (GiB, CLAUDE.md 6.6).
+DISK_MIN_FREE_GB ?= 25
 
 # Number of lines of `docker compose logs` shown by `make logs`.
 TAIL ?= 100
@@ -173,7 +182,7 @@ build-%: ## Build one image (make build-successor)
 .PHONY: test
 test: ## Run unit tests of every component
 	@if [ -z "$(COMPONENT_NAMES)" ]; then echo "no components with a Makefile yet; nothing to test."; fi
-	@for name in $(COMPONENT_NAMES); do $(MAKE) test-$$name; done
+	@for name in $(COMPONENTS); do $(MAKE) test-$$name; done
 
 .PHONY: test-%
 test-%: ## Run unit tests of one component (make test-successor)
@@ -190,7 +199,7 @@ e2e: ## Run end-to-end tests through the gateway
 
 .PHONY: lint
 lint: lint-repo lint-scaffold contracts-check ## Run every linter (repository-level, contracts and per component)
-	@for name in $(COMPONENT_NAMES); do $(MAKE) lint-$$name; done
+	@for name in $(COMPONENTS); do $(MAKE) lint-$$name; done
 	@$(MAKE) temporary
 
 .PHONY: contracts-check
@@ -230,7 +239,7 @@ lint-%: ## Lint one component (make lint-successor)
 .PHONY: fmt
 fmt: ## Format the code of every component
 	@if [ -z "$(COMPONENT_NAMES)" ]; then echo "no components with a Makefile yet; nothing to format."; fi
-	@for name in $(COMPONENT_NAMES); do $(MAKE) fmt-$$name; done
+	@for name in $(COMPONENTS); do $(MAKE) fmt-$$name; done
 
 .PHONY: fmt-%
 fmt-%: ## Format one component (make fmt-successor)
@@ -248,7 +257,7 @@ doc-check: ## Check file headers and comments before top-level definitions in ev
 .PHONY: doc-coverage
 doc-coverage: doc-check doc-coverage-repo ## doc-check, repository Python and the native tool of every component
 	@if [ -z "$(COMPONENT_NAMES)" ]; then echo "no components with a Makefile yet; native coverage tools: nothing to run."; fi
-	@for name in $(COMPONENT_NAMES); do $(MAKE) doc-coverage-$$name; done
+	@for name in $(COMPONENTS); do $(MAKE) doc-coverage-$$name; done
 
 .PHONY: doc-coverage-repo
 doc-coverage-repo: docs-image ## interrogate (100%) and doctests of the repository Python scripts
@@ -279,7 +288,7 @@ docs-image: ## Build the documentation tool image (MkDocs Material, interrogate)
 .PHONY: api-docs
 api-docs: ## Export the native API documentation of every component to build/api-docs
 	@if [ -z "$(COMPONENT_NAMES)" ]; then echo "no components with a Makefile yet; no native API documentation to export."; fi
-	@for name in $(COMPONENT_NAMES); do $(MAKE) api-docs-$$name; done
+	@for name in $(COMPONENTS); do $(MAKE) api-docs-$$name; done
 
 .PHONY: api-docs-%
 api-docs-%: ## Export the native API documentation of one component (make api-docs-successor)
@@ -325,6 +334,26 @@ clean: ## Remove containers, volumes, orphan networks and generated docs and por
 		echo "$(COMPOSE_FILE) not present; no containers to remove."; \
 	fi
 	rm -rf docs/site build/portal $(API_DOCS_DIR)
+
+.PHONY: disk
+disk: ## Show free disk space and the Docker footprint; warn below DISK_MIN_FREE_GB
+	@free="$$(df -Pk "$(CURDIR)" | awk 'NR == 2 {printf "%d", $$4 / 1048576}')"; \
+		echo "Free on the host: $${free} GiB (threshold $(DISK_MIN_FREE_GB) GiB)"; \
+		echo; docker system df; echo; \
+		echo "AaaS images (stage images share layers, sizes overlap):"; \
+		docker images --filter 'reference=aaas/*' --format '  {{.Repository}}:{{.Tag}}\t{{.Size}}' | sort; \
+		if [ "$$free" -lt $(DISK_MIN_FREE_GB) ]; then \
+			echo; echo "warning: less than $(DISK_MIN_FREE_GB) GiB free; run make prune-stages (CLAUDE.md 6.6)." >&2; \
+		fi
+
+.PHONY: prune-stages
+prune-stages: ## Remove AaaS toolchain/lint/test/doc-coverage images, dangling images and the build cache
+	@stages="$$(docker images --format '{{.Repository}}:{{.Tag}}' | grep -E '^aaas/.+:(toolchain|lint|test|doc-coverage)$$' || true)"; \
+		if [ -n "$$stages" ]; then echo "$$stages" | xargs docker rmi >/dev/null; echo "removed:"; echo "$$stages" | sed 's/^/  /'; \
+		else echo "no AaaS stage images"; fi
+	docker image prune --force
+	docker builder prune --all --force
+	@$(MAKE) disk
 
 # ---------------------------------------------------------------------------
 # Project status

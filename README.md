@@ -45,6 +45,7 @@ service catalog, contracts and request flow are described in [`CLAUDE.md`](CLAUD
 ```sh
 make help    # lists every target
 make status  # current step, latest snapshots, container state
+make disk    # free space and Docker footprint; make prune-stages reclaims it
 make new-service NAME=successor LANG=haskell   # scaffold a service
 make up      # starts everything except the aws-local profile
 make topics-check   # Redpanda topics match contracts/events/topics.psv

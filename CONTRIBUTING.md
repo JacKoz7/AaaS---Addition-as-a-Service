@@ -86,6 +86,8 @@ tests inside Docker through its own Makefile (ADR-0002).
 | `make changelog-<svc> [VERSION=X.Y.Z]` | Changelog entries from the commits of a component (ADR-0010) |
 | `make up` / `make e2e` | Run the system / end-to-end tests |
 | `make status` | Current state of the project |
+| `make lint COMPONENTS="<svc> ..."` | Aggregate targets (`test`, `lint`, `fmt`, `doc-coverage`, `api-docs`) restricted to the components a change touched |
+| `make disk` / `make prune-stages` | Free space and Docker footprint / remove toolchain, lint, test and doc-coverage images and the build cache (disk budget: at least 25 GiB free) |
 
 ## 5. Definition of Done
 
