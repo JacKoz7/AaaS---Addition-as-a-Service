@@ -1,0 +1,112 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 AaaS Contributors
+ *
+ * Component:       frontend-shell
+ * Module:          src/style.css
+ * Owning Team:     Customer Experience Tribe (CXT)
+ * Classification:  INTERNAL
+ * Purpose:         Layout of the temporary calculator page: a display above
+ *                  a 3-column keypad, light and dark colour schemes.
+ * Related Docs:    frontend/shell/README.md, ADR-0018
+ */
+
+:root {
+  --bg: #eef0f3;
+  --body: #ffffff;
+  --display: #1f2933;
+  --display-text: #f5f7fa;
+  --key: #e4e7eb;
+  --key-text: #1f2933;
+  --accent: #2f6fdb;
+  --accent-text: #ffffff;
+  --clear: #c94b4b;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #12161b;
+    --body: #1c2229;
+    --display: #0b0e12;
+    --key: #2a323c;
+    --key-text: #e4e7eb;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  font-family: system-ui, sans-serif;
+}
+
+.calculator {
+  width: min(22rem, calc(100vw - 2rem));
+  padding: 1rem;
+  border-radius: 1rem;
+  background: var(--body);
+  box-shadow: 0 0.5rem 2rem rgb(0 0 0 / 20%);
+}
+
+.display {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-height: 5.5rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 0.5rem;
+  background: var(--display);
+  color: var(--display-text);
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+.display .detail {
+  min-height: 1.25rem;
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+.display .main {
+  font-size: 2.25rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.keypad button {
+  padding: 1rem 0;
+  border: 0;
+  border-radius: 0.5rem;
+  background: var(--key);
+  color: var(--key-text);
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.keypad button:active {
+  filter: brightness(0.9);
+}
+
+.keypad button.equals {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.keypad button.clear {
+  grid-column: span 3;
+  background: var(--clear);
+  color: var(--accent-text);
+}

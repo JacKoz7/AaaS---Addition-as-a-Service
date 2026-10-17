@@ -1,0 +1,23 @@
+{
+  "name": "aaas-frontend-shell",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AaaS temporary calculator page (plain JavaScript): keypad and display. TEMPORARY(P8.15).",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "lint": "prettier --check . && eslint .",
+    "fmt": "prettier --write .",
+    "test": "node --test \"tests/*.test.js\"",
+    "doc-coverage": "AAAS_DOCS_ONLY=1 eslint --max-warnings 0 . && jsdoc --pedantic -X -c jsdoc.json > /dev/null",
+    "api-docs": "jsdoc --pedantic -c jsdoc.json"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.13.0",
+    "eslint-plugin-jsdoc": "65.3.11",
+    "globals": "17.13.0",
+    "jsdoc": "4.0.5",
+    "prettier": "3.9.10"
+  }
+}

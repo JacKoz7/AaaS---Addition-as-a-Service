@@ -1,0 +1,32 @@
+<!--
+  SPDX-License-Identifier: MIT
+  Copyright (c) 2026 AaaS Contributors
+
+  Component:       frontend-shell
+  Module:          src/index.html
+  Owning Team:     Customer Experience Tribe (CXT)
+  Classification:  INTERNAL
+  Purpose:         The temporary calculator page: display and keypad.
+                   TEMPORARY(P8.15): replaced by the single-spa shell.
+  Related Docs:    frontend/shell/README.md, CLAUDE.md 1, ADR-0018
+-->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AaaS — Addition as a Service</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="main.js"></script>
+  </head>
+  <body>
+    <main class="calculator" aria-label="Calculator">
+      <output class="display" aria-live="polite">
+        <span id="display-detail" class="detail"></span>
+        <span id="display-main" class="main">0</span>
+      </output>
+      <div id="keypad" class="keypad"></div>
+    </main>
+  </body>
+</html>

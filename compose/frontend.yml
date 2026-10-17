@@ -11,6 +11,30 @@
 # Related Docs:    CLAUDE.md (section 2, microfrontends), ADR-0003
 
 # Profile: frontend
-# The temporary plain-JS shell arrives in P1.8; the single-spa shell and the
-# per-key microfrontends arrive in Phase 8.
-services: {}
+# Every element is an nginx container on the `public` network only, reached
+# through the gateway (CLAUDE.md 6.2). The single-spa shell and the per-key
+# microfrontends arrive in Phase 8.
+services:
+  # --- frontend-shell (plain JavaScript, CXT) -------------------------------
+  # TEMPORARY(P8.15): one page with the keypad and the display (step P1.8);
+  # replaced by the single-spa shell (P8.1) and the microfrontends.
+  frontend-shell:
+    build:
+      # Relative to compose/, the directory of the included file.
+      context: ../frontend/shell
+      dockerfile: Dockerfile
+      target: runtime
+    image: aaas/frontend-shell:dev
+    profiles: [frontend]
+    networks: [public]
+    # Static files from nginx: the default limit of a compiled service
+    # (CLAUDE.md 6.2) is ample. Measured usage: frontend/shell/docs/CAPACITY.md.
+    mem_limit: 64m
+    cpus: 0.25
+    stop_grace_period: 10s
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/health || exit 1"]
+      interval: 10s
+      timeout: 2s
+      retries: 5
+      start_period: 5s

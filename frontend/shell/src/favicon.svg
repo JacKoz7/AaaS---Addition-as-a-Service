@@ -1,0 +1,15 @@
+<!--
+  SPDX-License-Identifier: MIT
+  Copyright (c) 2026 AaaS Contributors
+
+  Component:       frontend-shell
+  Module:          src/favicon.svg
+  Owning Team:     Customer Experience Tribe (CXT)
+  Classification:  INTERNAL
+  Purpose:         Browser tab icon of the calculator: a plus sign.
+  Related Docs:    frontend/shell/README.md, ADR-0018
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="6" fill="#2f6fdb" />
+  <path d="M16 7v18M7 16h18" stroke="#ffffff" stroke-width="4" stroke-linecap="round" />
+</svg>

@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       frontend-shell
+# Module:          .dockerignore
+# Owning Team:     Customer Experience Tribe (CXT)
+# Classification:  INTERNAL
+# Purpose:         Keeps installed packages, documentation, git metadata and
+#                  host build output out of the Docker build context.
+# Related Docs:    frontend/shell/Dockerfile
+
+.git
+node_modules/
+build/
+docs/
+README.md
+**/*.log

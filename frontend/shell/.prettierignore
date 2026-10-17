@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       frontend-shell
+# Module:          .prettierignore
+# Owning Team:     Customer Experience Tribe (CXT)
+# Classification:  INTERNAL
+# Purpose:         Files Prettier does not format: installed packages,
+#                  generated output, the npm lockfile and Markdown documents
+#                  (formatted by the repository's own rules).
+# Related Docs:    frontend/shell/README.md, ADR-0018
+
+node_modules/
+build/
+package-lock.json
+*.md

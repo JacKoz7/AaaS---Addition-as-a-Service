@@ -1,0 +1,6 @@
+{
+  "source": { "include": ["src"], "includePattern": "\\.js$" },
+  "opts": { "destination": "build/api-docs", "recurse": true },
+  "plugins": [],
+  "templates": { "default": { "includeDate": false } }
+}
