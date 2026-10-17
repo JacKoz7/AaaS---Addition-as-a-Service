@@ -1,0 +1,37 @@
+{
+  "$comment": "SPDX-License-Identifier: MIT. Copyright (c) 2026 AaaS Contributors. Component: successor. Module: migrations/0001_call_log.json. Owning Team: Arithmetic Excellence Center (AEC). Classification: INTERNAL. Purpose: creates the call log database and its design document. Related Docs: services/successor/README.md, ADR-0016.",
+  "description": "Call log of the successor: database successor_calls and the design document call_log with the view by_task and the field documentation.",
+  "operations": [
+    { "createDatabase": "successor_calls" },
+    {
+      "putDocument": {
+        "database": "successor_calls",
+        "document": {
+          "_id": "_design/call_log",
+          "language": "javascript",
+          "aaas_documentation": {
+            "database": "successor_calls: one document per successor call of a task. The document _id is <taskId>:<n>, the natural key of a call: an addition computes the successor of every value from a to a + b - 1 once, so a retried call finds its own document. Documents are never updated or deleted by the service.",
+            "fields": {
+              "_id": "<taskId>:<n>, the natural key of the call.",
+              "taskId": "Task the call was made for (lowercase UUIDv7).",
+              "n": "Argument of the call, 0..199997.",
+              "result": "Successor of n, always n + 1.",
+              "eventId": "eventId of the aaas.successor.called.v1 event published for the call (UUIDv7).",
+              "event": "That event exactly as published (JSON text); a retried call publishes it again.",
+              "calledAt": "When the call was first served (UTC, ISO 8601 with milliseconds).",
+              "traceId": "Trace identifier of the first request (W3C Trace Context)."
+            },
+            "views": {
+              "by_task": "Key [taskId, n], value result: the calls of one task in order of their argument."
+            }
+          },
+          "views": {
+            "by_task": {
+              "map": "function (doc) { if (doc.taskId && typeof doc.n === 'number') { emit([doc.taskId, doc.n], doc.result); } }"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

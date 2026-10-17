@@ -1,0 +1,106 @@
+cabal-version: 3.0
+
+-- SPDX-License-Identifier: MIT
+-- Copyright (c) 2026 AaaS Contributors
+--
+-- Component:       successor
+-- Module:          successor.cabal
+-- Owning Team:     Arithmetic Excellence Center (AEC)
+-- Classification:  INTERNAL
+-- Purpose:         Cabal package of the successor service: the library with
+--                  all logic, the executable, the hspec test suite and the
+--                  doctest suite of the documentation examples.
+-- Related Docs:    services/successor/README.md, ADR-0016
+
+name:          successor
+version:       0.1.0
+synopsis:      AaaS successor: computes n + 1
+license:       MIT
+author:        AaaS Contributors
+maintainer:    AaaS Contributors
+category:      Arithmetic
+build-type:    Simple
+
+-- Warnings shared by every component; -Werror is added by the lint and
+-- build stages through cabal.project (ADR-0016).
+common warnings
+  ghc-options:
+    -Wall -Wcompat -Widentities -Wincomplete-record-updates
+    -Wincomplete-uni-patterns -Wmissing-export-lists
+    -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+    -Wmissing-signatures
+
+common language
+  default-language:   GHC2021
+  default-extensions:
+    DerivingStrategies
+    LambdaCase
+    OverloadedStrings
+
+library
+  import:          warnings, language
+  hs-source-dirs:  src
+  exposed-modules:
+    Successor.Api
+    Successor.CallLog
+    Successor.Config
+    Successor.Core
+    Successor.Event
+    Successor.Identifiers
+    Successor.Log
+    Successor.Metrics
+    Successor.Publisher
+    Successor.Service
+    Successor.Trace
+
+  build-depends:
+    , aeson               ^>=2.3
+    , base                ^>=4.20
+    , bytestring          ^>=0.12
+    , containers          ^>=0.7
+    , directory           ^>=1.3
+    , filepath            ^>=1.5
+    , http-client         ^>=0.7
+    , http-types          ^>=0.12
+    , hw-kafka-client     ^>=5.3
+    , prometheus-client   ^>=1.1
+    , random              ^>=1.2
+    , scientific          ^>=0.3
+    , text                ^>=2.1
+    , time                ^>=1.12
+    , wai                 ^>=3.2
+    , warp                ^>=3.4
+
+executable successor
+  import:         warnings, language
+  hs-source-dirs: app
+  main-is:        Main.hs
+  ghc-options:    -threaded -rtsopts "-with-rtsopts=-N2 -M40m"
+  build-depends:
+    , aeson
+    , base
+    , successor
+    , text
+    , unix       ^>=2.8
+    , warp
+
+test-suite spec
+  import:         warnings, language
+  type:           exitcode-stdio-1.0
+  hs-source-dirs: tests
+  main-is:        Spec.hs
+  ghc-options:    -threaded
+  build-depends:
+    , aeson
+    , base
+    , bytestring
+    , case-insensitive
+    , containers
+    , directory
+    , filepath
+    , hspec        ^>=2.11
+    , http-types
+    , successor
+    , text
+    , wai
+    , wai-extra    ^>=3.1

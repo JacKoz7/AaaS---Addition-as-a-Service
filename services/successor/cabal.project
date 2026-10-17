@@ -1,0 +1,23 @@
+-- SPDX-License-Identifier: MIT
+-- Copyright (c) 2026 AaaS Contributors
+--
+-- Component:       successor
+-- Module:          cabal.project
+-- Owning Team:     Arithmetic Excellence Center (AEC)
+-- Classification:  INTERNAL
+-- Purpose:         Cabal project of the successor service: the Hackage index
+--                  state that pins every dependency (together with
+--                  cabal.project.freeze) and the build-wide options.
+-- Related Docs:    services/successor/successor.cabal, ADR-0016
+
+packages: .
+
+-- Every dependency is resolved against this snapshot of Hackage; the exact
+-- versions are recorded in cabal.project.freeze.
+index-state: hackage.haskell.org 2026-10-15T00:00:00Z
+
+tests: True
+
+-- Warnings are errors in every build of the service's own package.
+package successor
+  ghc-options: -Werror

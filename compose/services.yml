@@ -173,7 +173,73 @@ services:
     # volume, owned by the image's non-root user (UID 10001).
     volumes:
       - parser-data:/data
+  # --- successor (haskell, AEC) ---------------------------------
+  # Computes n + 1 for the Peano loop (CLAUDE.md 3, step 7; ADR-0016); called
+  # by the ledger (P1.7) and later by the saga. No gateway route.
+  successor:
+    build:
+      # Relative to compose/, the directory of the included file.
+      context: ../services/successor
+      dockerfile: Dockerfile
+      target: runtime
+    image: aaas/successor:dev
+    profiles: [services]
+    # `services` for its callers and Redpanda, `data` for its own database.
+    networks: [services, data]
+    environment:
+      AAAS_SERVICE: successor
+      AAAS_ENV: ${AAAS_ENV:-local}
+      AAAS_BOOTSTRAP: ${AAAS_BOOTSTRAP:-env}
+      AAAS_KAFKA_BROKERS: redpanda:9092
+      AAAS_DB_URL: http://successor-db:5984
+      AAAS_DB_USER: successor
+      SUCCESSOR_DB_PASSWORD: ${SUCCESSOR_DB_PASSWORD:-change-me}
+    # Compiled language (GHC native code): default limit for compiled
+    # services (CLAUDE.md 6.2); the GHC heap is capped at 40 MB (-M40m in
+    # successor.cabal). Measured usage: services/successor/docs/CAPACITY.md.
+    mem_limit: 64m
+    cpus: 0.5
+    # Requests in flight get 8 s; a watchdog exits after 9 s.
+    stop_grace_period: 10s
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+    depends_on:
+      successor-db:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+      redpanda-topics:
+        condition: service_completed_successfully
+  successor-db:
+    # CouchDB 3.5.1 with the AaaS configuration copied in (single node,
+    # n = 1); see services/successor/couchdb/Dockerfile.
+    build:
+      context: ../services/successor/couchdb
+      dockerfile: Dockerfile
+    image: aaas/successor-db:dev
+    profiles: [services]
+    networks: [data]
+    environment:
+      # Admin of this dedicated instance (moves to OpenBao in P5.3).
+      COUCHDB_USER: successor
+      COUCHDB_PASSWORD: ${SUCCESSOR_DB_PASSWORD:-change-me}
+    volumes:
+      - successor-data:/opt/couchdb/data
+    # Databases: default limit (CLAUDE.md 6.2); measured in CAPACITY.md.
+    mem_limit: 256m
+    cpus: 0.5
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://127.0.0.1:5984/_up"]
+      interval: 10s
+      timeout: 2s
+      retries: 10
+      start_period: 20s
 # AAAS:VOLUMES
 volumes:
   expression-assembler-data: {}
   parser-data: {}
+  successor-data: {}

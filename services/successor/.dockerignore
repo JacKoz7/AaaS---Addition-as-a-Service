@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       successor
+# Module:          .dockerignore
+# Owning Team:     Arithmetic Excellence Center (AEC)
+# Classification:  INTERNAL
+# Purpose:         Keeps documentation, git metadata and host build output out
+#                  of the Docker build context.
+# Related Docs:    services/successor/Dockerfile
+
+.git
+docs/
+README.md
+**/node_modules
+**/target
+**/_build
+**/build
+**/dist
+**/*.log
