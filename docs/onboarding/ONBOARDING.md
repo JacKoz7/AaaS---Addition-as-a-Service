@@ -87,8 +87,11 @@ make down
 Current state (Phase 1): `make up` starts the Redpanda event bus, creates its
 topics and serves Redpanda Console on <http://127.0.0.1:8082>;
 `make topics-check` confirms the topics. The gateway answers on
-<http://127.0.0.1/>; its routes return `502 Bad Gateway` until the services
-behind them arrive in the next steps.
+<http://127.0.0.1/> and forwards `POST /api/v1/keys` to `expression-assembler`
+(key presses, `=` returns a `taskId`; example in
+[its README](../../services/expression-assembler/README.md)); the other
+routes return `502 Bad Gateway` until their services arrive in the next
+steps.
 
 From milestone **M1** (step P1.9): open <http://localhost/>, press `2`, `+`,
 `3`, `=` and wait for the display to show `5`. `make e2e` runs the same
