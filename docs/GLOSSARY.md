@@ -14,7 +14,7 @@ Extension of `CLAUDE.md` section 11. Terms are in alphabetical order.
 | ADR | Architecture Decision Record: a short document of one decision (context, decision, consequences) in `docs/adr/NNNN-title.md`. |
 | AEC, CGC, CXT, OSG, PEG, ROU, TIB, TIO | The eight teams of `CLAUDE.md` 6.5.1: Arithmetic Excellence Center, Cloud Governance Committee, Customer Experience Tribe, Observability Steering Group, Platform Enablement Guild, Revenue Operations Unit, Trust & Identity Board, Transaction Integrity Office. |
 | AppRole | OpenBao authentication method: each service logs in with its own `role_id`/`secret_id` to read its database password (P5.3). |
-| AST | Abstract syntax tree of the expression, built by `parser`. |
+| AST | Abstract syntax tree of the expression, built by `parser`: the addition of two numerals (ADR-0015); cached per expression text in the parser's `ast_cache`. |
 | Bootstrap mode | `AAAS_BOOTSTRAP=env` (configuration from environment variables) or `platform` (config-server, OpenBao, Consul, schema-registry). |
 | C4 model | Notation for architecture diagrams at four levels (system context, containers, components, code); AaaS draws them in Mermaid in `docs/architecture/c4/` (ADR-0010). |
 | Carry | Transfer of one unit to the next higher digit position when a digit wraps from 9 to 0; performed by the `carry` service. |
@@ -38,6 +38,7 @@ Extension of `CLAUDE.md` section 11. Terms are in alphabetical order.
 | git-cliff | Changelog generator that renders Conventional Commits through a template (`cliff.toml`); used by `make changelog-<component>` (ADR-0010). |
 | Hash chain | Each ledger entry stores `sha256` of `prevHash`, `taskId`, `a`, `b`, `result` and `recordedAt` joined by a vertical bar (ADR-0013); the first entry has 64 zeros as `prevHash`; any modification breaks every later hash. |
 | Idempotency key | Header `Idempotency-Key` of the `=` request; the same key always maps to the same task. |
+| Idempotency record | A consumer's own table of processed `eventId`s (`processed_events`, `CLAUDE.md` 4.2); the parser also stores the event it produced, so a retry republishes the identical event (ADR-0015). |
 | Ledger | Immutable record of results in immudb, each entry hashed together with the previous hash. |
 | Microfrontend | Independently built and served part of the UI (each key, the display, the timer, the invoice button), composed by the single-spa shell. |
 | Milestone | M1 to M7: a working capability at the end of a phase (`CLAUDE.md` 9.2). |
