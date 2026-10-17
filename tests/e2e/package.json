@@ -1,0 +1,14 @@
+{
+  "name": "aaas-e2e",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AaaS end-to-end tests: additions clicked in a browser through the gateway (CLAUDE.md 6.4).",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1"
+  }
+}

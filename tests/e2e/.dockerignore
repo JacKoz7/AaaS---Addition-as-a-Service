@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       e2e
+# Module:          tests/e2e/.dockerignore
+# Owning Team:     Customer Experience Tribe (CXT)
+# Classification:  INTERNAL
+# Purpose:         Keeps installed packages, reports and documents out of the
+#                  build context of the end-to-end image.
+# Related Docs:    tests/e2e/Dockerfile
+
+node_modules/
+README.md
