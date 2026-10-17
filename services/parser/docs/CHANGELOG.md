@@ -10,3 +10,22 @@ Entries are generated from commits with scope `parser` by git-cliff
 hand with a **Business Impact** section.
 
 ## [Unreleased]
+
+## [0.1.0] — 2026-10-17
+
+### Added
+
+- Parse submitted expressions and request additions (`509a4b7`)
+
+### Business Impact
+
+We are proud to announce that AaaS now understands what it is asked. Every
+expression submitted with `=` is read by a dedicated OCaml service, held to
+the uncompromising grammar `number + number`, and, if it passes, handed to
+the computation as `aaas.addition.requested.v1`, exactly once, however many
+times the event bus chooses to deliver it. Expressions that fall short, from
+the ambitious `2++3` to the minimalist `+`, are declined with a precise
+reason and position, recorded for posterity and counted on our metrics.
+Repeated expressions are served from an AST cache, and a typical addition
+request leaves the parser a mere 13 milliseconds (median) after `=` was
+pressed.
