@@ -1,0 +1,18 @@
+{
+  "description": "A key press never belongs to a task.",
+  "errorAt": "/taskId",
+  "event": {
+    "eventId": "018f3c2e-7b1a-7c3d-9f00-000000000040",
+    "type": "aaas.key.pressed",
+    "version": 1,
+    "occurredAt": "2026-10-16T11:59:58.100Z",
+    "producer": "expression-assembler",
+    "taskId": "018f3c2e-7b1a-7c3d-9f00-0000000000aa",
+    "traceparent": "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01",
+    "payload": {
+      "sessionId": "5b0f8a54-3c1e-4d6f-9a7b-2e8c1d4f6a90",
+      "key": "2",
+      "seq": 0
+    }
+  }
+}
