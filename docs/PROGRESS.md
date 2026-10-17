@@ -11,14 +11,14 @@ Step statuses: `TODO`, `IN_PROGRESS`, `DONE`, `BLOCKED`. At most one step may be
 
 | Field | Value |
 | --- | --- |
-| Current phase | Phase 1 — End-to-end skeleton |
-| Last completed step | P1.8 — Temporary frontend: `frontend/shell` with one plain-JS page (keypad + display), `TEMPORARY(P8.15)` |
-| Last completed at | 2026-10-17 20:10 CEST |
-| Snapshot tag | step/P1.8 |
-| Step in progress | P1.9 — `tests/e2e`, `make e2e` (M1) |
-| Next step | P1.9 — `tests/e2e` with the `2+3=5` case, `make e2e` — **M1** |
+| Current phase | Phase 2 — Digits, carries, parsing (M2) |
+| Last completed step | P1.9 — `tests/e2e` with the `2+3=5` case, `make e2e` — **M1** |
+| Last completed at | 2026-10-17 20:25 CEST |
+| Snapshot tag | step/P1.9 (phase-1-done) |
+| Step in progress | none |
+| Next step | P2.1 — `contracts/proto/` + `buf.yaml`, `buf.gen.yaml`, code generation for Go, Rust, Haskell, OCaml, Elixir, C#, Crystal, Zig, Python; CI `buf lint` and `buf breaking` |
 | Blockers | none |
-| Milestones reached | — (Phase 0 complete: [release notes](releases/phase-0.md); first milestone M1 after Phase 1) |
+| Milestones reached | M1 (Phase 1, 2026-10-17: [release notes](releases/phase-1.md)); Phase 0 complete ([release notes](releases/phase-0.md)) |
 
 ## Steps
 
@@ -49,7 +49,7 @@ Step statuses: `TODO`, `IN_PROGRESS`, `DONE`, `BLOCKED`. At most one step may be
 | P1.6 | `successor` (Haskell, CouchDB): `Next(n) = n+1` computed natively, `TEMPORARY(P2.13)` | DONE | 2026-10-17 | step/P1.6 | [log](progress/steps/P1.6.md) |
 | P1.7 | `ledger` (Nim, immudb): consumes `addition.requested`, calls successor `b` times (`TEMPORARY(P3.3)`), stores result with hash, `GET /api/v1/tasks/{id}` (`TEMPORARY(P3.3)`) | DONE | 2026-10-17 | step/P1.7 | [log](progress/steps/P1.7.md) |
 | P1.8 | Temporary frontend: `frontend/shell` with one plain-JS page (keypad + display), `TEMPORARY(P8.x)` | DONE | 2026-10-17 | step/P1.8 | [log](progress/steps/P1.8.md) |
-| P1.9 | `tests/e2e` with the `2+3=5` case, `make e2e` — **M1** | IN_PROGRESS | | | [log](progress/steps/P1.9.md) |
+| P1.9 | `tests/e2e` with the `2+3=5` case, `make e2e` — **M1** | DONE | 2026-10-17 | step/P1.9 | [log](progress/steps/P1.9.md) |
 
 ### Phase 2 — Digits, carries, parsing (M2)
 
