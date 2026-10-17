@@ -48,6 +48,7 @@ make status  # current step, latest snapshots, container state
 make new-service NAME=successor LANG=haskell   # scaffold a service
 make up      # starts everything except the aws-local profile
 make topics-check   # Redpanda topics match contracts/events/topics.psv
+make contracts-check   # event schemas and their examples (also run by make lint)
 make e2e     # proves that 2 + 3 = 5
 make down
 ```

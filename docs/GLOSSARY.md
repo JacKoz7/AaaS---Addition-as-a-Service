@@ -5,7 +5,7 @@
 | Document | Glossary of Terms |
 | Owning Team | Platform Enablement Guild (PEG) |
 | Classification | INTERNAL |
-| Last Reviewed | 2026-10-16 |
+| Last Reviewed | 2026-10-17 |
 
 Extension of `CLAUDE.md` section 11. Terms are in alphabetical order.
 
@@ -26,16 +26,17 @@ Extension of `CLAUDE.md` section 11. Terms are in alphabetical order.
 | Consensus | Three replicas (Python, Rust, COBOL) compute `a + b` natively and Raft commits the majority result, which must equal the Peano result. |
 | Continue-as-new | Temporal mechanism restarting a workflow with a fresh history; the addition workflow uses it every 1000 iterations. |
 | Contract | Machine-readable interface: JSON Schema of an event, `.proto` of a gRPC service, OpenAPI of an HTTP API, in `contracts/`. |
+| Contract test | Check that a contract and its examples agree: for events, `make contracts-check` passes every valid example and fails every invalid one at its `errorAt` location (ADR-0013). |
 | Definition of Done | Checklist every step must satisfy before it is closed (`CLAUDE.md` 9.1). |
 | Digit service | One of `digit-0` to `digit-9`: returns its value and its successor digit from its own SQLite database. |
 | DLQ | Dead Letter Queue: topic `aaas.dlq.v1` for events that failed after local retries; handled by `dead-letter`. |
 | Documentation portal | MkDocs Material site assembled from every document of the repository plus generated catalogs; `make docs` builds it into `docs/site/`, `make docs-serve` serves it (ADR-0010). |
 | DPIA | Data Protection Impact Assessment under GDPR, in `docs/governance/DPIA.md`. |
-| Event envelope | Common JSON wrapper of every event: `eventId`, `type`, `version`, `occurredAt`, `producer`, `taskId`, `traceparent`, `payload`. |
+| Event envelope | Common JSON wrapper of every event: `eventId`, `type`, `version`, `occurredAt`, `producer`, `taskId`, `traceparent`, `payload`; schema `contracts/events/envelope.v1.schema.json` (ADR-0013). |
 | Floci | Local emulator of AWS services, the default target of the infrastructure code. |
 | forwardAuth | Traefik middleware that asks an external service (`rate-limiter`) whether to let a request through. |
 | git-cliff | Changelog generator that renders Conventional Commits through a template (`cliff.toml`); used by `make changelog-<component>` (ADR-0010). |
-| Hash chain | `hash = sha256(prevHash || taskId || a || b || result || timestamp)`; any modification breaks every later hash. |
+| Hash chain | Each ledger entry stores `sha256` of `prevHash`, `taskId`, `a`, `b`, `result` and `recordedAt` joined by a vertical bar (ADR-0013); the first entry has 64 zeros as `prevHash`; any modification breaks every later hash. |
 | Idempotency key | Header `Idempotency-Key` of the `=` request; the same key always maps to the same task. |
 | Ledger | Immutable record of results in immudb, each entry hashed together with the previous hash. |
 | Microfrontend | Independently built and served part of the UI (each key, the display, the timer, the invoice button), composed by the single-spa shell. |
@@ -56,6 +57,8 @@ Extension of `CLAUDE.md` section 11. Terms are in alphabetical order.
 | STRIDE | Threat categories: Spoofing, Tampering, Repudiation, Information disclosure, Denial of service, Elevation of privilege. |
 | Successor | `S(n) = n + 1`, computed by the `successor` service through the digit services and `carry`. |
 | Task | One addition, identified by `taskId` (UUIDv7), with statuses `ACCEPTED`, `PARSED`, `COUNTING`, `VOTING`, `RECORDING`, `RECORDED` or `FAILED`. |
+| Tolerant reader | Consumer rule of ADR-0013: unknown fields of an event are ignored, so adding an optional field to a schema is a compatible change. |
 | TEMPORARY marker | Comment `TEMPORARY(P<phase>.<step>): ...` marking a shortcut removed by the named step; listed by `make lint`. |
 | Topic registry | `contracts/events/topics.psv`: every Redpanda topic with partitions, producer and consumers; creates the topics (`make topics`) and feeds the event catalog (ADR-0011). |
 | traceparent | W3C Trace Context header (and envelope field) propagating one trace across HTTP, gRPC and events. |
+| UUIDv7 | Time-ordered UUID (RFC 9562) used for `eventId` and `taskId`; identifiers sort by creation time. |

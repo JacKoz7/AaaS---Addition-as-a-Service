@@ -86,7 +86,9 @@ make down
 
 Current state (Phase 1): `make up` starts the Redpanda event bus, creates its
 topics and serves Redpanda Console on <http://127.0.0.1:8082>;
-`make topics-check` confirms the topics. The services follow in the next steps.
+`make topics-check` confirms the topics. The gateway answers on
+<http://127.0.0.1/>; its routes return `502 Bad Gateway` until the services
+behind them arrive in the next steps.
 
 From milestone **M1** (step P1.9): open <http://localhost/>, press `2`, `+`,
 `3`, `=` and wait for the display to show `5`. `make e2e` runs the same
@@ -99,6 +101,9 @@ scenario automatically.
    commit, work, close the step.
 3. A new service starts with `make new-service NAME=<name> LANG=<language>`;
    every file starts with a header from `scripts/file-header.sh render`.
+4. An event contract changes in `contracts/events/` (schema plus valid and
+   invalid examples, ADR-0013) in its own `contract(contracts)` commit;
+   `make contracts-check` validates it.
 
 ## 7. Who Owns What
 

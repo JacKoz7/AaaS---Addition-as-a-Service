@@ -5,7 +5,7 @@
 | Document | Enterprise Risk Register |
 | Owning Team | Platform Enablement Guild (PEG) |
 | Classification | INTERNAL |
-| Last Reviewed | 2026-10-16 |
+| Last Reviewed | 2026-10-17 |
 | Review Cadence | At the end of every phase, and whenever an incident or RFC adds a risk |
 
 ## Scales
@@ -34,6 +34,7 @@
 | R-008 | The joke invoice is mistaken for a real tax document | 1 | 3 | 3 Low | ROU | Amount 0.00 PLN, fictitious seller without a tax ID, explicit notice that it is not a VAT invoice (P9.2) | Open |
 | R-009 | MkDocs 2.0 removes the plugin and hook system and is announced as incompatible with Material for MkDocs; an unpinned upgrade breaks the portal | 2 | 2 | 4 Low | PEG | MkDocs 1.6.1 and Material 9.7.7 pinned in the tool image `infra/docs-portal/Dockerfile`; the portal logic lives in one hook (`scripts/docs-portal.py`) that produces plain Markdown, so a move to another generator reuses it (ADR-0010) | Open |
 | R-010 | The single Redpanda broker has no replica; removing its volume (`make clean`) or a disk fault loses every event not yet consumed | 2 | 2 | 4 Low | PEG | Events are transport, not the system of record: results live in the ledger (immudb), task state in the saga database; topics are recreated from `contracts/events/topics.psv`; consumers are idempotent by `eventId` (`CLAUDE.md` 4.2, ADR-0011) | Open |
+| R-011 | An incompatible change is made inside an existing event schema (a new required field, a narrowed type) and breaks producers or consumers that rely on the old contract | 2 | 3 | 6 Medium | PEG | Compatibility policy of ADR-0013 (only optional fields may be added within a version; everything else is a new `.v<N+1>` topic); separate `contract(contracts)` commits reviewed by the owning team; `make contracts-check` in CI; compatibility rules enforced by `schema-registry` from P3.1 | Open |
 
 ## Closed Risks
 
