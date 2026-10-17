@@ -60,7 +60,8 @@ Business Justification:
 
 Owner: Platform Enablement Guild (PEG)
 Since: validate-events 0.1.0
-Versions: 0.1.0 (P1.3) first release; 0.2.0 (P1.5) ``--events`` mode.
+Versions: 0.1.0 (P1.3) first release; 0.2.0 (P1.5) ``--events`` mode;
+    0.3.0 (P1.6) truth check of successor calls.
 See Also: ADR-0013, Makefile target ``contracts-check``, scripts/docs-portal.py.
 """
 
@@ -309,7 +310,8 @@ def check_truth(event: dict[str, Any]) -> list[str]:
 
     Description:
         A payload with ``a``, ``b`` and ``result`` must satisfy
-        ``result == a + b``. A payload with ``hash`` must carry the SHA-256
+        ``result == a + b``; a payload with ``n`` and ``result`` (a
+        successor call) must satisfy ``result == n + 1``. A payload with ``hash`` must carry the SHA-256
         of ``prevHash|taskId|a|b|result|recordedAt`` (ADR-0013), and the
         entry with ``sequence`` 1 must have the genesis ``prevHash``.
 
@@ -337,6 +339,8 @@ def check_truth(event: dict[str, Any]) -> list[str]:
     Example:
         >>> check_truth({"taskId": "t", "payload": {"a": 2, "b": 3, "result": 6}})
         ['result 6 is not 2 + 3']
+        >>> check_truth({"taskId": "t", "payload": {"n": 9, "result": 11}})
+        ['result 11 is not 9 + 1']
 
     See Also: ledger_hash.
     """
@@ -344,6 +348,8 @@ def check_truth(event: dict[str, Any]) -> list[str]:
     problems = []
     if {"a", "b", "result"} <= payload.keys() and payload["result"] != payload["a"] + payload["b"]:
         problems.append(f"result {payload['result']} is not {payload['a']} + {payload['b']}")
+    if {"n", "result"} <= payload.keys() and payload["result"] != payload["n"] + 1:
+        problems.append(f"result {payload['result']} is not {payload['n']} + 1")
     if "hash" in payload:
         if payload["hash"] != ledger_hash(event["taskId"], payload):
             problems.append("hash does not match prevHash|taskId|a|b|result|recordedAt")
