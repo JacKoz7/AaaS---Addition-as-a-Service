@@ -43,7 +43,8 @@ Business Justification:
 Owner: Platform Enablement Guild (PEG)
 Since: docs-portal 0.1.0
 Versions: 0.1.0 (P0.10) first release; 0.2.0 (P1.1) topic registry in the
-    event catalog.
+    event catalog; 0.3.0 (P1.3) schema fields and examples in the event
+    catalog.
 See Also: mkdocs.yml, ADR-0010, Makefile targets ``docs`` and ``docs-serve``.
 """
 
@@ -892,8 +893,10 @@ def table(header: list[str], rows: list[list[str]]) -> str:
         Joins a header and rows into pipe-table Markdown.
 
     Description:
-        Pipes inside cells are escaped. An empty ``rows`` still renders the
-        header so the reader sees the structure.
+        Pipes inside cells are escaped, except inside inline code spans:
+        Python-Markdown does not split cells on a pipe inside backticks and
+        would show the backslash literally. An empty ``rows`` still renders
+        the header so the reader sees the structure.
 
     Business Justification:
         Every catalog page is a table.
@@ -921,12 +924,57 @@ def table(header: list[str], rows: list[list[str]]) -> str:
         | A |
         | --- |
         | x\\|y |
+        >>> print(table(["A"], [["`x|y` z|w"]]).splitlines()[2])
+        | `x|y` z\\|w |
 
     See Also: generate_service_catalog.
     """
     lines = ["| " + " | ".join(header) + " |", "| " + " | ".join("---" for _ in header) + " |"]
-    lines += ["| " + " | ".join(cell.replace("|", "\\|") for cell in row) + " |" for row in rows]
+    lines += ["| " + " | ".join(escape_cell(cell) for cell in row) + " |" for row in rows]
     return "\n".join(lines) + "\n"
+
+
+def escape_cell(cell: str) -> str:
+    """Escape the pipes of a table cell outside inline code spans.
+
+    Summary:
+        Prefixes every ``|`` outside backtick code spans with a backslash.
+
+    Description:
+        Code spans are found with :data:`CODE_SPAN` and copied unchanged.
+
+    Business Justification:
+        Contract patterns and hash rules contain pipes and must render
+        exactly as written in the catalogs.
+
+    Parameters:
+        cell (str): Markdown text of one cell.
+
+    Returns:
+        str: the cell, safe to place between table pipes.
+
+    Errors:
+        None.
+
+    Side Effects:
+        None.
+
+    Complexity: O(n) time and memory in the cell length.
+    Thread Safety: safe (pure function).
+    Owner: Platform Enablement Guild (PEG)
+    Since: docs-portal 0.3.0
+
+    Example:
+        >>> escape_cell("a|b `c|d`")
+        'a\\\\|b `c|d`'
+
+    See Also: table, CODE_SPAN.
+    """
+    parts, last = [], 0
+    for match in CODE_SPAN.finditer(cell):
+        parts += [cell[last : match.start()].replace("|", "\\|"), match.group(0)]
+        last = match.end()
+    return "".join(parts) + cell[last:].replace("|", "\\|")
 
 
 def component_dir(root: Path, name: str) -> str | None:
@@ -1221,8 +1269,11 @@ def generate_event_catalog(root: Path) -> str:
         The topic table comes from ``contracts/events/topics.psv``: topic,
         partitions, producer, consumers, purpose, and the schema file whose
         ``title`` equals the topic, if any. The schema table lists, for each
-        ``*.json`` file, the schema ``title`` (the topic), its
-        ``description`` and ``$id``, and a link to the source file on GitHub.
+        ``*.schema.json`` file, the schema ``title``, its ``$id``, a link to
+        the source file on GitHub and the number of valid and invalid
+        examples under ``examples/<title>/``. A section per schema then shows
+        its ``description`` and a table of its fields: the envelope fields
+        for the envelope, the payload fields for an event (schema_fields).
         A file that is not valid JSON is reported with a warning, which fails
         the strict build.
 
@@ -1264,11 +1315,9 @@ def generate_event_catalog(root: Path) -> str:
         "replication factor 1, `cleanup.policy=delete` and seven days of "
         "retention (ADR-0011).\n\n"
     )
-    schemas = (
-        sorted((root / "contracts" / "events").rglob("*.json")) if (root / "contracts" / "events").is_dir() else []
-    )
-    schema_rows = []
-    schema_by_topic: dict[str, str] = {}
+    events_dir = root / "contracts" / "events"
+    schemas = sorted(events_dir.glob("*.schema.json")) if events_dir.is_dir() else []
+    loaded: list[tuple[Path, dict]] = []
     for path in schemas:
         rel = path.relative_to(root).as_posix()
         try:
@@ -1279,15 +1328,37 @@ def generate_event_catalog(root: Path) -> str:
         if not isinstance(schema, dict):
             LOG.warning("%s: a JSON Schema must be an object", rel)
             continue
+        loaded.append((path, schema))
+    # The envelope first: every event schema builds on it.
+    loaded.sort(key=lambda item: item[0].name != "envelope.v1.schema.json")
+    defs: dict = {}
+    for path, schema in loaded:
+        if path.name == "envelope.v1.schema.json":
+            defs = schema.get("$defs", {})
+    schema_rows = []
+    sections = []
+    schema_by_topic: dict[str, str] = {}
+    for path, schema in loaded:
+        rel = path.relative_to(root).as_posix()
+        title = str(schema.get("title", path.stem))
         link = f"[{path.name}]({github_url(rel, False)})"
-        schema_by_topic[str(schema.get("title", path.stem))] = link
-        schema_rows.append(
-            [
-                f"`{schema.get('title', path.stem)}`",
-                str(schema.get("description", "—")).replace("\n", " "),
-                f"`{schema.get('$id', '—')}`",
-                link,
-            ]
+        schema_by_topic[title] = link
+        examples = events_dir / "examples" / title
+        valid = len(list((examples / "valid").glob("*.json")))
+        invalid = len(list((examples / "invalid").glob("*.json")))
+        example_link = (
+            f"[{valid} valid, {invalid} invalid]({github_url((examples).relative_to(root).as_posix(), True)})"
+            if examples.is_dir()
+            else "—"
+        )
+        schema_rows.append([f"`{title}`", f"`{schema.get('$id', '—')}`", link, example_link])
+        if path.name == "envelope.v1.schema.json":
+            fields, label = schema, "Envelope fields"
+        else:
+            fields, label = schema.get("properties", {}).get("payload", {}), "Payload fields"
+        sections.append(
+            f"### `{title}`\n\n{schema.get('description', '')}\n\n**{label}**\n\n"
+            + table(["Field", "Required", "Constraint", "Description"], schema_fields(fields, defs))
         )
     topic_rows = [
         [f"`{topic}`", partitions, producer, consumers, purpose, schema_by_topic.get(topic, "—")]
@@ -1301,7 +1372,134 @@ def generate_event_catalog(root: Path) -> str:
     page += "\n## Schemas\n\n"
     if not schema_rows:
         return page + "No event schema exists in `contracts/events/` yet.\n"
-    return page + table(["Event", "Description", "Schema ID", "Source"], schema_rows)
+    page += (
+        "Every event is the envelope plus a payload (ADR-0013). Examples are validated in CI by "
+        "`make contracts-check` (`scripts/validate-events.py`).\n\n"
+    )
+    page += table(["Schema", "Schema ID", "Source", "Examples"], schema_rows)
+    return page + "\n" + "\n".join(sections)
+
+
+def schema_fields(schema: dict, defs: dict) -> list[list[str]]:
+    """Describe the properties of an object schema.
+
+    Summary:
+        Renders one table row per property of a JSON Schema object.
+
+    Description:
+        Each row holds the property name, whether it is required, a short
+        constraint and the ``description``. A ``$ref`` to a definition of
+        the envelope (``urn:aaas:events:envelope:v1#/$defs/<name>`` or
+        ``#/$defs/<name>``) is resolved in ``defs``. The constraint shows,
+        in this order, a ``const``, the type, an integer range, a pattern
+        and a format; a ``oneOf`` joins its alternatives with "or".
+
+    Business Justification:
+        The event catalog documents every field of every event from the
+        schema itself, so the documentation cannot drift from the contract.
+
+    Parameters:
+        schema (dict): object schema with ``properties`` and ``required``.
+        defs (dict): ``$defs`` of the envelope schema.
+
+    Returns:
+        list[list[str]]: rows ``[field, required, constraint, description]``.
+
+    Errors:
+        None (unknown references are shown as the reference text).
+
+    Side Effects:
+        None.
+
+    Complexity: O(n) time and memory in the number of properties.
+    Thread Safety: safe (no shared state).
+    Owner: Platform Enablement Guild (PEG)
+    Since: docs-portal 0.3.0
+
+    Example:
+        >>> defs = {"operand": {"type": "integer", "minimum": 0, "maximum": 9}}
+        >>> s = {"required": ["a"], "properties": {"a": {"$ref": "#/$defs/operand", "description": "x"}}}
+        >>> schema_fields(s, defs)
+        [['`a`', 'yes', 'integer 0–9', 'x']]
+
+    See Also: schema_constraint, generate_event_catalog, contracts/events/envelope.v1.schema.json.
+    """
+
+    required = set(schema.get("required", []))
+    return [
+        [
+            f"`{name}`",
+            "yes" if name in required else "no",
+            schema_constraint(node, defs),
+            str(node.get("description", "—")),
+        ]
+        for name, node in schema.get("properties", {}).items()
+    ]
+
+
+def schema_constraint(node: dict, defs: dict) -> str:
+    """Summarise the constraint of one property schema.
+
+    Summary:
+        Short text of the constraint of one property schema.
+
+    Description:
+        Resolves a reference to an envelope definition in ``defs`` (keywords
+        next to the ``$ref`` take precedence), then shows a ``const``, or the
+        alternatives of a ``oneOf`` joined with "or", or the type followed by
+        the integer range, the pattern and the format. Pipe characters are
+        left to :func:`table`, which escapes them.
+
+    Business Justification:
+        Keeps the cells of the event catalog short and readable.
+
+    Parameters:
+        node (dict): property schema.
+        defs (dict): ``$defs`` of the envelope schema.
+
+    Returns:
+        str: Markdown text, ``—`` when unconstrained.
+
+    Errors:
+        None (an unknown reference is shown as the reference text).
+
+    Side Effects:
+        None.
+
+    Complexity: O(depth) time and memory.
+    Thread Safety: safe (no shared state).
+    Owner: Platform Enablement Guild (PEG)
+    Since: docs-portal 0.3.0
+
+    Example:
+        >>> schema_constraint({"const": 1}, {})
+        '`1`'
+        >>> defs = {"n": {"type": "integer", "minimum": 1}}
+        >>> schema_constraint({"oneOf": [{"$ref": "#/$defs/n"}, {"type": "null"}]}, defs)
+        'integer ≥ 1 or null'
+
+    See Also: schema_fields.
+    """
+    ref = node.get("$ref", "")
+    if "#/$defs/" in ref:
+        node = {**defs.get(ref.rsplit("/", 1)[1], {"type": ref}), **{k: v for k, v in node.items() if k != "$ref"}}
+    if "const" in node:
+        return f"`{json.dumps(node['const'])}`"
+    if "oneOf" in node:
+        return " or ".join(schema_constraint(alternative, defs) for alternative in node["oneOf"])
+    parts = [str(node["type"])] if "type" in node else []
+    low, high = node.get("minimum"), node.get("maximum")
+    if low is not None and high is not None:
+        parts.append(f"{low}–{high}")
+    elif low is not None:
+        parts.append(f"≥ {low}")
+    elif high is not None:
+        parts.append(f"≤ {high}")
+    if "pattern" in node:
+        parts.append(f"`{node['pattern']}`")
+    if "format" in node:
+        parts.append(f"({node['format']})")
+    return " ".join(parts) or "—"
 
 
 def generate_api_catalog(root: Path, portal_files: set[str]) -> str:
