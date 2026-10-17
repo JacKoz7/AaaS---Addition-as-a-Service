@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:aaas:events:aaas.successor.called.v1",
+  "$comment": "Component: contracts. Owning Team: Arithmetic Excellence Center (AEC). Classification: INTERNAL. Related Docs: CLAUDE.md 3 (step 7) and 4.2, ADR-0013, ADR-0016, contracts/events/topics.psv.",
+  "title": "aaas.successor.called.v1",
+  "description": "Published by successor once per computation of n + 1 for a task, after the call is recorded in its call log. Audit trail of the Peano arithmetic: an addition a + b produces b of these events. No service consumes it yet.",
+  "allOf": [
+    {
+      "$ref": "urn:aaas:events:envelope:v1"
+    }
+  ],
+  "properties": {
+    "type": {
+      "description": "Event type of this schema.",
+      "const": "aaas.successor.called"
+    },
+    "version": {
+      "description": "Major version of this schema.",
+      "const": 1
+    },
+    "producer": {
+      "description": "The only service allowed to publish this event (contracts/events/topics.psv).",
+      "const": "successor"
+    },
+    "taskId": {
+      "description": "Addition task the call was made for; never null for this event.",
+      "$ref": "urn:aaas:events:envelope:v1#/$defs/uuidV7"
+    },
+    "payload": {
+      "description": "The argument and the result of one successor computation.",
+      "type": "object",
+      "required": [
+        "n",
+        "result"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "n": {
+          "description": "Argument of the call: a natural number from 0 to 199 997, so that the result is a possible sum.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 199997
+        },
+        "result": {
+          "description": "The successor of n, always n + 1.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 199998
+        }
+      }
+    }
+  }
+}
