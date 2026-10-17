@@ -47,7 +47,7 @@ make help    # lists every target
 make status  # current step, latest snapshots, container state
 make disk    # free space and Docker footprint; make prune-stages reclaims it
 make new-service NAME=successor LANG=haskell   # scaffold a service
-make up      # starts everything except the aws-local profile
+make up      # starts everything except the aws-local profile (BUILD=1 rebuilds every image)
 make topics-check   # Redpanda topics match contracts/events/topics.psv
 make contracts-check   # event schemas and their examples (also run by make lint)
 make e2e     # proves that 2 + 3 = 5

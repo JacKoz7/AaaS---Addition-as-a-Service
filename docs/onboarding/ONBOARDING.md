@@ -80,6 +80,7 @@ snapshot tags and the containers. The log of every completed step is in
 
 ```sh
 make up      # starts every profile except aws-local and waits for healthchecks
+             # (builds missing images only; make up BUILD=1 rebuilds all)
 make ps
 make down
 ```
@@ -96,8 +97,12 @@ watch it with `make logs SVC=parser` (`"msg":"addition requested"`, or
 `aaas.addition.requested.v1`. The `successor` answers one step of the
 addition; try it from a container on the `services` network:
 `docker compose exec parser wget -qO- --post-data '{"n":41,"taskId":"018f3c2e-7b1a-7c3d-9f00-0000000000aa"}' --header 'content-type: application/json' http://successor:8080/v1/next`
-returns `{"n":42}`. The other routes return `502 Bad Gateway` until their
-services arrive in the next steps.
+returns `{"n":42}`. The `ledger` counts every requested addition by calling
+the successor `b` times, appends the result to its hash chain and answers
+`GET http://127.0.0.1/api/v1/tasks/<taskId>` with the progress and, once
+`RECORDED`, the result (`2 + 3` takes under a second; example in
+[its README](../../services/ledger/README.md)). The frontend (`/`) returns
+`502 Bad Gateway` until step P1.8.
 
 From milestone **M1** (step P1.9): open <http://localhost/>, press `2`, `+`,
 `3`, `=` and wait for the display to show `5`. `make e2e` runs the same

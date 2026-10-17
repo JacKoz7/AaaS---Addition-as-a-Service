@@ -39,6 +39,7 @@ Extension of `CLAUDE.md` section 11. Terms are in alphabetical order.
 | Hash chain | Each ledger entry stores `sha256` of `prevHash`, `taskId`, `a`, `b`, `result` and `recordedAt` joined by a vertical bar (ADR-0013); the first entry has 64 zeros as `prevHash`; any modification breaks every later hash. |
 | Idempotency key | Header `Idempotency-Key` of the `=` request; the same key always maps to the same task. |
 | Idempotency record | A consumer's own table of processed `eventId`s (`processed_events`, `CLAUDE.md` 4.2); the parser also stores the event it produced, so a retry republishes the identical event (ADR-0015). |
+| immudb | Tamper-evident database of the `ledger`: it keeps every version of every row and never deletes; the ledger uses its SQL engine through the REST API of its web server (ADR-0017). |
 | Ledger | Immutable record of results in immudb, each entry hashed together with the previous hash. |
 | Microfrontend | Independently built and served part of the UI (each key, the display, the timer, the invoice button), composed by the single-spa shell. |
 | Milestone | M1 to M7: a working capability at the end of a phase (`CLAUDE.md` 9.2). |
@@ -60,6 +61,7 @@ Extension of `CLAUDE.md` section 11. Terms are in alphabetical order.
 | STRIDE | Threat categories: Spoofing, Tampering, Repudiation, Information disclosure, Denial of service, Elevation of privilege. |
 | Successor | `S(n) = n + 1`, computed by the `successor` service through the digit services and `carry`. |
 | Task | One addition, identified by `taskId` (UUIDv7), with statuses `ACCEPTED`, `PARSED`, `COUNTING`, `VOTING`, `RECORDING`, `RECORDED` or `FAILED`. |
+| Task checkpoint | Progress of a counting task (`done` successor calls, `current` value) stored by the `ledger` every 1 000 calls, so that a restart resumes from it instead of from `a` (ADR-0017). |
 | Tolerant reader | Consumer rule of ADR-0013: unknown fields of an event are ignored, so adding an optional field to a schema is a compatible change. |
 | TEMPORARY marker | Comment `TEMPORARY(P<phase>.<step>): ...` marking a shortcut removed by the named step; listed by `make lint`. |
 | Topic registry | `contracts/events/topics.psv`: every Redpanda topic with partitions, producer and consumers; creates the topics (`make topics`) and feeds the event catalog (ADR-0011). |
