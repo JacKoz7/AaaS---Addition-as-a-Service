@@ -9,7 +9,7 @@
 #                  inspecting the AaaS system on a developer workstation.
 # Related Docs:    CLAUDE.md (sections 4.2, 6.2, 6.4, 6.5.4, 6.5.7, 6.5.8,
 #                  8.1, 9.3), ADR-0002, ADR-0009, ADR-0010, ADR-0011,
-#                  docs/PROGRESS.md
+#                  ADR-0013, docs/PROGRESS.md
 #
 # Conventions:
 #   - `make <verb>` acts on the whole system; `make <verb>-<name>` acts on one
@@ -189,9 +189,13 @@ e2e: ## Run end-to-end tests through the gateway
 # ---------------------------------------------------------------------------
 
 .PHONY: lint
-lint: lint-repo lint-scaffold ## Run every linter (repository-level and per component)
+lint: lint-repo lint-scaffold contracts-check ## Run every linter (repository-level, contracts and per component)
 	@for name in $(COMPONENT_NAMES); do $(MAKE) lint-$$name; done
 	@$(MAKE) temporary
+
+.PHONY: contracts-check
+contracts-check: docs-image ## Validate the event schemas and their examples in contracts/events (ADR-0013)
+	$(DOCS_RUN) --entrypoint python3 $(DOCS_IMAGE) scripts/validate-events.py
 
 .PHONY: lint-scaffold
 lint-scaffold: ## Fail if any TODO(scaffold) marker from new-service.sh remains

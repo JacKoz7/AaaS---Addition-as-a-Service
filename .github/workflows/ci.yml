@@ -7,14 +7,14 @@
 # Classification:  INTERNAL
 # Purpose:         Continuous integration: repository linters (pre-commit),
 #                  commit message linting (commitlint), the documentation
-#                  check, the strict build of the documentation portal, a
-#                  smoke test of the core Compose profile (event bus and
-#                  topics), and build, lint, unit tests and documentation
+#                  check, the strict build of the documentation portal, the
+#                  contract test of the event schemas, a smoke test of the
+#                  core Compose profile (event bus and topics), and build, lint, unit tests and documentation
 #                  coverage of every changed component as a matrix with one
 #                  job per services/<name> or frontend/<name> directory.
 # Related Docs:    CLAUDE.md (sections 6.3, 6.4, 6.5.7, 7.1, 9.1), ADR-0006,
 #                  ADR-0005, ADR-0009, ADR-0010, ADR-0011,
-#                  scripts/ci/changed-components.sh
+#                  ADR-0013, scripts/ci/changed-components.sh
 #
 # Third-party actions are pinned to full commit SHAs; the tag they correspond
 # to is given in the trailing comment. Update them deliberately, never to a
@@ -92,6 +92,19 @@ jobs:
         run: make docs-portal
       - name: Docstring coverage and doctests (make doc-coverage-repo)
         run: make doc-coverage-repo
+
+  # -------------------------------------------------------------------------
+  # Contract tests: every event schema is valid and follows ADR-0013, every
+  # valid example passes and every invalid example fails where it should.
+  # -------------------------------------------------------------------------
+  contracts:
+    name: contracts (event schemas)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - name: Validate the event schemas and examples (make contracts-check)
+        run: make contracts-check
 
   # -------------------------------------------------------------------------
   # Shared infrastructure: the core profile starts, the broker is healthy and
@@ -208,7 +221,7 @@ jobs:
   # -------------------------------------------------------------------------
   ci-ok:
     name: ci-ok
-    needs: [lint, docs, compose-core, commitlint, changes, component]
+    needs: [lint, docs, contracts, compose-core, commitlint, changes, component]
     if: always()
     runs-on: ubuntu-24.04
     timeout-minutes: 5
