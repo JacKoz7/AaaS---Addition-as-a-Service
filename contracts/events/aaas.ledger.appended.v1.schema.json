@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:aaas:events:aaas.ledger.appended.v1",
+  "$comment": "Component: contracts. Owning Team: Transaction Integrity Office (TIO). Classification: INTERNAL. Related Docs: CLAUDE.md 3 and 4.2, ADR-0013, contracts/events/topics.psv. Hash rule: ADR-0013.",
+  "title": "aaas.ledger.appended.v1",
+  "description": "Published by ledger after an addition is appended to the immutable ledger. Carries the whole ledger entry, so that cloud-notary can verify the hash chain without access to the ledger database. Consumed by stopwatch (stop of the official time) and billing (invoice).",
+  "allOf": [
+    {
+      "$ref": "urn:aaas:events:envelope:v1"
+    }
+  ],
+  "properties": {
+    "type": {
+      "description": "Event type of this schema.",
+      "const": "aaas.ledger.appended"
+    },
+    "version": {
+      "description": "Major version of this schema.",
+      "const": 1
+    },
+    "producer": {
+      "description": "The only service allowed to publish this event (contracts/events/topics.psv).",
+      "const": "ledger"
+    },
+    "taskId": {
+      "description": "Addition task the event belongs to; never null for this event.",
+      "$ref": "urn:aaas:events:envelope:v1#/$defs/uuidV7"
+    },
+    "payload": {
+      "description": "The ledger entry: position in the chain, operands, result, recording time and the hash chain link.",
+      "type": "object",
+      "required": [
+        "sequence",
+        "a",
+        "b",
+        "result",
+        "recordedAt",
+        "prevHash",
+        "hash"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "sequence": {
+          "description": "Position of the entry in the hash chain: 1 for the first entry, then increasing by one without gaps.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "a": {
+          "description": "First operand of the recorded addition.",
+          "$ref": "urn:aaas:events:envelope:v1#/$defs/operand"
+        },
+        "b": {
+          "description": "Second operand of the recorded addition.",
+          "$ref": "urn:aaas:events:envelope:v1#/$defs/operand"
+        },
+        "result": {
+          "description": "Recorded result of the addition.",
+          "$ref": "urn:aaas:events:envelope:v1#/$defs/sum"
+        },
+        "recordedAt": {
+          "description": "Instant the entry was appended; part of the hashed content, so it is fixed in the millisecond UTC form.",
+          "$ref": "urn:aaas:events:envelope:v1#/$defs/timestamp"
+        },
+        "prevHash": {
+          "description": "Hash of the previous entry; 64 zeros for the first entry (sequence 1).",
+          "$ref": "urn:aaas:events:envelope:v1#/$defs/sha256"
+        },
+        "hash": {
+          "description": "SHA-256 of the UTF-8 string `prevHash|taskId|a|b|result|recordedAt`: the fields joined by `|`, numbers in decimal without leading zeros, taskId and recordedAt exactly as in the event (ADR-0013).",
+          "$ref": "urn:aaas:events:envelope:v1#/$defs/sha256"
+        }
+      }
+    }
+  }
+}

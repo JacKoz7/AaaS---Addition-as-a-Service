@@ -1,0 +1,17 @@
+{
+  "description": "traceparent is lowercase hexadecimal.",
+  "errorAt": "/traceparent",
+  "event": {
+    "eventId": "018f3c2e-7b1a-7c3d-9f00-000000000001",
+    "type": "aaas.addition.requested",
+    "version": 1,
+    "occurredAt": "2026-10-16T12:00:00.000Z",
+    "producer": "parser",
+    "taskId": "018f3c2e-7b1a-7c3d-9f00-0000000000aa",
+    "traceparent": "00-4BF92F3577B34DA6A3CE929D0E0E4736-00f067aa0ba902b7-01",
+    "payload": {
+      "a": 3,
+      "b": 2
+    }
+  }
+}

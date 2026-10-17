@@ -1,0 +1,13 @@
+{
+  "eventId": "018f3c2e-7b1a-7c3d-9f00-000000000003",
+  "type": "aaas.addition.requested",
+  "version": 1,
+  "occurredAt": "2026-10-16T12:00:07.000Z",
+  "producer": "parser",
+  "taskId": "018f3c30-1111-7222-8333-0000000000cc",
+  "traceparent": "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01",
+  "payload": {
+    "a": 0,
+    "b": 0
+  }
+}

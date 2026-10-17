@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:aaas:events:aaas.addition.requested.v1",
+  "$comment": "Component: contracts. Owning Team: Arithmetic Excellence Center (AEC). Classification: INTERNAL. Related Docs: CLAUDE.md 3 and 4.2, ADR-0013, contracts/events/topics.psv.",
+  "title": "aaas.addition.requested.v1",
+  "description": "Published by parser once the expression is parsed into an addition of two operands. Consumed by the ledger until P3.4 and by saga-orchestrator from P3.3, which starts AdditionWorkflow(taskId, a, b).",
+  "allOf": [
+    {
+      "$ref": "urn:aaas:events:envelope:v1"
+    }
+  ],
+  "properties": {
+    "type": {
+      "description": "Event type of this schema.",
+      "const": "aaas.addition.requested"
+    },
+    "version": {
+      "description": "Major version of this schema.",
+      "const": 1
+    },
+    "producer": {
+      "description": "The only service allowed to publish this event (contracts/events/topics.psv).",
+      "const": "parser"
+    },
+    "taskId": {
+      "description": "Addition task the event belongs to; never null for this event.",
+      "$ref": "urn:aaas:events:envelope:v1#/$defs/uuidV7"
+    },
+    "payload": {
+      "description": "The operands of the requested addition. Before commutator (P2.15) the order is the one typed by the user; afterwards a ≥ b, so b is the number of successor calls.",
+      "type": "object",
+      "required": [
+        "a",
+        "b"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "a": {
+          "description": "First operand, the augend.",
+          "$ref": "urn:aaas:events:envelope:v1#/$defs/operand"
+        },
+        "b": {
+          "description": "Second operand, the addend: the number of successor calls.",
+          "$ref": "urn:aaas:events:envelope:v1#/$defs/operand"
+        }
+      }
+    }
+  }
+}

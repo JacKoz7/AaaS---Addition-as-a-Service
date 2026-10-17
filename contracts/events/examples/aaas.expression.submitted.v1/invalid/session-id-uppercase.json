@@ -1,0 +1,17 @@
+{
+  "description": "Identifiers use the lowercase canonical UUID form.",
+  "errorAt": "/payload/sessionId",
+  "event": {
+    "eventId": "018f3c2e-7b1a-7c3d-9f00-000000000010",
+    "type": "aaas.expression.submitted",
+    "version": 1,
+    "occurredAt": "2026-10-16T11:59:59.950Z",
+    "producer": "expression-assembler",
+    "taskId": "018f3c2e-7b1a-7c3d-9f00-0000000000aa",
+    "traceparent": "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01",
+    "payload": {
+      "sessionId": "5B0F8A54-3C1E-4D6F-9A7B-2E8C1D4F6A90",
+      "expression": "2+3"
+    }
+  }
+}

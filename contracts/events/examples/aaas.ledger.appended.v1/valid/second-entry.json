@@ -1,0 +1,18 @@
+{
+  "eventId": "018f3c2e-7b1a-7c3d-9f00-000000000031",
+  "type": "aaas.ledger.appended",
+  "version": 1,
+  "occurredAt": "2026-10-16T12:31:40.121Z",
+  "producer": "ledger",
+  "taskId": "018f3c2f-0d42-7e10-a3b1-0000000000bb",
+  "traceparent": "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01",
+  "payload": {
+    "sequence": 2,
+    "a": 99999,
+    "b": 99999,
+    "result": 199998,
+    "recordedAt": "2026-10-16T12:31:40.120Z",
+    "prevHash": "a528ebcccf497b893dfb1a855b84fab4885b574b9459e1c8d15925e231325dd3",
+    "hash": "c02368e81c2efea8892418415022877b71b56cf10430046fc9d3595136d73639"
+  }
+}

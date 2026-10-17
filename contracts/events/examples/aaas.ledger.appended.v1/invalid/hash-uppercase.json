@@ -1,0 +1,22 @@
+{
+  "description": "Digests are lowercase hexadecimal.",
+  "errorAt": "/payload/hash",
+  "event": {
+    "eventId": "018f3c2e-7b1a-7c3d-9f00-000000000030",
+    "type": "aaas.ledger.appended",
+    "version": 1,
+    "occurredAt": "2026-10-16T12:00:02.531Z",
+    "producer": "ledger",
+    "taskId": "018f3c2e-7b1a-7c3d-9f00-0000000000aa",
+    "traceparent": "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01",
+    "payload": {
+      "sequence": 1,
+      "a": 3,
+      "b": 2,
+      "result": 5,
+      "recordedAt": "2026-10-16T12:00:02.530Z",
+      "prevHash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "hash": "A528EBCCCF497B893DFB1A855B84FAB4885B574B9459E1C8D15925E231325DD3"
+    }
+  }
+}

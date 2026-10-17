@@ -1,0 +1,22 @@
+{
+  "description": "The chain starts at sequence 1.",
+  "errorAt": "/payload/sequence",
+  "event": {
+    "eventId": "018f3c2e-7b1a-7c3d-9f00-000000000030",
+    "type": "aaas.ledger.appended",
+    "version": 1,
+    "occurredAt": "2026-10-16T12:00:02.531Z",
+    "producer": "ledger",
+    "taskId": "018f3c2e-7b1a-7c3d-9f00-0000000000aa",
+    "traceparent": "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01",
+    "payload": {
+      "sequence": 0,
+      "a": 3,
+      "b": 2,
+      "result": 5,
+      "recordedAt": "2026-10-16T12:00:02.530Z",
+      "prevHash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "hash": "a528ebcccf497b893dfb1a855b84fab4885b574b9459e1c8d15925e231325dd3"
+    }
+  }
+}

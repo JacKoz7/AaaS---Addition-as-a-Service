@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:aaas:events:aaas.result.voted.v1",
+  "$comment": "Component: contracts. Owning Team: Transaction Integrity Office (TIO). Classification: INTERNAL. Related Docs: CLAUDE.md 3 and 4.2, ADR-0013, contracts/events/topics.psv.",
+  "title": "aaas.result.voted.v1",
+  "description": "Published by outbox-relay (Debezium) from the outbox of saga-orchestrator once the Peano result is computed and, from P4.5, confirmed by the consensus majority. Consumed by ledger, which records it.",
+  "allOf": [
+    {
+      "$ref": "urn:aaas:events:envelope:v1"
+    }
+  ],
+  "properties": {
+    "type": {
+      "description": "Event type of this schema.",
+      "const": "aaas.result.voted"
+    },
+    "version": {
+      "description": "Major version of this schema.",
+      "const": 1
+    },
+    "producer": {
+      "description": "The only service allowed to publish this event (contracts/events/topics.psv).",
+      "const": "outbox-relay"
+    },
+    "taskId": {
+      "description": "Addition task the event belongs to; never null for this event.",
+      "$ref": "urn:aaas:events:envelope:v1#/$defs/uuidV7"
+    },
+    "payload": {
+      "description": "The operands and the agreed result of the addition.",
+      "type": "object",
+      "required": [
+        "a",
+        "b",
+        "result"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "a": {
+          "description": "First operand, as in aaas.addition.requested.v1.",
+          "$ref": "urn:aaas:events:envelope:v1#/$defs/operand"
+        },
+        "b": {
+          "description": "Second operand, as in aaas.addition.requested.v1.",
+          "$ref": "urn:aaas:events:envelope:v1#/$defs/operand"
+        },
+        "result": {
+          "description": "Sum computed by Peano arithmetic (b successor calls starting from a) and, from P4.5, equal to the result of the consensus majority.",
+          "$ref": "urn:aaas:events:envelope:v1#/$defs/sum"
+        }
+      }
+    }
+  }
+}
