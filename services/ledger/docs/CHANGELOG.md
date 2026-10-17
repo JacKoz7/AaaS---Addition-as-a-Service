@@ -1,0 +1,25 @@
+# Changelog — `ledger`
+
+All notable changes to this service are documented in this file. The format
+follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the
+service is versioned with [Semantic Versioning](https://semver.org/) under
+tags `ledger/vX.Y.Z` (docs/governance/RELEASE_PROCESS.md).
+
+Entries are generated from commits with scope `ledger` by git-cliff
+(`make changelog-ledger VERSION=X.Y.Z`, ADR-0010) and then completed by
+hand with a **Business Impact** section.
+
+## [Unreleased]
+
+## [0.1.0] — 2026-10-17
+
+### Added
+
+- Service scaffolded from `templates/service/` (`scripts/new-service.sh`).
+
+<!-- TODO(scaffold): list what this first version delivers. -->
+
+### Business Impact
+
+<!-- TODO(scaffold): one paragraph, in the corporate tone of the release
+     notes, describing what this version means for the addition. -->
