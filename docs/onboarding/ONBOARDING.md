@@ -93,8 +93,11 @@ topics and serves Redpanda Console on <http://127.0.0.1:8082>;
 consumes every submitted expression and publishes the requested addition;
 watch it with `make logs SVC=parser` (`"msg":"addition requested"`, or
 `"expression rejected"` for `2++3`) or in Redpanda Console on the topic
-`aaas.addition.requested.v1`. The other routes return `502 Bad Gateway`
-until their services arrive in the next steps.
+`aaas.addition.requested.v1`. The `successor` answers one step of the
+addition; try it from a container on the `services` network:
+`docker compose exec parser wget -qO- --post-data '{"n":41,"taskId":"018f3c2e-7b1a-7c3d-9f00-0000000000aa"}' --header 'content-type: application/json' http://successor:8080/v1/next`
+returns `{"n":42}`. The other routes return `502 Bad Gateway` until their
+services arrive in the next steps.
 
 From milestone **M1** (step P1.9): open <http://localhost/>, press `2`, `+`,
 `3`, `=` and wait for the display to show `5`. `make e2e` runs the same
