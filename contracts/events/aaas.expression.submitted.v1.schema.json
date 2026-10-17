@@ -40,7 +40,7 @@
           "$ref": "urn:aaas:events:envelope:v1#/$defs/uuid"
         },
         "expression": {
-          "description": "Key presses of the session in order, from the last `C` (or the session start) up to the `=`, which is not included. Only digit keys and `+` occur; the syntax (exactly one `+` between two numbers) is checked by parser and the range by validator, so a malformed expression is still a valid event.",
+          "description": "Digit and `+` keys of the session in order, typed after the last `C` or `=` (or since the session started) and before the submitting `=`, which is not included. The syntax (exactly one `+` between two numbers) is checked by parser and the range by validator, so a malformed expression is still a valid event.",
           "type": "string",
           "pattern": "^[0-9+]{1,64}$"
         }
