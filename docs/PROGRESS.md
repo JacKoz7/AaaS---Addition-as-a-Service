@@ -15,7 +15,7 @@ Step statuses: `TODO`, `IN_PROGRESS`, `DONE`, `BLOCKED`. At most one step may be
 | Last completed step | P1.5 — `parser` (OCaml, SQLite): consumes `expression.submitted`, builds AST, publishes `addition.requested` (without validator and commutator) |
 | Last completed at | 2026-10-17 13:14 CEST |
 | Snapshot tag | step/P1.5 |
-| Step in progress | none |
+| Step in progress | P1.6 — `successor` (Haskell, CouchDB): `Next(n) = n+1` computed natively, `TEMPORARY(P2.13)` |
 | Next step | P1.6 — `successor` (Haskell, CouchDB): `Next(n) = n+1` computed natively, `TEMPORARY(P2.13)` |
 | Blockers | none |
 | Milestones reached | — (Phase 0 complete: [release notes](releases/phase-0.md); first milestone M1 after Phase 1) |
@@ -46,7 +46,7 @@ Step statuses: `TODO`, `IN_PROGRESS`, `DONE`, `BLOCKED`. At most one step may be
 | P1.3 | Event envelope and JSON Schema for `expression.submitted`, `addition.requested`, `result.voted`, `ledger.appended` in `contracts/events/` + example validation in CI | DONE | 2026-10-17 | step/P1.3 | [log](progress/steps/P1.3.md) |
 | P1.4 | `expression-assembler` (C#, SurrealDB): `POST /api/v1/keys`, expression assembly, event publishing, `202 {taskId}` | DONE | 2026-10-17 | step/P1.4 | [log](progress/steps/P1.4.md) |
 | P1.5 | `parser` (OCaml, SQLite): consumes `expression.submitted`, builds AST, publishes `addition.requested` (without validator and commutator) | DONE | 2026-10-17 | step/P1.5 | [log](progress/steps/P1.5.md) |
-| P1.6 | `successor` (Haskell, CouchDB): `Next(n) = n+1` computed natively, `TEMPORARY(P2.13)` | TODO | | | |
+| P1.6 | `successor` (Haskell, CouchDB): `Next(n) = n+1` computed natively, `TEMPORARY(P2.13)` | IN_PROGRESS | | | |
 | P1.7 | `ledger` (Nim, immudb): consumes `addition.requested`, calls successor `b` times (`TEMPORARY(P3.3)`), stores result with hash, `GET /api/v1/tasks/{id}` (`TEMPORARY(P3.3)`) | TODO | | | |
 | P1.8 | Temporary frontend: `frontend/shell` with one plain-JS page (keypad + display), `TEMPORARY(P8.x)` | TODO | | | |
 | P1.9 | `tests/e2e` with the `2+3=5` case, `make e2e` — **M1** | TODO | | | |
