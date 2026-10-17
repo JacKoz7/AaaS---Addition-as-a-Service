@@ -101,12 +101,13 @@ returns `{"n":42}`. The `ledger` counts every requested addition by calling
 the successor `b` times, appends the result to its hash chain and answers
 `GET http://127.0.0.1/api/v1/tasks/<taskId>` with the progress and, once
 `RECORDED`, the result (`2 + 3` takes under a second; example in
-[its README](../../services/ledger/README.md)). The frontend (`/`) returns
-`502 Bad Gateway` until step P1.8.
+[its README](../../services/ledger/README.md)). The calculator itself is on
+<http://127.0.0.1/>: press `2`, `+`, `3`, `=` and the display shows the
+progress, then `5` (the temporary page of step P1.8, replaced by the
+microfrontends in Phase 8).
 
-From milestone **M1** (step P1.9): open <http://localhost/>, press `2`, `+`,
-`3`, `=` and wait for the display to show `5`. `make e2e` runs the same
-scenario automatically.
+From milestone **M1** (step P1.9) `make e2e` runs the same scenario
+automatically.
 
 ## 6. Make Your First Change
 

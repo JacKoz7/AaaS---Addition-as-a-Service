@@ -16,6 +16,7 @@ Extension of `CLAUDE.md` section 11. Terms are in alphabetical order.
 | AppRole | OpenBao authentication method: each service logs in with its own `role_id`/`secret_id` to read its database password (P5.3). |
 | AST | Abstract syntax tree of the expression, built by `parser`: the addition of two numerals (ADR-0015); cached per expression text in the parser's `ast_cache`. |
 | Bootstrap mode | `AAAS_BOOTSTRAP=env` (configuration from environment variables) or `platform` (config-server, OpenBao, Consul, schema-registry). |
+| Browser event bus | `window` `CustomEvent`s with the `aaas:` prefix (`aaas:key-pressed`, `aaas:task-started`, `aaas:task-finished`, `aaas:clear`), the only channel between microfrontends (`CLAUDE.md` 2); used by the temporary page of P1.8 already (ADR-0018). |
 | C4 model | Notation for architecture diagrams at four levels (system context, containers, components, code); AaaS draws them in Mermaid in `docs/architecture/c4/` (ADR-0010). |
 | Carry | Transfer of one unit to the next higher digit position when a digit wraps from 9 to 0; performed by the `carry` service. |
 | CDC | Change Data Capture: reading database changes from the transaction log; Debezium uses it to publish the outbox. |
