@@ -1,4 +1,4 @@
-# AaaS — Addition as a Service
+# AaaS - Addition as a Service
 
 > **Enterprise-grade addition of two non-negative integers.**
 > 35 microservices, 28 programming languages, one `+`.
