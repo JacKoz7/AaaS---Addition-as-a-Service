@@ -69,4 +69,4 @@ dockerfile|Dockerfile,.dockerfile,.dockerignore||# ||80|
 yaml|.yml,.yaml||# ||80|
 toml|.toml||# ||80|
 ini|.ini||; ||80|
-conf|CODEOWNERS,.doc-check-ignore,.conf,.cfg,.env,.example,.psv,.gitignore,.gitattributes,.editorconfig,.opam,.ocamlformat||# ||80|
+conf|CODEOWNERS,.doc-check-ignore,.prettierignore,.conf,.cfg,.env,.example,.psv,.gitignore,.gitattributes,.editorconfig,.opam,.ocamlformat||# ||80|
