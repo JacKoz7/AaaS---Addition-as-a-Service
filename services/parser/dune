@@ -1,0 +1,22 @@
+; SPDX-License-Identifier: MIT
+; Copyright (c) 2026 AaaS Contributors
+;
+; Component:       parser
+; Module:          dune
+; Owning Team:     Arithmetic Excellence Center (AEC)
+; Classification:  INTERNAL
+; Purpose:         Build settings shared by every directory of the service:
+;                  all compiler warnings are errors in every profile, and
+;                  odoc warnings fail the documentation build.
+; Related Docs:    services/parser/README.md, ADR-0015
+
+; Warnings: the default set of dune plus 44/45 (open shadowing) disabled, and
+; every enabled warning is an error, including 50 (misplaced documentation
+; comment), so that a doc comment always documents the definition below it.
+
+(env
+ (_
+  (flags
+   (:standard -w +a-4-40-41-42-44-45-70 -warn-error +a))
+  (odoc
+   (warnings fatal))))

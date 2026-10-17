@@ -1,0 +1,24 @@
+; SPDX-License-Identifier: MIT
+; Copyright (c) 2026 AaaS Contributors
+;
+; Component:       parser
+; Module:          src/lib/dune
+; Owning Team:     Arithmetic Excellence Center (AEC)
+; Classification:  INTERNAL
+; Purpose:         The aaas_parser library: every module of the service except
+;                  the process entry point.
+; Related Docs:    services/parser/README.md, ADR-0015
+
+(library
+ (name aaas_parser)
+ (libraries
+  unix
+  yojson
+  sqlite3
+  kafka
+  kafka_lwt
+  lwt
+  lwt.unix
+  cohttp
+  cohttp-lwt-unix
+  uri))

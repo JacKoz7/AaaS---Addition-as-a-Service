@@ -1,0 +1,15 @@
+(lang dune 3.20)
+
+; SPDX-License-Identifier: MIT
+; Copyright (c) 2026 AaaS Contributors
+;
+; Component:       parser
+; Module:          dune-project
+; Owning Team:     Arithmetic Excellence Center (AEC)
+; Classification:  INTERNAL
+; Purpose:         Dune project of the parser service: language version of
+;                  the build files and project metadata.
+; Related Docs:    services/parser/README.md, services/parser/aaas_parser.opam,
+;                  ADR-0015
+
+(name aaas_parser)

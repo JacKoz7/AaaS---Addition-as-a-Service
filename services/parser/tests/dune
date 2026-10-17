@@ -1,0 +1,13 @@
+; SPDX-License-Identifier: MIT
+; Copyright (c) 2026 AaaS Contributors
+;
+; Component:       parser
+; Module:          tests/dune
+; Owning Team:     Arithmetic Excellence Center (AEC)
+; Classification:  INTERNAL
+; Purpose:         Unit test executable of the parser, run by `dune test`.
+; Related Docs:    services/parser/README.md (Running and testing), ADR-0015
+
+(test
+ (name test_parser)
+ (libraries aaas_parser alcotest fmt lwt lwt.unix yojson))

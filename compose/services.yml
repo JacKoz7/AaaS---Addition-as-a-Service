@@ -130,6 +130,50 @@ services:
       timeout: 2s
       retries: 10
       start_period: 10s
+  # --- parser (ocaml, AEC) ---------------------------------
+  # Turns the submitted expression into an AST and requests the addition
+  # (CLAUDE.md 3, step 4; ADR-0015). Event-driven only: no route in the
+  # gateway, no published port.
+  parser:
+    build:
+      # Relative to compose/, the directory of the included file.
+      context: ../services/parser
+      dockerfile: Dockerfile
+      target: runtime
+    image: aaas/parser:dev
+    profiles: [services]
+    # `services` only: Redpanda is there, and the database (SQLite) is
+    # embedded in the process, so the service needs no `data` network.
+    networks: [services]
+    environment:
+      AAAS_SERVICE: parser
+      AAAS_ENV: ${AAAS_ENV:-local}
+      AAAS_BOOTSTRAP: ${AAAS_BOOTSTRAP:-env}
+      AAAS_KAFKA_BROKERS: redpanda:9092
+      AAAS_CONSUMER_GROUP: parser
+      AAAS_DB_PATH: /data/parser.db
+    # Compiled language (OCaml, native code): default limit for compiled
+    # services (CLAUDE.md 6.2). Measured usage: services/parser/docs/CAPACITY.md.
+    mem_limit: 64m
+    cpus: 0.5
+    # The process stops within 9 s (watchdog in src/main/main.ml).
+    stop_grace_period: 10s
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+    depends_on:
+      redpanda:
+        condition: service_healthy
+      redpanda-topics:
+        condition: service_completed_successfully
+    # SQLite is embedded in the service process; its files live in this
+    # volume, owned by the image's non-root user (UID 10001).
+    volumes:
+      - parser-data:/data
 # AAAS:VOLUMES
 volumes:
   expression-assembler-data: {}
+  parser-data: {}
