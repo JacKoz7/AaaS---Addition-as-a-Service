@@ -573,6 +573,18 @@ Szablony wszystkich dokumentów są w `templates/docs/` i `scripts/new-service.s
 - `CHANGELOG.md` każdego serwisu jest generowany z commitów przez **git-cliff** (scope commita = serwis), a potem uzupełniany ręcznie o sekcję „Business Impact”.
 - Każde zamknięcie fazy kończy się release notes w `docs/releases/phase-N.md` w tonie korporacyjnego komunikatu („We are thrilled to announce…”), ale z prawdziwą listą zmian.
 
+### 6.6 Miejsce na dysku (budżet)
+
+Komputer właściciela ma dysk 460 GB, z czego na AaaS realnie zostaje kilkadziesiąt GB. Największy koszt to **obrazy narzędzi** (etapy `toolchain`/`lint`/`test`/`doc-coverage`, 1–9 GB na język, np. Haskell ~8 GB) i cache buildów, a nie obrazy runtime (zwykle < 300 MB). Zasady:
+
+- **Budżet:** obrazy i wolumeny AaaS w stanie ustalonym (po zamknięciu kroku) ≤ 35 GB; w trakcie kroku ≤ 50 GB. Na hoście ma zostać co najmniej **25 GB wolnego** (`DISK_MIN_FREE_GB`).
+- **Przed rozpoczęciem kroku** uruchom `make disk`. Jeśli wolnego jest mniej niż 25 GB, najpierw `make prune-stages`; jeśli dalej za mało, zatrzymaj się i powiedz użytkownikowi, ile brakuje i co (poza AaaS) zajmuje miejsce. Nigdy nie usuwaj niczego spoza AaaS (obrazy, wolumeny, kontenery innych projektów) bez wyraźnej zgody.
+- **Lokalnie buduj narzędzia tylko zmienionych komponentów.** `make test`, `lint`, `fmt`, `doc-coverage`, `api-docs` przyjmują `COMPONENTS=<a> <b>` (domyślnie wszystkie). W kroku uruchamiaj je z `COMPONENTS` ograniczonym do serwisów, które krok zmienił; pełny przebieg po wszystkich komponentach robi CI. `build/api-docs` pozostałych komponentów zostaje z poprzednich kroków, więc `make docs-portal` nadal składa cały portal.
+- **Na zamknięcie kroku** (po weryfikacji, przed komunikatem końcowym) uruchom `make prune-stages`: usuwa obrazy etapów `aaas/*:{toolchain,lint,test,doc-coverage}`, wiszące obrazy i cały cache buildów Dockera. Zostają obrazy runtime `aaas/*:dev`, obrazy baz i wolumeny z danymi. Wynik `make disk` wpisz do sekcji „Verification” logu kroku.
+- **Obrazy etapów** mają być możliwie chude: jedno źródło toolchaina na język (np. obraz bazowy z kompilatorem, bez dodatkowego SDK, jeśli nie jest potrzebny), bez dokumentacji i cache menedżerów pakietów w warstwach (`--no-cache`, `rm -rf` w tym samym `RUN`), wspólny obraz bazowy dla serwisów w tym samym języku (np. jeden `postgres:17` dla wszystkich baz PostgreSQL, jeden `node` dla mikrofrontendów).
+- **Dane rosnące bez limitu** (log wywołań successora, ledger, logi Loki, metryki Prometheusa, Redpanda) muszą mieć retencję lub limit rozmiaru opisany w `CAPACITY.md` serwisu.
+- Przy wyborze obrazu bazowego albo narzędzia z kilkoma wariantami wybierz mniejszy, o ile spełnia wymagania; większy uzasadnij w komentarzu w Dockerfile.
+
 ---
 
 ## 7. Git: commity, gałęzie, PR
@@ -653,6 +665,7 @@ Każda decyzja architektoniczna, której nie ma w tym pliku (np. wrapper CGI dla
 10. Pilnuj RAM-u: po dodaniu serwisu sprawdź `docker stats` i zapisz zużycie w `docs/CAPACITY.md` serwisu.
 11. **Każdy krok musi się zmieścić w jednej sesji.** Jeśli krok okazuje się za duży, przed rozpoczęciem podziel go na podkroki (`P2.13a`, `P2.13b`…), dopisz je do `docs/PROGRESS.md` i commitnij podział.
 12. **Dokumentuj w trakcie, nie na końcu.** Kod bez docstringa, plik bez nagłówka albo serwis bez kompletu dokumentów z 6.5.5 to krok niezakończony. Dokumentacja ma być korporacyjna w tonie, ale prawdziwa w treści.
+13. **Pilnuj dysku** zgodnie z 6.6: `make disk` przed krokiem, `COMPONENTS=` ograniczone do zmienionych komponentów, `make prune-stages` na zamknięcie kroku.
 
 ### 8.1 Stan pracy, snapshoty i sesje
 
@@ -805,7 +818,8 @@ Jeśli krok trzeba cofnąć, użytkownik może wrócić do stanu po dowolnym kro
 - [ ] Testy jednostkowe serwisu przechodzą.
 - [ ] `make up` startuje wszystko, co powinno działać na tym etapie, a healthchecki są zielone.
 - [ ] `make e2e` przechodzi (jeśli krok dotyka przepływu dodawania).
-- [ ] `make lint` przechodzi.
+- [ ] `make lint` przechodzi (lokalnie z `COMPONENTS=` ograniczonym do zmienionych komponentów, w CI dla wszystkich; 6.6).
+- [ ] `make prune-stages` wykonane, `make disk` pokazuje co najmniej 25 GB wolnego, a jeśli nie (miejsce zajmuje coś spoza AaaS), użytkownik dostał tę informację (6.6).
 - [ ] README serwisu i ewentualne ADR są aktualne.
 - [ ] `make doc-coverage` pokazuje 100% dla zmienionych serwisów (nagłówki plików, docstringi, `COMMENT ON` w migracjach).
 - [ ] Komplet dokumentów z 6.5.5 dla nowego serwisu istnieje i jest wypełniony prawdziwą treścią; dla zmienionego serwisu zaktualizowane `CHANGELOG.md`, `API.md`, `DEPENDENCIES.md`, `RUNBOOK.md` (jeśli doszedł alert), `CAPACITY.md` (jeśli zmienił się RAM).
