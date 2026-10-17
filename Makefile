@@ -123,13 +123,17 @@ help: ## Show this help
 # Running the system
 # ---------------------------------------------------------------------------
 
+# `make up` builds only the images that do not exist yet: after
+# `make prune-stages` the build cache is empty, and rebuilding every image
+# would rebuild every toolchain (CLAUDE.md 6.6). A changed service is rebuilt
+# with `make build-<name>`; BUILD=1 rebuilds everything before starting.
 .PHONY: up
-up: ## Start all profiles except aws-local and wait for healthchecks
+up: ## Start all profiles except aws-local and wait for healthchecks (BUILD=1 rebuilds every image first)
 	$(call require_file,$(COMPOSE_FILE),P0.3)
 	@if [ -z "$$($(COMPOSE) config --services)" ]; then \
 		echo "no services defined for profiles '$(PROFILES)' yet; nothing to start."; \
 	else \
-		$(COMPOSE) up --detach --build --remove-orphans --wait; \
+		$(COMPOSE) up --detach $(if $(BUILD),--build,) --remove-orphans --wait; \
 	fi
 
 .PHONY: down
