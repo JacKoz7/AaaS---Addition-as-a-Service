@@ -15,7 +15,7 @@ Step statuses: `TODO`, `IN_PROGRESS`, `DONE`, `BLOCKED`. At most one step may be
 | Last completed step | P1.8 — Temporary frontend: `frontend/shell` with one plain-JS page (keypad + display), `TEMPORARY(P8.15)` |
 | Last completed at | 2026-10-17 20:10 CEST |
 | Snapshot tag | step/P1.8 |
-| Step in progress | none |
+| Step in progress | P1.9 — `tests/e2e`, `make e2e` (M1) |
 | Next step | P1.9 — `tests/e2e` with the `2+3=5` case, `make e2e` — **M1** |
 | Blockers | none |
 | Milestones reached | — (Phase 0 complete: [release notes](releases/phase-0.md); first milestone M1 after Phase 1) |
@@ -49,7 +49,7 @@ Step statuses: `TODO`, `IN_PROGRESS`, `DONE`, `BLOCKED`. At most one step may be
 | P1.6 | `successor` (Haskell, CouchDB): `Next(n) = n+1` computed natively, `TEMPORARY(P2.13)` | DONE | 2026-10-17 | step/P1.6 | [log](progress/steps/P1.6.md) |
 | P1.7 | `ledger` (Nim, immudb): consumes `addition.requested`, calls successor `b` times (`TEMPORARY(P3.3)`), stores result with hash, `GET /api/v1/tasks/{id}` (`TEMPORARY(P3.3)`) | DONE | 2026-10-17 | step/P1.7 | [log](progress/steps/P1.7.md) |
 | P1.8 | Temporary frontend: `frontend/shell` with one plain-JS page (keypad + display), `TEMPORARY(P8.x)` | DONE | 2026-10-17 | step/P1.8 | [log](progress/steps/P1.8.md) |
-| P1.9 | `tests/e2e` with the `2+3=5` case, `make e2e` — **M1** | TODO | | | |
+| P1.9 | `tests/e2e` with the `2+3=5` case, `make e2e` — **M1** | IN_PROGRESS | | | [log](progress/steps/P1.9.md) |
 
 ### Phase 2 — Digits, carries, parsing (M2)
 
