@@ -48,7 +48,8 @@ kotlin|.kt,.kts|/*| * | */|80|
 java|.java|/*| * | */|80|
 lisp|.lisp,.asd,.cl||;;;; ||80|
 ocaml|.ml,.mli|(*|   | *)|80|
-dune|dune,dune-project,.opam||; ||80|
+dune|dune||; ||80|
+dune-project|dune-project||; ||80|(lang dune 3.20)
 crystal|.cr||# ||80|
 ruby|.rb,Gemfile,Rakefile,.gemspec||# ||80|# frozen_string_literal: true
 php|.php|/**| * | */|80|<?php
@@ -66,4 +67,4 @@ make|Makefile,.mk||# ||80|
 dockerfile|Dockerfile,.dockerfile,.dockerignore||# ||80|
 yaml|.yml,.yaml||# ||80|
 toml|.toml||# ||80|
-conf|CODEOWNERS,.doc-check-ignore,.conf,.ini,.cfg,.env,.example,.psv,.gitignore,.gitattributes,.editorconfig||# ||80|
+conf|CODEOWNERS,.doc-check-ignore,.conf,.ini,.cfg,.env,.example,.psv,.gitignore,.gitattributes,.editorconfig,.opam,.ocamlformat||# ||80|
