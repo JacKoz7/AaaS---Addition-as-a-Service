@@ -1,0 +1,38 @@
+<!--
+  SPDX-License-Identifier: MIT
+  Copyright (c) 2026 AaaS Contributors
+
+  Component:       expression-assembler
+  Module:          Directory.Build.props
+  Owning Team:     Customer Experience Tribe (CXT)
+  Classification:  INTERNAL
+  Purpose:         Build settings shared by the service and its tests: target
+                   framework, nullable reference types, warnings as errors,
+                   XML documentation (CS1591 as an error) and StyleCop
+                   analyzers that require documentation of every element,
+                   private ones included (CLAUDE.md 6.5.4).
+  Related Docs:    services/expression-assembler/README.md, stylecop.json,
+                   .editorconfig, ADR-0014
+-->
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors>$(WarningsAsErrors);CS1591</WarningsAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <Deterministic>true</Deterministic>
+    <Version>0.1.0</Version>
+    <Company>AaaS Contributors</Company>
+    <Product>AaaS expression-assembler</Product>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" PrivateAssets="all" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)stylecop.json" Link="stylecop.json" />
+  </ItemGroup>
+</Project>

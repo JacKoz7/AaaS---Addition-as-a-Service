@@ -1,0 +1,32 @@
+<!--
+  SPDX-License-Identifier: MIT
+  Copyright (c) 2026 AaaS Contributors
+
+  Component:       expression-assembler
+  Module:          src/ExpressionAssembler/ExpressionAssembler.csproj
+  Owning Team:     Customer Experience Tribe (CXT)
+  Classification:  INTERNAL
+  Purpose:         Project of the expression-assembler web service: ASP.NET
+                   Core minimal API, Kafka producer (Confluent.Kafka),
+                   Prometheus metrics and OpenTelemetry tracing. Every
+                   package is pinned to an exact version.
+  Related Docs:    services/expression-assembler/README.md,
+                   services/expression-assembler/docs/DEPENDENCIES.md
+-->
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <AssemblyName>expression-assembler</AssemblyName>
+    <RootNamespace>AaaS.ExpressionAssembler</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Confluent.Kafka" Version="2.16.0" />
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.11.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.20.0" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.20.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.20.0" />
+    <PackageReference Include="prometheus-net.AspNetCore" Version="8.2.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="ExpressionAssembler.Tests" />
+  </ItemGroup>
+</Project>

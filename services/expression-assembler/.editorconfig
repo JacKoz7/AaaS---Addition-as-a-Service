@@ -1,0 +1,56 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 AaaS Contributors
+#
+# Component:       expression-assembler
+# Module:          .editorconfig
+# Owning Team:     Customer Experience Tribe (CXT)
+# Classification:  INTERNAL
+# Purpose:         C# formatting (dotnet format) and analyzer severities of
+#                  the service. Inherits the repository .editorconfig for
+#                  line endings and indentation.
+# Related Docs:    Directory.Build.props, stylecop.json, ADR-0014
+
+[*.cs]
+indent_size = 4
+csharp_style_namespace_declarations = file_scoped:error
+csharp_using_directive_placement = outside_namespace:error
+dotnet_sort_system_directives_first = true
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_prefer_braces = true:error
+
+# Documentation of every element, private ones included (CLAUDE.md 6.5.4).
+dotnet_diagnostic.SA1600.severity = error
+dotnet_diagnostic.SA1601.severity = error
+dotnet_diagnostic.SA1602.severity = error
+dotnet_diagnostic.SA1611.severity = error
+dotnet_diagnostic.SA1615.severity = error
+dotnet_diagnostic.SA1618.severity = error
+dotnet_diagnostic.CS1591.severity = error
+
+# The file header is the AaaS header of CLAUDE.md 6.5.2 (checked by
+# scripts/doc-check.sh), not StyleCop's copyright XML header.
+dotnet_diagnostic.SA1633.severity = none
+dotnet_diagnostic.SA1634.severity = none
+dotnet_diagnostic.SA1635.severity = none
+dotnet_diagnostic.SA1636.severity = none
+dotnet_diagnostic.SA1637.severity = none
+dotnet_diagnostic.SA1638.severity = none
+dotnet_diagnostic.SA1639.severity = none
+dotnet_diagnostic.SA1640.severity = none
+dotnet_diagnostic.SA1641.severity = none
+# `this.` prefixes and underscore-free private fields conflict with the .NET
+# naming conventions used in this service (private fields: _camelCase).
+dotnet_diagnostic.SA1101.severity = none
+dotnet_diagnostic.SA1309.severity = none
+# Remarks carry the mandatory documentation sections as paragraphs; StyleCop's
+# rule against <para> in summaries does not apply to remarks.
+dotnet_diagnostic.SA1629.severity = none
+# Records with positional parameters are documented with <param> tags.
+dotnet_diagnostic.SA1313.severity = none
+# Several small types per file are grouped by concern (results, records).
+dotnet_diagnostic.SA1402.severity = none
+dotnet_diagnostic.SA1649.severity = none
+
+[*.{csproj,props,targets,slnx}]
+indent_size = 2

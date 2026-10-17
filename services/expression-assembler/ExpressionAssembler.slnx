@@ -1,0 +1,16 @@
+<!--
+  SPDX-License-Identifier: MIT
+  Copyright (c) 2026 AaaS Contributors
+
+  Component:       expression-assembler
+  Module:          ExpressionAssembler.slnx
+  Owning Team:     Customer Experience Tribe (CXT)
+  Classification:  INTERNAL
+  Purpose:         Solution of the service and its tests; the unit that
+                   dotnet format, build and test operate on.
+  Related Docs:    services/expression-assembler/Dockerfile
+-->
+<Solution>
+  <Project Path="src/ExpressionAssembler/ExpressionAssembler.csproj" />
+  <Project Path="tests/ExpressionAssembler.Tests/ExpressionAssembler.Tests.csproj" />
+</Solution>

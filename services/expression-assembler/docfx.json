@@ -1,0 +1,26 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dotnet/docfx/main/schemas/docfx.schema.json",
+  "metadata": [
+    {
+      "src": [{ "src": "src/ExpressionAssembler", "files": ["ExpressionAssembler.csproj"] }],
+      "dest": "api",
+      "includePrivateMembers": true,
+      "filter": "docfx/filter.yml",
+      "properties": { "Configuration": "Release" }
+    }
+  ],
+  "build": {
+    "content": [
+      { "files": ["api/**.yml", "api/index.md"] },
+      { "files": ["index.md"], "src": "docfx" }
+    ],
+    "template": ["default", "modern"],
+    "globalMetadata": {
+      "_appTitle": "expression-assembler API",
+      "_appFooter": "AaaS Contributors — Customer Experience Tribe (CXT)",
+      "_enableSearch": false,
+      "_disableContribution": true
+    },
+    "output": "_site"
+  }
+}

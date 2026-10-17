@@ -60,5 +60,76 @@ services:
       timeout: 2s
       retries: 5
       start_period: 10s
+  # --- expression-assembler (csharp, CXT) ---------------------------------
+  # Turns key presses into an expression and starts a task (CLAUDE.md 3,
+  # step 2; ADR-0014). Behind the gateway at /api/v1/keys.
+  expression-assembler:
+    build:
+      # Relative to compose/, the directory of the included file.
+      context: ../services/expression-assembler
+      dockerfile: Dockerfile
+      target: runtime
+    image: aaas/expression-assembler:dev
+    profiles: [services]
+    # `services` for the gateway and Redpanda, `data` for its own database.
+    networks: [services, data]
+    environment:
+      AAAS_SERVICE: expression-assembler
+      AAAS_ENV: ${AAAS_ENV:-local}
+      AAAS_BOOTSTRAP: ${AAAS_BOOTSTRAP:-env}
+      AAAS_KAFKA_BROKERS: redpanda:9092
+      AAAS_DB_URL: http://expression-assembler-db:8000
+      AAAS_DB_USER: expression_assembler
+      EXPRESSION_ASSEMBLER_DB_PASSWORD: ${EXPRESSION_ASSEMBLER_DB_PASSWORD:-change-me}
+    # Deviation from the 64 MB default for compiled languages (CLAUDE.md 6.2):
+    # .NET compiles to IL and runs on a JIT runtime with a garbage collector,
+    # plus the native librdkafka client; the interpreted-language default of
+    # 128 MB applies. The GC heap is capped at 70% of the limit
+    # (DOTNET_GCHeapHardLimitPercent in the Dockerfile). Measured usage:
+    # services/expression-assembler/docs/CAPACITY.md.
+    mem_limit: 128m
+    cpus: 0.5
+    # The host stops within 8 s (HostOptions.ShutdownTimeout).
+    stop_grace_period: 10s
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/health || exit 1"]
+      interval: 10s
+      timeout: 4s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      expression-assembler-db:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+      redpanda-topics:
+        condition: service_completed_successfully
+  expression-assembler-db:
+    image: surrealdb/surrealdb:v3.3.4
+    profiles: [services]
+    networks: [data]
+    command: ["start", "--log", "info", "surrealkv:/home/nonroot/db"]
+    environment:
+      # Root-level user of this dedicated instance (moves to OpenBao in P5.3).
+      SURREAL_USER: expression_assembler
+      SURREAL_PASS: ${EXPRESSION_ASSEMBLER_DB_PASSWORD:-change-me}
+      SURREAL_NO_BANNER: "true"
+      # SurrealKV defaults to a 256 MiB memtable and a 3 GiB block cache;
+      # bounded so that the store fits the 256 MB database limit.
+      SURREAL_SURREALKV_MAX_MEMTABLE_SIZE: "16777216"
+      SURREAL_SURREALKV_BLOCK_CACHE_CAPACITY: "16777216"
+    volumes:
+      # The image runs as `nonroot` (UID 65532); mounting the volume on its
+      # home directory gives the new volume that owner.
+      - expression-assembler-data:/home/nonroot
+    mem_limit: 256m
+    cpus: 0.5
+    healthcheck:
+      test: ["CMD", "/surreal", "is-ready", "--endpoint", "http://127.0.0.1:8000"]
+      interval: 10s
+      timeout: 2s
+      retries: 10
+      start_period: 10s
 # AAAS:VOLUMES
-volumes: {}
+volumes:
+  expression-assembler-data: {}
