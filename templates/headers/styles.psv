@@ -34,7 +34,8 @@ swift|.swift||// ||80|
 gleam|.gleam||// ||80|
 d|.d||// ||80|
 racket|.rkt||;; ||80|#lang racket/base
-haskell|.hs,.cabal||-- ||80|
+haskell|.hs,cabal.project,cabal.project.freeze||-- ||80|
+cabal|.cabal||-- ||80|cabal-version: 3.0
 elixir|.ex,.exs||# ||80|
 go|.go||// ||80|
 gomod|go.mod,go.work||// ||80|
@@ -67,4 +68,5 @@ make|Makefile,.mk||# ||80|
 dockerfile|Dockerfile,.dockerfile,.dockerignore||# ||80|
 yaml|.yml,.yaml||# ||80|
 toml|.toml||# ||80|
-conf|CODEOWNERS,.doc-check-ignore,.conf,.ini,.cfg,.env,.example,.psv,.gitignore,.gitattributes,.editorconfig,.opam,.ocamlformat||# ||80|
+ini|.ini||; ||80|
+conf|CODEOWNERS,.doc-check-ignore,.conf,.cfg,.env,.example,.psv,.gitignore,.gitattributes,.editorconfig,.opam,.ocamlformat||# ||80|
